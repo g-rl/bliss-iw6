@@ -32,7 +32,6 @@ main()
 init()
 {
     thread on_player_connect();
-    thread overflow_fix_init();
     thread handle_snr();
 
     level.original_damage = level.callbackPlayerDamage;
@@ -88,7 +87,7 @@ on_event()
             if (isdefined(self.first_spawn))
                 continue;
             self.first_spawn = true;
-            
+
             // host checks
             if (self ishost())
             {
@@ -109,7 +108,8 @@ on_event()
 
             // setup button monitoring & menu variables
             if (!isdefined(self.menu_init))
-            {
+            {          
+                self overflow_fix_init(); // does not work.
                 self thread initial_variable();
                 self thread initial_monitor();
                 self thread monitor_buttons();
@@ -152,33 +152,15 @@ pers_catcher()
     
     // using setpersifuniold as well until i fix saving
     self setpersifuniold("unstuck", self.origin);
-    self setpersifuniold("smooth_can_time", 0.2);
     self setpersifuni("camo", int(camo_list));
+    self setpersifuni("smooth_can_time", "0.2");
 
-    // these are broken asf right now idk why lmfao
-    /* 
-    // self setpersifuni("unstuck", self.origin);
-    self setpersifuni("smooth_can_time", 0.2);
-    self setpersifuni("instashoots", false);
-    self setpersifuni("always_canswap", false);
-    self setpersifuni("smooth_canswaps", false);
-    self setpersifuni("stz_tilt", false);
-    self setpersifuni("freeze_bots", false);
-    self setpersifuni("instashoots", false);
-    self setpersifuni("instashoots_reg", false);
-    self setpersifuni("eq_swap", false);
-    self setpersifuni("instant_eq", false);
-    self setpersifuni("auto_prone", false);
-    self setpersifuni("game_end_prone", false);
-    self setpersifuni("stall", false);
-    self setpersifuni("pink", false);
-    self setpersifuni("auto_reload", false);
-    self setpersifuni("alt_swap", false);
-    self setpersifuni("elevators", false);
-    self setpersifuni("is_saved", false);
-    self setpersifuni("freeze_bots", false);
-    */
-    // setdvarifuni("unstuck_origin_" + getdvar("mapname"), self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
+    self setup_bind("sprint_loop", false, ::sprintloopbind);
+    self setup_bind("lunge", false, ::lungebind);
+    self setup_bind("mala", false, ::malabind);
+    self setup_bind("illusion", false, ::illusioncanswapbind);
+    self setup_bind("smooth", false, ::smoothbind);
+    self setup_bind("gunlock", false, ::gunlockbind);
 
     foreach(perk in perk_list)
     if (!is_true(self.pers["my_perks"][perk]))
@@ -259,4 +241,28 @@ pers_catcher()
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
     self freezecontrols(0);
+
+    // these are broken asf right now idk why lmfao
+    /* 
+    // self setpersifuni("unstuck", self.origin);
+    self setpersifuni("smooth_can_time", 0.2);
+    self setpersifuni("always_canswap", false);
+    self setpersifuni("smooth_canswaps", false);
+    self setpersifuni("stz_tilt", false);
+    self setpersifuni("freeze_bots", false);
+    self setpersifuni("instashoots", false);
+    self setpersifuni("eq_swap", false);
+    self setpersifuni("instant_eq", false);
+    self setpersifuni("auto_prone", false);
+    self setpersifuni("game_end_prone", false);
+    self setpersifuni("stall", false);
+    self setpersifuni("pink", false);
+    self setpersifuni("auto_reload", false);
+    self setpersifuni("alt_swap", false);
+    self setpersifuni("elevators", false);
+    self setpersifuni("is_saved", false);
+    self setpersifuni("freeze_bots", false);
+    */
+    // setdvarifuni("unstuck_origin_" + getdvar("mapname"), self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
+
 }

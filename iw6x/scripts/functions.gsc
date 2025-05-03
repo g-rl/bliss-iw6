@@ -5,6 +5,244 @@
 #include scripts\utils;
 #include scripts\menu;
 
+toggle_sprint_loop(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    // self iprintln(new);
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+    
+	if (self.pers[index])
+    {
+		self iprintln("sprint loop ^2on");
+		self thread sprintloopbind(bind, pers);
+        // self.pers["test_bind_" + new] = false;
+	}
+	else
+	{
+		self iprintln("sprint loop ^1off");
+		self notify("stop" + pers);
+	}
+}
+
+sprintloopbind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+   
+    for(;;) 
+    {
+        self waittill(bind);
+        if (!self in_menu())
+        {
+            instashoot();
+            setweaponanim(32);
+        }
+        wait 0.1;
+    }
+}
+
+toggle_mala(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+    
+	if (self.pers[index])
+    {
+		self iprintln("mala bind ^2on");
+		self thread malabind(bind, pers);
+	}
+	else
+	{
+		self iprintln("mala bind ^1off");
+		self notify("stop" + pers);
+	}
+}
+
+malabind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+   
+    for(;;) 
+    {
+        self waittill(bind);
+        if (!self in_menu())
+        {
+            setweaponflag(2);
+        }
+        wait 0.1;
+    }
+}
+
+toggle_illusion(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+    
+	if (self.pers[index])
+    {
+		self iprintln("illusion canswap bind ^2on");
+		self thread illusioncanswapbind(bind, pers);
+	}
+	else
+	{
+		self iprintln("illusion canswap bind ^1off");
+		self notify("stop" + pers);
+	}
+}
+
+toggle_smooth(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+    
+	if (self.pers[index])
+    {
+		self iprintln("smooth bind ^2on");
+		self thread smoothbind(bind, pers);
+	}
+	else
+	{
+		self iprintln("smooth bind ^1off");
+		self notify("stop" + pers);
+	}
+}
+
+gunlockbind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+   
+    for(;;) 
+    {
+        self waittill(bind);
+        if (!self in_menu())
+        {
+            self SwitchToWeaponImmediate("alt_" + self GetCurrentWeapon());
+            waitframe();
+            self canswap();
+        }
+        wait 0.1;
+    }
+}
+
+toggle_gunlock(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+    
+	if (self.pers[index])
+    {
+		self iprintln("gunlock ^2on");
+		self thread gunlockbind(bind, pers);
+	}
+	else
+	{
+		self iprintln("gunlock ^1off");
+		self notify("stop" + pers);
+	}
+}
+
+smoothbind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+   
+    for(;;) 
+    {
+        self waittill(bind);
+        if (!self in_menu())
+        {
+            smoothaction();
+        }
+        wait 0.1;
+    }
+}
+
+illusioncanswapbind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+   
+    for(;;) 
+    {
+        self waittill(bind);
+        if (!self in_menu())
+        {
+            self canswap();
+            waitframe();
+            self illusion();
+        }
+        wait 0.1;
+    }
+}
+
+toggle_lunge_bind(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    // self iprintln(new);
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+    
+	if (self.pers[index])
+    {
+		self iprintln("lunge bind ^2on");
+		self thread lungebind(bind, pers);
+        // self.pers["test_bind_" + new] = false;
+	}
+	else
+	{
+		self iprintln("lunge bind ^1off");
+		self notify("stop" + pers);
+	}
+}
+
+lungebind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+   
+    for(;;) 
+    {
+        self waittill(bind);
+        if (!self in_menu())
+        {
+            instashoot();
+            setweaponanim(11);
+        }
+        wait 0.1;
+    }
+}
+
 pickup_bomb()
 {
     self thread maps\mp\gametypes\sr::onPickup(self);
@@ -65,10 +303,10 @@ change_camo(value)
 
 drop_canswap()
 {
-    weapons = randomize("iw6_pdw_mp,iw6_pdwauto_mp,iw6_mk14_mp_mk14scope,iw6_svu_mp_svuscope,iw6_sc2010_mp,iw6_bren_mp,iw6_usr_mp_usrscope,iw6_l115a3_mp_l115a3scope,iw6_microtar_mp,iw6_vks_mp_vksscope,iw6_dlcweap03_mp_dlcweap03scope,iw6_k7_mp,iw6_maul_mp,iw6_lsat_mp,iw6_ak12_mp,iw6_arx160_mp,iw6_dlcweap01_mp,iw6_pp19_mp,iw6_vepr_mp,iw6_microtar_mp,iw6_dlcweap03_mp,iw6_mts255_mp,iw6_sc2010_mp,iw6_gm6helisnipe_mp,iw6_l115a3_mp,iw6_m27_mp,iw6_kriss_mp,iw6_magnum_mp,iw6_mp443_mp,iw6_cbjms_mp,iw6_magnumjugg_mp");
+    weapons = randomize("iw6_mk14_mp_mk14scope,iw6_svu_mp_svuscope,iw6_sc2010_mp,iw6_bren_mp,iw6_usr_mp_usrscope,iw6_l115a3_mp_l115a3scope,iw6_microtar_mp,iw6_vks_mp_vksscope,iw6_dlcweap03_mp_dlcweap03scope,iw6_k7_mp,iw6_maul_mp,iw6_lsat_mp,iw6_ak12_mp,iw6_arx160_mp,iw6_dlcweap01_mp,iw6_pp19_mp,iw6_vepr_mp,iw6_microtar_mp,iw6_dlcweap03_mp,iw6_mts255_mp,iw6_sc2010_mp,iw6_gm6helisnipe_mp,iw6_l115a3_mp,iw6_m27_mp,iw6_kriss_mp,iw6_cbjms_mp");
     self giveweapon(weapons);
     self switchtoweapon(weapons);
-    self dropitem(weapons);
+    self setdropcamo(weapons, self getpers("camo"));
 }
 
 weapon_settings(setting)
@@ -605,7 +843,7 @@ smoothcanswapsloop()
         self waittill("weapon_change");
         if (self getpers("always_canswap") == true)
         {
-            wait (self getpers("smooth_can_time"));
+            wait (float(self getpers("smooth_can_time")));
             if (israising())
                 smoothaction();
         }
@@ -613,7 +851,7 @@ smoothcanswapsloop()
         {
             if (self getcurrentweapon() == self getpers("canswap_weapon"))
             {
-                wait (self getpers("smooth_can_time"));
+                wait (float(self getpers("smooth_can_time")));
                 if (israising())
                     smoothaction();
             }
@@ -974,4 +1212,9 @@ print_positions()
 {
     print(getdvar("mapname") + " ");
     print(self get_printed_position());
+}
+
+illusion()
+{
+    instashoot();
 }

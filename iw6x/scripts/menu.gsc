@@ -287,7 +287,7 @@ set_slider(scrolling, index)
         {
             slider_elem = slider_bruh[index];
             if (isdefined(slider_elem))
-                slider_elem set_safe_text(self.structure[index]["array"][self.slider[storage]]);
+                slider_elem set_text(self.structure[index]["array"][self.slider[storage]]);
         }
     }
     else
@@ -318,7 +318,7 @@ set_slider(scrolling, index)
         {
             slider_elem = slider_bruh[index];
             if (isdefined(slider_elem))
-                slider_elem set_safe_text(slider_value); // setvalue
+                slider_elem set_text(slider_value); // setvalue
         }
 
         self.menu["hud"]["slider"][2][index].x = (self.menu["hud"]["slider"][1][index].x + (abs((self.slider[storage] - self.structure[index]["minimum"])) / position) - 42);
@@ -365,10 +365,12 @@ create_text(text, font, font_scale, alignment, relative, x_offset, y_offset, col
 
     element maps\mp\gametypes\_hud_util::setpoint(alignment, relative, x_offset, y_offset);
 
+    /*
     if( int( text ) )
         element setvalue( text );
     else
-        element set_text( text );;
+    */
+    element set_safe_text( self, text );;
 
     self.element_count++;
 
@@ -659,11 +661,11 @@ flicker_shaders()
     self endon("end_flicker");
 
     first = true;
-    waittime = 2;
 
     for(;;)
     {
         color = self.current_menu_color;
+        waittime = randomintrange(1,2);
 
         if (!first)
         {
@@ -765,7 +767,7 @@ close_menu_game_over()
 create_title(title)
 {
     // tolower or no?
-    self.menu["hud"]["title"] set_safe_text(isdefined(title) ? title : self get_title());
+    self.menu["hud"]["title"] set_text(isdefined(title) ? title : self get_title());
 }
 
 create_summary(summary)
@@ -778,7 +780,7 @@ create_summary(summary)
         if (!isdefined(self.menu["hud"]["summary"]))
             self.menu["hud"]["summary"] = self create_text(tolower(isdefined(summary) ? summary : self.structure[self get_cursor()]["summary"]), self.font, self.font_scale, "TOP_LEFT", "TOPCENTER", (self.x_offset + 4), (self.y_offset + 35), self.color[4], 1, 10);
         else
-            self.menu["hud"]["summary"] set_safe_text(tolower(isdefined(summary) ? summary : self.structure[self get_cursor()]["summary"]));
+            self.menu["hud"]["summary"] set_text(tolower(isdefined(summary) ? summary : self.structure[self get_cursor()]["summary"]));
     }
 }
 

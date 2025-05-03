@@ -8,18 +8,22 @@ setup_teleports()
 {
     // map, origin, angles
 
+    // prison break
     self.bliss["teleports"]["mp_prisonbreak"][0] = ["main spot", "cool spot"];
     self.bliss["teleports"]["mp_prisonbreak"][1] = [(-1746.18, 541.934, 1291.4), (1219.91, 2726, 1716.29)];
     self.bliss["teleports"]["mp_prisonbreak"][2] = [(4.548, -76.0089, 0), (12.196, -136.675, 0)];
 
+    // freight 
     self.bliss["teleports"]["mp_frag"][0] = ["main ele spot", "ladder spot"];
     self.bliss["teleports"]["mp_frag"][1] = [(-125.857, 1424.61, 521.782), (1027.63, 1862.34, 407.484)];
     self.bliss["teleports"]["mp_frag"][2] = [(4.65798, -29.2957, 0), (3.54736, 122.79, 0)];
 
+    // stormfront
     self.bliss["teleports"]["mp_fahrenheit"][0] = ["middle of map", "ledge spot", "window", "cool spot", "cool spot 2"];
     self.bliss["teleports"]["mp_fahrenheit"][1] = [(1367.68, -1172.25, 858.979), (1068.29, -1852.73, 898.659), (246.793, -2347.9, 916.256), (-1975.21, -2755.56, 827.43), (427.899, 199.001, 986.933)];
     self.bliss["teleports"]["mp_fahrenheit"][2] = [(2.93884, -172.057, 0), (1.42822, -158.434, 0), (2.93859, -72.4658, 0), (6.25, 36.0297, 0), (3.19824, -3.83984, 0)];
 
+    // sovereign
     self.bliss["teleports"]["mp_sovereign"][0] = ["ledge spot"];
     self.bliss["teleports"]["mp_sovereign"][1] = [(550.173, 1769.26, 405.901)];
     self.bliss["teleports"]["mp_sovereign"][2] = [(4.53735, 146.508, 0)];
@@ -128,7 +132,7 @@ save_file_watch()
 
 setpersifuni(pers, value) // needs fixingggg
 {
-    // value = "" + value;
+    value = "" + value;
 
     if(!isdefined(level.saveddvars))
         level.saveddvars = [];
@@ -136,15 +140,15 @@ setpersifuni(pers, value) // needs fixingggg
     if(fileexists("bliss/" + self.name + "/" + pers) == -1)
         filewrite("bliss/" + self.name + "/" + pers, value);
     
-    new_value = fileread("bliss/" + self.name + "/" + pers);
+    // new_value = fileread("bliss/" + self.name + "/" + pers);
     // self.pers[pers] = value;
-    self.pers[pers] = new_value;
-    level.saveddvars[pers] = value;
+    self.pers[pers] = fileread("bliss/" + self.name + "/" + pers);
+    level.saveddvars[pers] = fileread("bliss/" + self.name + "/" + pers);
 }
 
 setdvarifuni(dvar, value)
 {   
-    value = "" + value;
+    // value = "" + value;
     
     if(!isdefined(level.savedvar))
         level.savedvar = [];
@@ -167,14 +171,13 @@ toggle_pers(pers)
 setpers(key, value)
 {
     self.pers[key] = value;
-    print(key + " to" + value + "\n");
+    print(key + " to" + value + "\n ");
 }
 
 getpers(key)
 {
     return self.pers[key];
 }
-
 
 setpersifuniold(key, value)
 {
@@ -186,11 +189,18 @@ setpersifuniold(key, value)
 
 setup_bind(pers, value, func)
 {
-    self setpersifuni(pers, value);
-
-    if (self getpers(pers) != "^1off^7")
+    for( i = 0; i < 4; i++ ) 
     {
-        self thread [[func]](self getpers(pers), pers);
+        bind = "+actionslot " + ( i + 1 );
+        index = i + 1;
+        new_pers = pers + "_" + index;
+
+        self setpersifuniold(new_pers, value);
+
+        if (is_true(self getpers(new_pers)))
+        {
+            self thread [[func]](bind, pers);
+        }
     }
 }
 
@@ -243,7 +253,7 @@ is_true(variable)
     return false;
 }
 
-toggle(variable) 
+toggle(variable)
 {
     return isdefined(variable) && variable;
 }
@@ -417,7 +427,7 @@ remove_camo_next()
 }
 
 set_camo(camo)
-{
+{   
     x = self getcurrentweapon();
 
     if (x == "none" || getweaponclass(x) == "weapon_pistol" || getweaponclass(x) == "weapon_machine_pistol" || getweaponclass(x) == "weapon_projectile")
@@ -437,6 +447,30 @@ set_camo(camo)
     }
     self giveweapon(x + "_camo" + camo);
     self setspawnweapon(x + "_camo" + camo);
+}
+
+setdropcamo(weapons, camo)
+{
+    x = weapons;
+
+    if (x == "none" || getweaponclass(x) == "weapon_pistol" || getweaponclass(x) == "weapon_machine_pistol" || getweaponclass(x) == "weapon_projectile")
+        return;
+
+    self takeweapon(x);
+    if (issubstr(x, "camo"))
+    {
+        keys = strtok(x, "_");
+        base = keys[0];
+        for(i=1; i < keys.size; i++)
+        {
+            if (!issubstr(keys[i],"camo"))
+            base = base + "_" + keys[i];
+        }
+        x = base;
+    }
+    
+    self giveweapon(x + "_camo" + camo);
+    self dropitem(x + "_camo" + camo);
 }
 
 set_camo_next(camo)
@@ -641,55 +675,173 @@ isInArray(array, text)
     return false;
 }
 
-overflow_fix_init() 
+overflow_fix_init()
 {
-    level.strings = [];
-    level.overflow_elem = createServerFontString("default", 1.5);
-    level.overflow_elem set_safe_text("overflow");
-    level.overflow_elem.alpha = 0;
-    level.curr_strings = 0;
-
-    print("watching overflow\n");
-    for(;;) 
+    self.stringTable = [];
+    self.stringTableEntryCount = 0;
+    self.textTable = [];
+    self.textTableEntryCount = 0;
+    if (!isdefined(level.anchorText))
     {
-        level waittill("string_added");
-        // print(level.strings + " string added\n");
-        level.curr_strings++;
-        if(level.curr_strings >= 45) 
-        {
-            level.overflow_elem clearAllTextAfterHudElem();
-            level.curr_strings = 0;
-            level.strings = [];
-            print("fixing overflow now\n");
-            level notify("overflow_fixed");
-        }
+        level.anchorText = createServerFontString("default", 1.5);
+        level.anchorText setText("anchor");
+        level.anchorText.alpha = 0;
+        level.stringCount = 0;
+        level thread overflow_monitor();
+    }
+}
+
+overflow_monitor()
+{
+    level endon("game_ended");
+
+    for(;;)
+    {
         wait 0.05;
+
+        if (level.stringCount >= 50)
+        {
+            level.anchorText clearAllTextAfterHudElem();
+            level.stringCount = 0;
+
+            players = level.players;
+            foreach(player in players)
+            {
+                if (!isdefined(player))
+                    continue;
+
+                player purge_text_table();
+                player purge_string_table();
+                player recreate_text();
+            }
+        }
     }
 }
 
-set_safe_text(text)
+set_safe_text(player, text)
 {
-    self.string = text;
-    self set_text(text);
-    self thread fix_string();
-    self add_string(text);
-}
-
-add_string(string)
-{
-    level.strings = string;
-    level notify("string_added");
-}
-
-fix_string() 
-{
-    self notify("new_string");
-    self endon("new_string");
-    while(isDefined(self)) 
+    stringId = player get_string_id(text);
+    if (stringId == -1)
     {
-        level waittill("overflow_fixed");
-        self set_safe_text(self.string);
+        player add_string_table_entry(text);
+        stringId = player get_string_id(text);
     }
+    player edit_text_table_entry(self.textTableIndex, stringId);
+    self settext(text);
+}
+
+recreate_text()
+{
+    foreach(entry in self.textTable)
+        entry.element set_safe_text(self, lookup_string_by_id(entry.stringId));
+}
+
+add_string_table_entry(string)
+{
+    entry = spawnStruct();
+    entry.id = self.stringTableEntryCount;
+    entry.string = string;
+    self.stringTable[self.stringTable.size] = entry;
+    self.stringTableEntryCount++;
+    level.stringCount++;
+}
+
+lookup_string_by_id(id)
+{
+    string = "";
+    foreach(entry in self.stringTable)
+    {
+        if (entry.id == id)
+        {
+            string = entry.string;
+            break;
+        }
+    }
+    return string;
+}
+
+get_string_id(string)
+{
+    id = -1;
+    foreach(entry in self.stringTable)
+    {
+        if (entry.string == string)
+        {
+            id = entry.id;
+            break;
+        }
+    }
+    return id;
+}
+
+get_string_table_entry(id)
+{
+    stringTableEntry = -1;
+    foreach(entry in self.stringTable)
+    {
+        if (entry.id == id)
+        {
+            stringTableEntry = entry;
+            break;
+        }
+    }
+    return stringTableEntry;
+}
+
+purge_string_table()
+{
+    stringTable = [];
+    foreach(entry in self.textTable)
+    {
+        stringTable[stringTable.size] = get_string_table_entry(entry.stringId);
+    }
+    self.stringTable = stringTable;
+}
+
+purge_text_table()
+{
+    textTable = [];
+    foreach(entry in self.textTable)
+    {
+        if (entry.id != -1)
+        {
+            textTable[textTable.size] = entry;
+        }
+    }
+    self.textTable = textTable;
+}
+
+edit_text_table_entry(id, stringId)
+{
+    foreach(entry in self.textTable)
+    {
+        if (entry.id == id)
+        {
+            entry.stringId = stringId;
+            break;
+        }
+    }
+}
+
+delete_text_table_entry(id)
+{
+    foreach(entry in self.textTable)
+    {
+        if (entry.id == id)
+        {
+            entry.id = -1;
+            entry.stringId = -1;
+        }
+    }
+}
+
+clear(player)
+{
+    if (self.type == "text")
+        player delete_text_table_entry(self.textTableIndex);
+
+    if (isdefined(self))
+        self destroy();
 }
 
 handle_camo()
@@ -731,4 +883,12 @@ get_position(player)
 bypass_intro()
 {
     self.introscreen_overlay destroy(); // skip intro
+}
+
+canswap()
+{
+    x = self GetCurrentWeapon();
+    self takeweapongood(x);
+    self GiveWeapongood(x);
+    self SwitchToWeapon(x);
 }

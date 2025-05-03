@@ -9,7 +9,7 @@
 // lets create the menu now
 initial_precache()
 {
-    foreach(shader in list("ui_arrow_right"))
+    foreach(shader in list("shader"))
         precacheshader(shader);
 
     foreach(model in list("model"))
@@ -476,7 +476,7 @@ add_menu(title, shader)
 
 add_option(text, summary, function, argument_1, argument_2, argument_3)
 {
-    option            = [];
+    option               = [];
     option["text"]       = text;
     option["summary"]    = summary;
     option["function"]   = function;
@@ -488,7 +488,7 @@ add_option(text, summary, function, argument_1, argument_2, argument_3)
 
 add_toggle(text, summary, function, toggle, array, argument_1, argument_2, argument_3)
 {
-    option          = [];
+    option             = [];
     option["text"]     = text;
     option["summary"]  = summary;
     option["function"] = function;
@@ -509,7 +509,7 @@ add_toggle(text, summary, function, toggle, array, argument_1, argument_2, argum
 
 add_array(text, summary, function, array, argument_1, argument_2, argument_3)
 {
-    option            = [];
+    option               = [];
     option["text"]       = text;
     option["summary"]    = summary;
     option["function"]   = function;
@@ -525,7 +525,7 @@ add_array(text, summary, function, array, argument_1, argument_2, argument_3)
 
 add_bind(text, summary, function, argument_1, argument_2, argument_3)
 {
-    option            = [];
+    option               = [];
     option["text"]       = text;
     option["summary"]    = summary;
     option["function"]   = function;
@@ -558,7 +558,7 @@ actionslot_notify_map(slot)
 
 add_increment(text, summary, function, start, minimum, maximum, increment, argument_1, argument_2, argument_3)
 {
-    option            = [];
+    option               = [];
     option["text"]       = text;
     option["summary"]    = summary;
     option["function"]   = function;
@@ -577,7 +577,7 @@ add_increment(text, summary, function, start, minimum, maximum, increment, argum
 
 add_category(text)
 {
-    option          = [];
+    option             = [];
     option["text"]     = text;
     option["category"] = true;
 

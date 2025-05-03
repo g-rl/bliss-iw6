@@ -5,6 +5,147 @@
 #include scripts\utils;
 #include scripts\menu;
 
+toggle_stall(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+
+    if (self.pers[index])
+    {
+        self iprintln("care package bind ^2on");
+        self thread care_package_stall(bind, pers);
+    }
+    else
+    {
+        self iprintln("care package bind ^1off");
+        self notify("stop" + pers);
+    }
+}
+
+toggle_tilt(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+
+    if (self.pers[index])
+    {
+        self iprintln("tilt screen bind ^2on");
+        self thread stz_tilt_bind(bind, pers);
+    }
+    else
+    {
+        self iprintln("tilt screen bind ^1off");
+        self setplayerangles((self.angles[0],self.angles[1],0));   
+        self.tilting = 0;
+        self notify("stop" + pers);
+    }
+}
+
+stz_tilt_bind(bind, endonstring)
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+
+    for(;;)
+    {
+        self waittill(bind);
+
+        if (self in_menu())
+            continue;
+
+        if (!is_true(self.tilting))
+        {
+            self setplayerangles((self.angles[0],self.angles[1],180));
+            self.tilting = 1;
+        } 
+        else
+        {
+            self setplayerangles((self.angles[0],self.angles[1],0));   
+            self.tilting = 0;
+        }
+    }
+}
+
+care_package_stall(bind, endonstring)
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+
+    for(;;)
+    {
+        self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
+
+        if (!self in_menu())
+        {
+            model = spawn("script_model", self.origin);
+            model setmodel("tag_origin");
+            self playerlinkto(model);
+            self thread game_bar();
+            wait 0.1;
+            self waittill(bind);
+            self notify("stopgamebar");
+            self setclientomnvar("ui_securing", 0);
+            self setclientomnvar("ui_securing_progress", 0);
+            self unlink();
+            model delete();
+        }
+        wait 0.01;
+    }
+}
+
+toggle_glide(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+
+    if (self.pers[index])
+    {
+        self iprintln("glide bind ^2on");
+        self thread glidebind(bind, pers);
+    }
+    else
+    {
+        self iprintln("glide bind ^1off");
+        self notify("stop" + pers);
+    }
+}
+
+glidebind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+   
+    for(;;) 
+    {
+        self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
+        if (!self in_menu())
+        {
+            instashoot();
+            setweaponanim(30);
+            wait 0.1;
+            setweaponanim(31);
+        }
+        wait 0.1;
+    }
+}
+
 toggle_sprint_loop(bind, i, pers)
 {
     index = pers + "_" + i;
@@ -14,18 +155,17 @@ toggle_sprint_loop(bind, i, pers)
     self.pers[pers + "_" + new] = undefined;
 
     wait 0.05;
-    
-	if (self.pers[index])
+
+    if (self.pers[index])
     {
-		self iprintln("sprint loop ^2on");
-		self thread sprintloopbind(bind, pers);
-        // self.pers["test_bind_" + new] = false;
-	}
-	else
-	{
-		self iprintln("sprint loop ^1off");
-		self notify("stop" + pers);
-	}
+        self iprintln("sprint loop ^2on");
+        self thread sprintloopbind(bind, pers);
+    }
+    else
+    {
+        self iprintln("sprint loop ^1off");
+        self notify("stop" + pers);
+    }
 }
 
 sprintloopbind(bind, endonstring) 
@@ -37,6 +177,7 @@ sprintloopbind(bind, endonstring)
     for(;;) 
     {
         self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
             instashoot();
@@ -54,17 +195,17 @@ toggle_mala(bind, i, pers)
     self.pers[pers + "_" + new] = undefined;
 
     wait 0.05;
-    
-	if (self.pers[index])
+
+    if (self.pers[index])
     {
-		self iprintln("mala bind ^2on");
-		self thread malabind(bind, pers);
-	}
-	else
-	{
-		self iprintln("mala bind ^1off");
-		self notify("stop" + pers);
-	}
+        self iprintln("mala bind ^2on");
+        self thread malabind(bind, pers);
+    }
+    else
+    {
+        self iprintln("mala bind ^1off");
+        self notify("stop" + pers);
+    }
 }
 
 malabind(bind, endonstring) 
@@ -76,6 +217,7 @@ malabind(bind, endonstring)
     for(;;) 
     {
         self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
             setweaponflag(2);
@@ -92,17 +234,17 @@ toggle_illusion(bind, i, pers)
     self.pers[pers + "_" + new] = undefined;
 
     wait 0.05;
-    
-	if (self.pers[index])
+
+    if (self.pers[index])
     {
-		self iprintln("illusion canswap bind ^2on");
-		self thread illusioncanswapbind(bind, pers);
-	}
-	else
-	{
-		self iprintln("illusion canswap bind ^1off");
-		self notify("stop" + pers);
-	}
+        self iprintln("illusion canswap bind ^2on");
+        self thread illusioncanswapbind(bind, pers);
+    }
+    else
+    {
+        self iprintln("illusion canswap bind ^1off");
+        self notify("stop" + pers);
+    }
 }
 
 toggle_smooth(bind, i, pers)
@@ -113,17 +255,17 @@ toggle_smooth(bind, i, pers)
     self.pers[pers + "_" + new] = undefined;
 
     wait 0.05;
-    
-	if (self.pers[index])
+
+    if (self.pers[index])
     {
-		self iprintln("smooth bind ^2on");
-		self thread smoothbind(bind, pers);
-	}
-	else
-	{
-		self iprintln("smooth bind ^1off");
-		self notify("stop" + pers);
-	}
+        self iprintln("smooth bind ^2on");
+        self thread smoothbind(bind, pers);
+    }
+    else
+    {
+        self iprintln("smooth bind ^1off");
+        self notify("stop" + pers);
+    }
 }
 
 gunlockbind(bind, endonstring) 
@@ -131,10 +273,11 @@ gunlockbind(bind, endonstring)
     self notify("stop" + endonstring);
     self endon("stop" + endonstring);
     self endon("disconnect");
-   
+
     for(;;) 
     {
         self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
             self SwitchToWeaponImmediate("alt_" + self GetCurrentWeapon());
@@ -153,17 +296,17 @@ toggle_gunlock(bind, i, pers)
     self.pers[pers + "_" + new] = undefined;
 
     wait 0.05;
-    
-	if (self.pers[index])
+
+    if (self.pers[index])
     {
-		self iprintln("gunlock ^2on");
-		self thread gunlockbind(bind, pers);
-	}
-	else
-	{
-		self iprintln("gunlock ^1off");
-		self notify("stop" + pers);
-	}
+        self iprintln("gunlock ^2on");
+        self thread gunlockbind(bind, pers);
+    }
+    else
+    {
+        self iprintln("gunlock ^1off");
+        self notify("stop" + pers);
+    }
 }
 
 smoothbind(bind, endonstring) 
@@ -171,10 +314,11 @@ smoothbind(bind, endonstring)
     self notify("stop" + endonstring);
     self endon("stop" + endonstring);
     self endon("disconnect");
-   
+
     for(;;) 
     {
         self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
             smoothaction();
@@ -188,10 +332,11 @@ illusioncanswapbind(bind, endonstring)
     self notify("stop" + endonstring);
     self endon("stop" + endonstring);
     self endon("disconnect");
-   
+
     for(;;) 
     {
         self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
             self canswap();
@@ -211,18 +356,18 @@ toggle_lunge_bind(bind, i, pers)
     self.pers[pers + "_" + new] = undefined;
 
     wait 0.05;
-    
-	if (self.pers[index])
+
+    if (self.pers[index])
     {
-		self iprintln("lunge bind ^2on");
-		self thread lungebind(bind, pers);
+        self iprintln("lunge bind ^2on");
+        self thread lungebind(bind, pers);
         // self.pers["test_bind_" + new] = false;
-	}
-	else
-	{
-		self iprintln("lunge bind ^1off");
-		self notify("stop" + pers);
-	}
+    }
+    else
+    {
+        self iprintln("lunge bind ^1off");
+        self notify("stop" + pers);
+    }
 }
 
 lungebind(bind, endonstring) 
@@ -230,10 +375,11 @@ lungebind(bind, endonstring)
     self notify("stop" + endonstring);
     self endon("stop" + endonstring);
     self endon("disconnect");
-   
+
     for(;;) 
     {
         self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
             instashoot();
@@ -338,47 +484,6 @@ toggle_elevators()
     }
 }
 
-toggle_stall_bind()
-{
-    self.pers["stall"] = !toggle(self.pers["stall"]);
-
-    if (self getpers("stall"))
-    {
-        self thread care_package_stall();
-    }
-    else
-    {
-        self notify("stop_stall");
-    }
-}
-
-care_package_stall()
-{
-    self endon("disconnect");
-    self endon("stop_stall");
-
-    for(;;)
-    {
-        self waittill("+actionslot 1");
-
-        if (!self in_menu())
-        {
-            model = spawn("script_model", self.origin);
-            model setmodel("tag_origin");
-            self playerlinkto(model);
-            self thread game_bar();
-            wait 0.1;
-            self waittill("+actionslot 1");
-            self notify("stopgamebar");
-            self setclientomnvar( "ui_securing",0);
-            self setclientomnvar( "ui_securing_progress",0 );
-            self unlink();
-            model delete();
-        }
-        wait 0.01;
-    }
-}
-
 game_bar()
 {
     self endon("stopgamebar");
@@ -453,6 +558,38 @@ insta_eq_loop()
     {
         self waittill("grenade_pullback");
         setweaponanimtime(0);
+    }
+}
+
+toggle_instant_pump()
+{
+    self.pers["insta_pumps"] = !toggle(self.pers["insta_pumps"]);
+
+    if (self getpers("insta_pumps"))
+    {
+        self thread insta_pump_loop();
+    }
+    else
+    {
+        self notify("stop_insta_pumps");
+    }
+}
+
+insta_pump_loop()
+{
+    self endon("stop_insta_pumps");
+    self endon("disconnect");
+    level endon("game_ended");
+
+    for(;;)
+    {
+        self waittill("weapon_fired");
+
+        if (getweaponclass( self getcurrentweapon() ) == "weapon_shotgun")
+        {
+            smoothaction();
+        }
+        wait 0.1;
     }
 }
 
@@ -748,47 +885,6 @@ nacto(weapon)
     self giveweapongood(current);
 }
 
-toggle_stz_tilt()
-{
-    self.pers["stz_tilt"] = !toggle(self.pers["stz_tilt"]);
-
-    if (self getpers("stz_tilt"))
-    {
-        self thread stz_tilt_bind();
-    }
-    else
-    {
-        self setplayerangles((self.angles[0],self.angles[1],0));
-        self notify("stop_stz_tilt");
-    }
-}
-
-stz_tilt_bind()
-{
-    self endon("disconnect");
-    self endon("stop_stz_tilt");
-    level endon("game_ended");
-
-    for(;;)
-    {
-        self waittill("+actionslot 1");
-
-        if (self in_menu())
-            continue;
-
-        if (!is_true(self.tilting))
-        {
-            self setplayerangles((self.angles[0],self.angles[1],180));
-            self.tilting = 1;
-        } 
-        else
-        {
-            self setplayerangles((self.angles[0],self.angles[1],0));   
-            self.tilting = 0;
-        }
-    }
-}
-
 toggle_always_canswap()
 {
     self.pers["always_canswap"] = !toggle(self.pers["always_canswap"]);
@@ -1045,6 +1141,8 @@ pink_loop()
                 if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100,300))
                 {
                     ent dodamage( ent.health + 100, ent.origin, self, self );
+                    waitframe();
+                    self setclientomnvar("ui_points_popup", 250); 
                 }
             }
         }

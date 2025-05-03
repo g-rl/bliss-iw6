@@ -24,15 +24,10 @@ render_menu_options()
     {
     case "bliss":
         self.is_bind_menu = false;
-        map = getdvar("mapname");
         self add_menu("bliss - " + random_message());
         self add_option("toggles", undefined, ::new_menu, "toggles");
-        self add_option("binds", "my super lazy binds menu lol", ::new_menu, "binds");
         self add_option("lobby", undefined, ::new_menu, "lobby");
         self add_option("weapons", undefined, ::new_menu, "weapons");
-        if (is_true(self.bliss["teleports"][map][3]))
-            self add_option("teleports", undefined, ::new_menu, "teleports");
-        
         self add_option("clients", undefined, ::new_menu, "all clients");
         break;
     case "teleports":
@@ -56,20 +51,26 @@ render_menu_options()
         self add_bind_index("smooth");
         self add_bind_index("mala");
         self add_bind_index("illusion");
+        self add_bind_index("glide");
+        self add_bind_index("care package stall");
+        self add_bind_index("tilt screen");
         // self add_bind_index("gunlock");
         break;
     case "weapons":
         self.is_bind_menu = false;
         self add_menu("weapons - " + first_weapon + " & " + next_weapon);
-        self add_increment("set camo", increment_controls, ::change_camo, int(self getpers("camo")), 10, 46, 1);
         // self add_option("camos", "change camo for both guns", ::new_menu, "camos");
+        self add_increment("set camo", increment_controls, ::change_camo, int(self getpers("camo")), 10, 46, 1);
         self add_array("settings", slider_controls, ::weapon_settings, list("refill ammo,drop canswap,drop weapon,take weapon"));
         self add_array("perks", slider_controls, ::toggle_perk, list("specialty_fastsprintrecovery,specialty_fastreload,specialty_lightweight,specialty_marathon,specialty_pitcher,specialty_sprintreload,specialty_quickswap,specialty_bulletaccuracy,specialty_quickdraw,specialty_silentkill,specialty_blindeye,specialty_quieter,specialty_incog,specialty_gpsjammer,specialty_paint,specialty_scavenger,specialty_detectexplosive,specialty_selectivehearing,specialty_comexp,specialty_falldamage,specialty_regenfaster,specialty_sharp_focus,specialty_stun_resistance,specialty_explosivedamage"));
         self add_array("killstreaks", slider_controls, ::give_certain_streak, list("fill all,care package,ammo crate,vests,kem strike,oracle,odin"));
         break;
     case "lobby":
+        map = getdvar("mapname");
         self.is_bind_menu = false;
         self add_menu("lobby - " + getdvar("mapname"));
+        if (is_true(self.bliss["teleports"][map][3])) // add all teleports from utils
+            self add_option("teleports", undefined, ::new_menu, "teleports");
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
@@ -89,10 +90,11 @@ render_menu_options()
     case "toggles":
         self.is_bind_menu = false;
         self add_menu("toggles");
+        self add_option("binds", "my lazy binds menu lol", ::new_menu, "binds");
         self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
-        // self add_toggle("automatic secondary camo", undefined, ::toggle_automatic_camo, self.pers["secondary_camo"]);
         self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         self add_toggle("instashoots [inphect]", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
+        self add_toggle("instant pumps", undefined, ::toggle_instant_pump, self.pers["insta_pumps"]);
         self add_toggle("smooth canswap", undefined, ::toggle_smooth_canswaps, self.pers["smooth_canswaps"]);
         self add_increment("smooth canswap time", increment_controls, ::smooth_can_time, float(self getpers("smooth_can_time")), 0.1, 1, 0.1);
         self add_toggle("always canswap", undefined, ::toggle_always_canswap, self.pers["always_canswap"]);
@@ -104,8 +106,6 @@ render_menu_options()
         self add_toggle("elevators", "crouch + [{+speed_throw}] to use", ::toggle_elevators, self.pers["elevators"]);
         self add_toggle("alt swaps", "only gives a third weapon", ::toggle_alt_swaps, self.pers["alt_swap"]);
         self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
-        self add_toggle("care package stalls ([{+actionslot 1}])", undefined, ::toggle_stall_bind, self.pers["stall"]);
-        self add_toggle("tilt screen ([{+actionslot 1}])", undefined, ::toggle_stz_tilt, self.pers["stz_tilt"]);
         break;
     case "all clients":
         self.is_bind_menu = false;
@@ -152,6 +152,15 @@ bind_index(menu)
             break;
         case "gunlock":
             self add_bind_menu(menu, ::toggle_gunlock, "gunlock");
+            break;
+        case "glide":
+            self add_bind_menu(menu, ::toggle_glide, "glide");
+            break;
+        case "care package stall":
+            self add_bind_menu(menu, ::toggle_stall, "stall");
+            break;
+        case "tilt screen":
+            self add_bind_menu(menu, ::toggle_tilt, "tilt");
             break;
         case "unassigned":
             self add_menu(menu);

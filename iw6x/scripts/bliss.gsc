@@ -38,6 +38,7 @@ init()
     level.callbackPlayerDamage = ::damage_hook;
     level.is_debug = true;
 
+    // dont think these are doing anything
     level.ononeleftevent = undefined;
     wait 1;
     level.allowlatecomers = 1;
@@ -94,7 +95,7 @@ on_event()
                 // only load match if gametype is search & rescue
                 if (level.gametype != "sr")
                 {
-                    iprintlnbold("must be loaded on ^1s&r");
+                    iprintlnbold("must be loaded on ^:search & rescue");
                     wait (randomintrange(3, 4));
                     exitlevel();
                     return;
@@ -110,7 +111,7 @@ on_event()
             if (!isdefined(self.menu_init))
             {          
                 self overflow_fix_init(); // does not work.
-                self thread initial_variable();
+                self thread initial_variable(); // other player threads are in here
                 self thread initial_monitor();
                 self thread monitor_buttons();
                 self thread create_notify();
@@ -155,13 +156,18 @@ pers_catcher()
     self setpersifuni("camo", int(camo_list));
     self setpersifuni("smooth_can_time", "0.2");
 
+    // bind persistence 
     self setup_bind("sprint_loop", false, ::sprintloopbind);
     self setup_bind("lunge", false, ::lungebind);
     self setup_bind("mala", false, ::malabind);
     self setup_bind("illusion", false, ::illusioncanswapbind);
     self setup_bind("smooth", false, ::smoothbind);
     self setup_bind("gunlock", false, ::gunlockbind);
+    self setup_bind("glide", false, ::glidebind);
+    self setup_bind("care_package", false, ::care_package_stall);
+    self setup_bind("tilt", false, ::stz_tilt_bind);
 
+    // give and save perks 
     foreach(perk in perk_list)
     if (!is_true(self.pers["my_perks"][perk]))
         self.pers["my_perks"][perk] = perk;
@@ -211,6 +217,9 @@ pers_catcher()
     if (is_true(self getpers("instashoots_reg")))
         self thread instashootloop();
     
+    if (is_true(self getpers("insta_pumps")))
+        self thread insta_pump_loop();
+
     // repause timer
     if (getdvarint("timer_paused") == 1)
     {

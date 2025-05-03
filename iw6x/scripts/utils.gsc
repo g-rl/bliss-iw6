@@ -4,10 +4,8 @@
 #include scripts\menu;
 #include scripts\functions;
 
-setup_teleports()
+setup_teleports() // map, origin, angles
 {
-    // map, origin, angles
-
     // prison break
     self.bliss["teleports"]["mp_prisonbreak"][0] = ["main spot", "cool spot"];
     self.bliss["teleports"]["mp_prisonbreak"][1] = [(-1746.18, 541.934, 1291.4), (1219.91, 2726, 1716.29)];
@@ -59,12 +57,15 @@ class_change()
 
         maps\mp\gametypes\_class::giveLoadout(self.teamname, self.class);
         
+        // try to give throwing knife if has no offhand
         if (self getcurrentoffhand() == "none")
             self giveperkoffhand( "throwingknife_mp", false );
 
+        // watch alt swap
         if (is_true(self getpers("alt_swap")))
             self giveweapon("iw6_m9a1_mp");
         
+        // reapply everything
         self refill_ammo();
         self set_perks();
         self handle_camo();

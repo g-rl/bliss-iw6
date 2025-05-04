@@ -613,14 +613,6 @@ unstuck()
     self setorigin(self getpers("unstuck"));
 }
 
-fill_streaks()
-{
-    foreach(streak in self.killstreaks)
-    {
-        self maps\mp\killstreaks\_killstreaks::givekillstreak(streak, true);
-    }  
-}
-
 give_certain_streak(streak)
 {
     if (streak == "fill all")
@@ -650,6 +642,14 @@ give_streak(streak)
     self thread maps\mp\killstreaks\_killstreaks::giveKillstreak(streak, false, false, self);
 }
 
+fill_streaks()
+{
+    foreach(streak in self.killstreaks)
+    {
+        self maps\mp\killstreaks\_killstreaks::givekillstreak(streak, true);
+    }  
+}
+
 refill_ammo()
 {
     x = self GetWeaponsListPrimaries();
@@ -667,12 +667,12 @@ refill_ammo()
 
 load_bots()
 {
-    foreach(p in level.players)
+    foreach(player in level.players)
     {
-        if ((isalive(p)) && isbot(p))
+        if ((isalive(player)) && isbot(player))
         {
             if (is_true(self.pers["freeze_bots"]))
-                p setorigin(self.pers["bot_position"]);
+                player setorigin(self.pers["bot_position"]);
         }
     }
 }
@@ -690,7 +690,7 @@ kem_strike()
 {
     if (getteamscore("allies") == 3 || getteamscore("axis") == 3)
     {
-        self maps\mp\killstreaks\_killstreaks::givekillstreak("nuke",false);
+        self maps\mp\killstreaks\_killstreaks::givekillstreak("nuke", false);
         self.pers["kills"] = 25;
         self.kills = 25;
         self.pers["score"] = 2350;
@@ -729,7 +729,7 @@ pink_loop()
             {
                 if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100,300))
                 {
-                    ent dodamage( ent.health + 100, ent.origin, self, self );
+                    ent dodamage(ent.health + 100, ent.origin, self, self);
                     waitframe();
                     self setclientomnvar("ui_points_popup", 250); 
                 }

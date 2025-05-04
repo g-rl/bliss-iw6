@@ -6,6 +6,8 @@
 #include scripts\_menu;
 #include scripts\_functions;
 
+// add mantle & ladder checks for crash safety (anims)
+
 toggle_stall(bind, i, pers)
 {
     index = pers + "_" + i;
@@ -168,7 +170,6 @@ toggle_sprint_loop(bind, i, pers)
 {
     index = pers + "_" + i;
     new = int(i) - 1;
-    // self iprintln(new);
     self.pers[index] = !toggle(self.pers[index]);
     self.pers[pers + "_" + new] = undefined;
 
@@ -298,7 +299,7 @@ gunlockbind(bind, endonstring)
         if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
-            self SwitchToWeaponImmediate("alt_" + self GetCurrentWeapon());
+            self switchtoweaponimmediate("alt_" + self GetCurrentWeapon());
             waitframe();
             self canswap();
         }
@@ -384,7 +385,6 @@ toggle_lunge_bind(bind, i, pers)
     {
         self iprintln("lunge bind ^2on");
         self thread lungebind(bind, pers);
-        // self.pers["test_bind_" + new] = false;
     }
     else
     {

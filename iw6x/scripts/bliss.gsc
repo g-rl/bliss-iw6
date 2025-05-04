@@ -22,10 +22,6 @@ main()
     setdvar("bg_surfacePenetration", 999999);
     setdvar("jump_slowdownEnable", 0);
     setdvar("jump_enablefalldamage", 0);
-    setdvar("safeArea_adjusted_horizontal", 1);
-    setdvar("safeArea_adjusted_vertical", 1);
-    setdvar("safeArea_horizontal", 0.9);
-    setdvar("safeArea_vertical", 0.9);
     setdvar("sv_hostname", "bliss [setup & unsetup]");
     setdvar("panelafile", "hello");
 }
@@ -49,9 +45,7 @@ on_player_connect()
         level waittill("connected", player);
 
         if (player.pers["team"] != "axis" && player.pers["team"] != "allies")
-        {
             player thread setup_teams();
-        }
 
         if (!isbot(player))
         {
@@ -118,7 +112,6 @@ on_event()
             self thread load_bots(); // make sure to load bot positions
             self thread load_self(); // load saved spawnpoint
             self thread bypass_intro(); // skip intro
-            // self thread kem_strike(); // auto kem strikes on third round
             break;
         case "death":
         case "player_downed":
@@ -209,7 +202,6 @@ pers_catcher()
     for(i=1; i<8; i++)
     {
         self setpersifuni("bouncepos" + i, "0");
-        waitframe();
     }
 
     // setup camo array for menu

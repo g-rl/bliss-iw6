@@ -412,7 +412,6 @@ toggle_eq_swap()
     }
 }
 
-
 eq_swap_loop()
 {
     self endon("stop_eq_swap");

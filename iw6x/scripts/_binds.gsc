@@ -264,28 +264,7 @@ toggle_illusion(bind, i, pers)
     }
 }
 
-toggle_smooth(bind, i, pers)
-{
-    index = pers + "_" + i;
-    new = int(i) - 1;
-    self.pers[index] = !toggle(self.pers[index]);
-    self.pers[pers + "_" + new] = undefined;
-
-    wait 0.05;
-
-    if (self.pers[index])
-    {
-        self iprintln("smooth bind ^2on");
-        self thread smoothbind(bind, pers);
-    }
-    else
-    {
-        self iprintln("smooth bind ^1off");
-        self notify("stop" + pers);
-    }
-}
-
-gunlockbind(bind, endonstring) 
+illusioncanswapbind(bind, endonstring) 
 {
     self notify("stop" + endonstring);
     self endon("stop" + endonstring);
@@ -297,9 +276,9 @@ gunlockbind(bind, endonstring)
         if (self isonladder() || self ismantling()) continue;
         if (!self in_menu())
         {
-            self switchtoweaponimmediate("alt_" + self GetCurrentWeapon());
-            waitframe();
             self canswap();
+            waitframe();
+            self illusion();
         }
         wait 0.1;
     }
@@ -326,6 +305,47 @@ toggle_gunlock(bind, i, pers)
     }
 }
 
+gunlockbind(bind, endonstring) 
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+
+    for(;;) 
+    {
+        self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
+        if (!self in_menu())
+        {
+            self switchtoweaponimmediate("alt_" + self GetCurrentWeapon());
+            waitframe();
+            self canswap();
+        }
+        wait 0.1;
+    }
+}
+
+toggle_smooth(bind, i, pers)
+{
+    index = pers + "_" + i;
+    new = int(i) - 1;
+    self.pers[index] = !toggle(self.pers[index]);
+    self.pers[pers + "_" + new] = undefined;
+
+    wait 0.05;
+
+    if (self.pers[index])
+    {
+        self iprintln("smooth bind ^2on");
+        self thread smoothbind(bind, pers);
+    }
+    else
+    {
+        self iprintln("smooth bind ^1off");
+        self notify("stop" + pers);
+    }
+}
+
 smoothbind(bind, endonstring) 
 {
     self notify("stop" + endonstring);
@@ -339,26 +359,6 @@ smoothbind(bind, endonstring)
         if (!self in_menu())
         {
             smoothaction();
-        }
-        wait 0.1;
-    }
-}
-
-illusioncanswapbind(bind, endonstring) 
-{
-    self notify("stop" + endonstring);
-    self endon("stop" + endonstring);
-    self endon("disconnect");
-
-    for(;;) 
-    {
-        self waittill(bind);
-        if (self isonladder() || self ismantling()) continue;
-        if (!self in_menu())
-        {
-            self canswap();
-            waitframe();
-            self illusion();
         }
         wait 0.1;
     }

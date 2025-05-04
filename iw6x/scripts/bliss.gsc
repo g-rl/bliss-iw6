@@ -202,10 +202,10 @@ setup_memory()
     }
 
     // setup bounce
-    self setpersifuni("bouncecount", "0");  
+    self setpersifuniold("bouncecount", "0");  
     for(i=1; i<8; i++)
     {
-        self setpersifuni("bouncepos" + i, "0");
+        self setpersifuniold("bouncepos" + i, "0");
     }
 
     // setup camo array for menu

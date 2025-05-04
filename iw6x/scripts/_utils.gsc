@@ -140,10 +140,10 @@ setpersifuni(pers, value) // needs fixingggg
 {
     value = "" + value;
 
-    if(!isdefined(level.saveddvars))
+    if (!isdefined(level.saveddvars))
         level.saveddvars = [];
 
-    if(fileexists("bliss/" + self.name + "/" + pers) == -1)
+    if (fileexists("bliss/" + self.name + "/" + pers) == -1)
         filewrite("bliss/" + self.name + "/" + pers, value);
     
     // new_value = fileread("bliss/" + self.name + "/" + pers);
@@ -156,10 +156,10 @@ setdvarifuni(dvar, value)
 {   
     // value = "" + value;
     
-    if(!isdefined(level.savedvar))
+    if (!isdefined(level.savedvar))
         level.savedvar = [];
 
-    if(fileexists("bliss/" + dvar) == -1)
+    if (fileexists("bliss/" + dvar) == -1)
         filewrite("bliss/" + dvar, value);
 
     setdvar(dvar, fileread("bliss/" + dvar));
@@ -692,7 +692,7 @@ genie(a, b)
 isInArray(array, text)
 {
     for(e=0;e<array.size;e++)
-        if(array[e] == text)
+        if (array[e] == text)
             return true;
     return false;
 }
@@ -879,7 +879,7 @@ kick_player(player)
 
 me_to_player(player)
 {
-    self setorigin(player.origin);
+    self set_position(player.origin, player getplayerangles());
 }
 
 player_to_cross(player)
@@ -909,8 +909,14 @@ bypass_intro()
 
 canswap()
 {
-    x = self GetCurrentWeapon();
+    x = self getcurrentweapon();
     self takeweapongood(x);
-    self GiveWeapongood(x);
-    self SwitchToWeapon(x);
+    self giveweapongood(x);
+    self switchtoweapon(x);
+}
+
+g_weapon(weapon)
+{
+    self giveweapon(weapon);
+    self switchtoweapon(weapon);
 }

@@ -841,7 +841,7 @@ spawn_bounce()
     self setpers("bouncepos" + x, self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
     self iprintln("^:spawned a bounce at " + self getorigin());
     
-    if(x == 1)
+    if (x == 1)
     {
         self notify("stop_bounce_loop");
         self thread bounce_loop(); // watch for placed bounces

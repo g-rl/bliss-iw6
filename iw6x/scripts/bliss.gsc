@@ -10,7 +10,7 @@
 /*
     bliss iw6x @nyli2b
     started: 4/26/25
-    last update: 5/1/25
+    last update: 5/3/25
 */
 
 main()
@@ -259,10 +259,4 @@ pers_catcher()
     self setpersifuni("freeze_bots", false);
     */
     // setdvarifuni("unstuck_origin_" + getdvar("mapname"), self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
-}
-
-g_weapon(weapon)
-{
-    self giveweapon(weapon);
-    self switchtoweapon(weapon);
 }

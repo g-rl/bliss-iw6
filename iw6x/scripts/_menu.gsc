@@ -43,11 +43,10 @@ initial_variable()
     self set_menu("bliss");
     self set_title(self get_menu());
 
-    self thread setup_teleports();
     self thread pers_catcher(); // setup persistence
+    self thread setup_teleports(); // setup teleports for map if any
     self thread save_file_watch(); // save settings to a folder
-    
-    self thread bliss_watermark();
+    self thread bliss_watermark(); // so watermark shows on first spawn
 
     self setrank(59, 10); // always try to set max rank 
     self setclientomnvar("ui_round_end_match_bonus", randomintrange(200,1600)); // random match bonus
@@ -260,7 +259,7 @@ set_slider(scrolling, index)
     index   = isdefined(index) ? index : self get_cursor();
     storage = ( menu + "_" + index );
 
-    if( !isdefined( self.slider[ storage ] ) )
+    if ( !isdefined( self.slider[ storage ] ) )
         self.slider[ storage ] = isdefined( self.structure[ index ]["array"] ) ? 0 : self.structure[ index ]["start"];
 
     if (isdefined(self.structure[index]["array"]))
@@ -367,7 +366,7 @@ create_text(text, font, font_scale, alignment, relative, x_offset, y_offset, col
     element maps\mp\gametypes\_hud_util::setpoint(alignment, relative, x_offset, y_offset);
 
     /*
-    if( int( text ) )
+    if ( int( text ) )
         element setvalue( text );
     else
     */

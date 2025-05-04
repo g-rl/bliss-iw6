@@ -83,7 +83,7 @@ render_menu_options()
         self add_option("give vish", undefined, ::give_vish);
         self add_option("give cowboy", undefined, ::give_cowboy);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
-        if(is_true(level.is_debug) && self get_name() == "catchet")
+        if (is_true(level.is_debug) && self get_name() == "catchet")
             self add_option("print position", undefined, ::print_positions);
         self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
         self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);

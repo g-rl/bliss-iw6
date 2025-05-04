@@ -32,6 +32,7 @@ render_menu_options()
         self add_option("lobby", credits, ::new_menu, "lobby");
         self add_option("weapons", credits, ::new_menu, "weapons");
         self add_option("clients", credits, ::new_menu, "all clients");
+        self add_option("menu info", credits, ::new_menu, "menu info");
         break;
     case "teleports":
         self.is_bind_menu = false;
@@ -78,7 +79,7 @@ render_menu_options()
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
         self add_option("pickup bomb", undefined, ::pickup_bomb);
         self add_array("bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
-        self add_array("helicopters", slider_controls, ::manage_heli, list("spawn,delete"));
+        // self add_array("helicopters", slider_controls, ::manage_heli, list("spawn,delete"));
         self add_option("give vish", undefined, ::give_vish);
         self add_option("give cowboy", undefined, ::give_cowboy);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
@@ -117,6 +118,15 @@ render_menu_options()
         {
             option_text = player get_name();
             self add_option(option_text, undefined, ::new_menu, "player option");
+        }
+        break;
+    case "menu info":
+        self.is_bind_menu = false;
+        self add_menu(menu);
+        opt = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
+        foreach(option in opt)
+        {
+            self add_category(option);
         }
         break;
     default:

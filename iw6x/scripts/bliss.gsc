@@ -114,6 +114,8 @@ on_event()
             self thread load_bots(); // make sure to load bot positions
             self thread load_self(); // load saved spawnpoint
             self thread bypass_intro(); // skip intro
+            wait 1;
+            self setrank(59, randomintrange(10,12)); // always try to set max rank
             break;
         case "death":
         case "player_downed":
@@ -133,7 +135,7 @@ on_bot_spawned()
     {
         self waittill("spawned_player");
         wait 1;
-        self setrank(59, randomint(10)); // give bots a rank
+        self setrank(59, randomint(11)); // give bots a rank
     }
 }
 
@@ -158,7 +160,7 @@ setup_memory()
     self setpersifuniold("unstuck", self.origin);
     self setpersifuni("camo", int(camo_list));
     self setpersifuni("smooth_can_time", "0.2");
-    self setpersifuni("numprestige", "10");
+    // self setpersifuni("numprestige", "10");
 
     // reload toggles etc on spawn
     self setup_pers("instashoots", ::inphectinstashootloop);

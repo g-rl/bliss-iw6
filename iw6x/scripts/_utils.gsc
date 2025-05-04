@@ -866,6 +866,12 @@ handle_camo()
 
 kick_player(player)
 {
+    if (player ishost())
+    {
+        self iprintln("unable to kick host");
+        return;
+    }
+
     kick(player getentitynumber());
 }
 
@@ -882,6 +888,49 @@ player_to_cross(player)
 player_to_me(player)
 {
     player set_position(self.origin, self getplayerangles());
+}
+
+player_to_sniper(player)
+{
+    if (!isbot(player))
+    {
+        self iprintln("player must be a bot");
+        return;
+    }
+
+    player maps\mp\killstreaks\_helisniper::tryUseHeliSniper(player.pers["deaths"] , "heli_sniper");
+}
+
+change_player_team(player)
+{
+    if (player ishost())
+    {
+        self iprintln("unable to change host team");
+        return;
+    }
+
+    if (player.team == "allies")
+    {
+        player.team = "axis";
+        player.sessionstate = "spectator";
+        waitframe();
+        player notify("luinotifyserver", "team_select", 0);
+        waitframe();
+        player notify("luinotifyserver", "class_select", player.class);
+        waitframe();
+        player.sessionstate = "playing";
+    }
+    else
+    {
+        player.team = "allies";
+        player.sessionstate = "spectator";
+        waitframe();
+        player notify("luinotifyserver", "team_select", 1);
+        waitframe();
+        player notify("luinotifyserver", "class_select", player.class);
+        waitframe();
+        player.sessionstate = "playing";
+    }
 }
 
 get_printed_position()

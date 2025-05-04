@@ -836,37 +836,6 @@ bounce_loop()
     }
 }
 
-player_to_sniper(player)
-{
-    player maps\mp\killstreaks\_helisniper::tryUseHeliSniper(player.pers["deaths"] , "heli_sniper");
-}
-
-change_player_team(player)
-{
-    if (player.team == "allies")
-    {
-        player.team = "axis";
-        player.sessionstate = "spectator";
-        waitframe();
-        player notify("luinotifyserver", "team_select", 0);
-        waitframe();
-        player notify("luinotifyserver", "class_select", player.class);
-        waitframe();
-        player.sessionstate = "playing";
-    }
-    else
-    {
-        player.team = "allies";
-        player.sessionstate = "spectator";
-        waitframe();
-        player notify("luinotifyserver", "team_select", 1);
-        waitframe();
-        player notify("luinotifyserver", "class_select", player.class);
-        waitframe();
-        player.sessionstate = "playing";
-    }
-}
-
 change_gravity(value)
 {
     setdvar("g_gravity", value);

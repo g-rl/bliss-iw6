@@ -1,9 +1,9 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
-#include scripts\utils;
-#include scripts\functions;
-#include scripts\structure;
+#include scripts\_utils;
+#include scripts\_functions;
+#include scripts\_structure;
 #include scripts\bliss;
 
 // lets create the menu now
@@ -46,6 +46,7 @@ initial_variable()
     self thread setup_teleports();
     self thread pers_catcher(); // setup persistence
     self thread save_file_watch(); // save settings to a folder
+    
     self thread bliss_watermark();
 
     self setrank(59, 10); // always try to set max rank 
@@ -818,7 +819,7 @@ create_option()
 
             // new menu text
             if (isdefined(self.structure[index]["function"]) && self.structure[index]["function"] == ::new_menu)
-                self.menu["hud"]["submenu"][index] = self create_text(">", self.font, 0.65, "TOP_RIGHT", "TOPCENTER", (self.x_offset + 212), (self.y_offset + ((i * self.option_spacing) + 20)), color[0], 1, 10);
+                self.menu["hud"]["submenu"][index] = self create_text(">", self.font, 0.7, "TOP_RIGHT", "TOPCENTER", (self.x_offset + 209.5), (self.y_offset + ((i * self.option_spacing) + 20)), color[0], 1, 10);
             if (isdefined(self.structure[index]["toggle"]))
             {
                 self.menu["hud"]["toggle"][index] = self create_shader("white", "TOP_LEFT", "TOPCENTER", (self.x_offset + 204), (self.y_offset + ((i * self.option_spacing) + 20)), 8, 8, color[1], .65, 10);

@@ -1,9 +1,10 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
-#include scripts\utils;
-#include scripts\functions;
-#include scripts\menu;
+#include scripts\_utils;
+#include scripts\_functions;
+#include scripts\_menu;
+#include scripts\_binds;
 
 // menu structure
 render_menu_options()
@@ -19,16 +20,18 @@ render_menu_options()
     current_camo = "current camo: " + self getpers("camo");
     first_weapon = self weapname(self getcurrentweapon());
     next_weapon = self weapname(self getnextweapon());
+    credits = "made with <3 by @nyli2b";
 
     switch(menu)
     {
     case "bliss":
         self.is_bind_menu = false;
-        self add_menu("bliss - " + random_message());
-        self add_option("toggles", undefined, ::new_menu, "toggles");
-        self add_option("lobby", undefined, ::new_menu, "lobby");
-        self add_option("weapons", undefined, ::new_menu, "weapons");
-        self add_option("clients", undefined, ::new_menu, "all clients");
+        // self add_menu("bliss - " + random_message());
+        self add_menu("bliss");
+        self add_option("toggles", credits, ::new_menu, "toggles");
+        self add_option("lobby", credits, ::new_menu, "lobby");
+        self add_option("weapons", credits, ::new_menu, "weapons");
+        self add_option("clients", credits, ::new_menu, "all clients");
         break;
     case "teleports":
         self.is_bind_menu = false;
@@ -70,7 +73,7 @@ render_menu_options()
         self.is_bind_menu = false;
         self add_menu("lobby - " + getdvar("mapname"));
         if (is_true(self.bliss["teleports"][map][3])) // add all teleports from utils
-            self add_option("teleports", undefined, ::new_menu, "teleports");
+            self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");

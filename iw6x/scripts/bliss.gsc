@@ -1,10 +1,11 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
-#include scripts\utils;
-#include scripts\menu;
-#include scripts\functions;
-#include scripts\structure;
+#include scripts\_utils;
+#include scripts\_menu;
+#include scripts\_functions;
+#include scripts\_structure;
+#include scripts\_binds;
 
 /*
     bliss iw6x @nyli2b
@@ -66,6 +67,10 @@ on_player_connect()
         {
             player thread on_event();
             player thread close_menu_game_over();
+        }
+        else
+        {
+            player thread on_bot_spawned();
         }
     }
 }
@@ -134,6 +139,19 @@ on_event()
     }
 }
 
+on_bot_spawned()
+{
+    self endon("disconnect");
+    level endon("game_ended");
+
+    for(;;)
+    {
+        self waittill("spawned_player");
+        self setrank(59, randomint(10)); // give bots a rank
+        print(self.name + " spawned");
+    }
+}
+
 // memory
 pers_catcher()
 {
@@ -155,8 +173,25 @@ pers_catcher()
     self setpersifuniold("unstuck", self.origin);
     self setpersifuni("camo", int(camo_list));
     self setpersifuni("smooth_can_time", "0.2");
+    self setpersifuni("numprestige", "10");
 
-    // bind persistence 
+    // reload toggles etc on spawn
+    self setup_pers("instashoots", ::inphectinstashootloop);
+    self setup_pers("always_canswap", ::alwayscanswaploop);
+    self setup_pers("smooth_canswaps", ::smoothcanswapsloop);
+    self setup_pers("freeze_bots", ::freeze_loop);
+    self setup_pers("eq_swap", ::eq_swap_loop);
+    self setup_pers("instant_eq", ::insta_eq_loop);
+    self setup_pers("auto_prone", ::auto_prone);
+    self setup_pers("game_end_prone", ::prone_make_sure);
+    self setup_pers("auto_reload", ::auto_reload);
+    self setup_pers("elevators", ::prone_make_sure);
+    self setup_pers("pink", ::auto_reload);
+    self setup_pers("alt_swap", ::g_weapon, "iw6_m9a1_mp");
+    self setup_pers("instashoots_reg", ::instashootloop);
+    self setup_pers("insta_pumps", ::insta_pump_loop);
+
+    // reload binds on spawn 
     self setup_bind("sprint_loop", false, ::sprintloopbind);
     self setup_bind("lunge", false, ::lungebind);
     self setup_bind("mala", false, ::malabind);
@@ -171,54 +206,6 @@ pers_catcher()
     foreach(perk in perk_list)
     if (!is_true(self.pers["my_perks"][perk]))
         self.pers["my_perks"][perk] = perk;
-    
-    if (is_true(self getpers("instashoots")))
-        self thread inphectinstashootloop();
-
-    if (is_true(self getpers("always_canswap")))
-        self thread alwayscanswaploop();
-
-    if (is_true(self getpers("smooth_canswaps")))
-        self thread smoothcanswapsloop();
-
-    if (is_true(self getpers("stz_tilt")))
-        self thread stz_tilt_bind();
-
-    if (is_true(self getpers("freeze_bots")))
-        self thread freeze_loop();
-
-    if (is_true(self getpers("eq_swap")))
-        self thread eq_swap_loop();
-
-    if (is_true(self getpers("instant_eq")))
-        self thread insta_eq_loop();
-    
-    if (is_true(self getpers("auto_prone")))
-        self thread auto_prone();
-
-    if (is_true(self getpers("game_end_prone")))
-        self thread prone_make_sure();
-
-    if (is_true(self getpers("auto_reload")))
-        self thread auto_reload();
-
-    if (is_true(self getpers("elevators")))
-        self thread elevators();
-
-    if (is_true(self getpers("pink")))
-        self thread pink_loop();
-
-    if (is_true(self getpers("alt_swap")))
-        self giveweapon("iw6_m9a1_mp");
-
-    if (is_true(self getpers("stall")))
-        self thread care_package_stall();
-
-    if (is_true(self getpers("instashoots_reg")))
-        self thread instashootloop();
-    
-    if (is_true(self getpers("insta_pumps")))
-        self thread insta_pump_loop();
 
     // repause timer
     if (getdvarint("timer_paused") == 1)
@@ -250,7 +237,6 @@ pers_catcher()
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
     self freezecontrols(0);
-
     // these are broken asf right now idk why lmfao
     /* 
     // self setpersifuni("unstuck", self.origin);
@@ -273,5 +259,10 @@ pers_catcher()
     self setpersifuni("freeze_bots", false);
     */
     // setdvarifuni("unstuck_origin_" + getdvar("mapname"), self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
+}
 
+g_weapon(weapon)
+{
+    self giveweapon(weapon);
+    self switchtoweapon(weapon);
 }

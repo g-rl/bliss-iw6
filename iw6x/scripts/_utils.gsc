@@ -1,8 +1,8 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
-#include scripts\menu;
-#include scripts\functions;
+#include scripts\_menu;
+#include scripts\_functions;
 
 setup_teleports() // map, origin, angles
 {
@@ -25,6 +25,11 @@ setup_teleports() // map, origin, angles
     self.bliss["teleports"]["mp_sovereign"][0] = ["ledge spot"];
     self.bliss["teleports"]["mp_sovereign"][1] = [(550.173, 1769.26, 405.901)];
     self.bliss["teleports"]["mp_sovereign"][2] = [(4.53735, 146.508, 0)];
+
+    // bayview
+    self.bliss["teleports"]["mp_ca_rumble"][0] = ["main spot", "a cool oom", "another oom"];
+    self.bliss["teleports"]["mp_ca_rumble"][1] = [(-440.559, -1221.58, 247.484), (1062.15, 1423.32, 403.902), (-983.862, 495.13, 533.309)];
+    self.bliss["teleports"]["mp_ca_rumble"][2] = [(10.5043, 52.0311, 0), (1.06995, -16.6333, 0), (-0.0946045, -138.186, 0)];
 
     // if map has options, add teleports menu 
     if (is_true(self.bliss["teleports"][getdvar("mapname")][1]))
@@ -205,6 +210,12 @@ setup_bind(pers, value, func)
     }
 }
 
+setup_pers(pers, func, arg)
+{
+    if (is_true(self getpers(pers)))
+        self thread [[func]](arg);
+}
+
 is_valid_weapon( weapon )
 {
     if ( !isdefined ( weapon ) )
@@ -251,6 +262,16 @@ is_true(variable)
         return true;
     }
 
+    return false;
+}
+
+is_really_true(variable)
+{
+    if (isdefined(variable) && variable && variable != 0 && variable != "0")
+    {
+        // print(variable + " is returning true lol\n");
+        return true;
+    }
     return false;
 }
 

@@ -92,7 +92,6 @@ toggle_alt_swaps()
     {
         self giveweapon("iw6_m9a1_mp");
         self switchtoweapon("iw6_m9a1_mp");
-        // self thread alt_swap_loop();
     }
     else
     {
@@ -584,7 +583,7 @@ give_vish()
 give_cowboy()
 {
     current = self getcurrentweapon();
-    x = "iw6_dlcweap02_mp_dlcweap02scope";
+    x = "iw6_dlcweap02_mp_dlcweap02scope"; // ripper
     scale = 1;
     self giveweapon(x);
     self setspawnweapon(x);

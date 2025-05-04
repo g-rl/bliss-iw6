@@ -5,11 +5,9 @@
 #include scripts\_utils;
 #include scripts\_menu;
 
-pickup_bomb()
+pickup_bomb() // edit this to remove bomb off groun
 {
     self thread maps\mp\gametypes\sr::onPickup(self);
-    // self setclientomnvar( "ui_carrying_bomb", true );
-    // setomnvar( "ui_bomb_carrier", self GetEntityNumber() );
 }
 
 pause_timer()
@@ -746,16 +744,6 @@ pink_loop()
     }
 }
 
-change_gravity(value)
-{
-    setdvar("g_gravity", value);
-}
-
-change_speed(value)
-{
-    setdvar("g_speed", value);
-}
-
 manage_heli(value)
 {
     if (value == "spawn")
@@ -866,9 +854,9 @@ change_player_team(player)
         player.team = "axis";
         player.sessionstate = "spectator";
         waitframe();
-        player notify( "luinotifyserver", "team_select", 0 );
+        player notify("luinotifyserver", "team_select", 0);
         waitframe();
-        player notify( "luinotifyserver", "class_select", player.class );
+        player notify("luinotifyserver", "class_select", player.class);
         waitframe();
         player.sessionstate = "playing";
     }
@@ -877,12 +865,22 @@ change_player_team(player)
         player.team = "allies";
         player.sessionstate = "spectator";
         waitframe();
-        player notify( "luinotifyserver", "team_select", 1 );
+        player notify("luinotifyserver", "team_select", 1);
         waitframe();
-        player notify( "luinotifyserver", "class_select", player.class );
+        player notify("luinotifyserver", "class_select", player.class);
         waitframe();
         player.sessionstate = "playing";
     }
+}
+
+change_gravity(value)
+{
+    setdvar("g_gravity", value);
+}
+
+change_speed(value)
+{
+    setdvar("g_speed", value);
 }
 
 change_killcam_time(value)

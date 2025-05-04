@@ -38,16 +38,6 @@ init()
     level.original_damage = level.callbackPlayerDamage;
     level.callbackPlayerDamage = ::damage_hook;
     level.is_debug = true;
-
-    // dont think these are doing anything
-    level.ononeleftevent = undefined;
-    wait 1;
-    level.allowlatecomers = 1;
-    level.graceperiod = 0;
-    level.ingraceperiod = 0;
-    level.prematchperiod = 0;
-    level.waitingforplayers = 0;
-    level.prematchperiodend = 0;
 }
 
 on_player_connect()

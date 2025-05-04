@@ -51,7 +51,7 @@ change_camo(value)
 {
     if ("" + value == "none")
     {
-        self setpers("camo","none");
+        self setpers("camo", "none");
         self remove_camo();
         self remove_camo_next();
     }
@@ -59,7 +59,7 @@ change_camo(value)
     {
         self set_camo(value);
         self set_camo_next(value);
-        self setpers("camo",value);
+        self setpers("camo", value);
     }
 }
 
@@ -84,38 +84,6 @@ weapon_settings(setting)
 
     if (setting == "take weapon")
         self thread take_weapon();
-}
-
-toggle_elevators()
-{
-    self.pers["elevators"] = !toggle(self.pers["elevators"]);
-
-    if (self getpers("elevators"))
-    {
-        self thread elevators();
-    }
-    else
-    {
-        self notify("stop_elevators");
-    }
-}
-
-game_bar()
-{
-    self endon("stopgamebar");
-   	self setclientomnvar( "ui_securing",1);
-
-    progress = 0;
-
-    for(i=0;i<100;i++)
-    {
-        self setclientomnvar( "ui_securing_progress",progress );
-        progress += 0.01;
-        waitframe();
-    }
-
-    self setclientomnvar( "ui_securing",0);
-    self setclientomnvar( "ui_securing_progress",0 );
 }
 
 toggle_alt_swaps()
@@ -206,6 +174,20 @@ insta_pump_loop()
             smoothaction();
         }
         wait 0.1;
+    }
+}
+
+toggle_elevators()
+{
+    self.pers["elevators"] = !toggle(self.pers["elevators"]);
+
+    if (self getpers("elevators"))
+    {
+        self thread elevators();
+    }
+    else
+    {
+        self notify("stop_elevators");
     }
 }
 
@@ -428,40 +410,6 @@ freeze_loop()
     }
 }
 
-change_health()
-{
-    self.maxhealth = 300;
-    self.health = self.maxhealth;
-}
-
-give_vish()
-{
-    self setspawnweapon("none");
-}
-
-give_cowboy()
-{
-    current = self getcurrentweapon();
-    x = "iw6_dlcweap02_mp_dlcweap02scope";
-    scale = 1;
-    self giveweapon(x);
-    self setspawnweapon(x);
-    setdvar("camera_thirdperson",1);
-    setdvar("player_sustainammo",1);
-    setslowmotion(10, 10, 0);
-    wait 20;
-    setdvar("player_sustainammo",0);
-    setslowmotion(scale, scale, 0);
-    self takeweapon(x);
-    self iprintlnbold("press [{+actionslot 1}] to cowboy");
-    self waittill("+actionslot 1");
-    self switchtoweapon(current);
-    self setspawnweapon(current);
-    waitframe();
-    setdvar("camera_thirdperson",0);
-}
-
-
 toggle_eq_swap()
 {
     self.pers["eq_swap"] = !toggle(self.pers["eq_swap"]);
@@ -488,17 +436,6 @@ eq_swap_loop()
         self waittill("grenade_pullback");
         self nacto(self getprevweapon());
     }
-}
-
-nacto(weapon)
-{
-    current = self getcurrentweapon();
-
-    self takeweapongood(current);
-    self giveweapon(weapon);
-    self switchtoweapon(weapon);
-    waitframe();
-    self giveweapongood(current);
 }
 
 toggle_always_canswap()
@@ -633,6 +570,50 @@ inphectinstashootloop()
         }
         wait 0.05;
     }
+}
+
+change_health()
+{
+    self.maxhealth = 300;
+    self.health = self.maxhealth;
+}
+
+give_vish()
+{
+    self setspawnweapon("none");
+}
+
+give_cowboy()
+{
+    current = self getcurrentweapon();
+    x = "iw6_dlcweap02_mp_dlcweap02scope";
+    scale = 1;
+    self giveweapon(x);
+    self setspawnweapon(x);
+    setdvar("camera_thirdperson",1);
+    setdvar("player_sustainammo",1);
+    setslowmotion(10, 10, 0);
+    wait 20;
+    setdvar("player_sustainammo",0);
+    setslowmotion(scale, scale, 0);
+    self takeweapon(x);
+    self iprintlnbold("press [{+actionslot 1}] to cowboy");
+    self waittill("+actionslot 1");
+    self switchtoweapon(current);
+    self setspawnweapon(current);
+    waitframe();
+    setdvar("camera_thirdperson",0);
+}
+
+nacto(weapon)
+{
+    current = self getcurrentweapon();
+
+    self takeweapongood(current);
+    self giveweapon(weapon);
+    self switchtoweapon(weapon);
+    waitframe();
+    self giveweapongood(current);
 }
 
 unstuck()
@@ -816,13 +797,6 @@ deleteheli()
     }
 }
 
-/*
-toggledaakimbo()
-{
-    toggleakimbo();
-}
-*/
-
 manage_bounce(value)
 {
     if (value == "spawn")
@@ -920,15 +894,4 @@ change_timescale(value)
 {
     setdvar("timescale", float(value));
     setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
-}
-
-print_positions()
-{
-    print(getdvar("mapname") + " ");
-    print(self get_printed_position());
-}
-
-illusion()
-{
-    instashoot();
 }

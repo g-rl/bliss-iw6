@@ -27,6 +27,52 @@ toggle_stall(bind, i, pers)
     }
 }
 
+care_package_stall(bind, endonstring)
+{
+    self notify("stop" + endonstring);
+    self endon("stop" + endonstring);
+    self endon("disconnect");
+
+    for(;;)
+    {
+        self waittill(bind);
+        if (self isonladder() || self ismantling()) continue;
+        if (!self in_menu())
+        {
+            model = spawn("script_model", self.origin);
+            model setmodel("tag_origin");
+            self playerlinkto(model);
+            self thread game_bar();
+            wait 0.1;
+            self waittill(bind);
+            self notify("stopgamebar");
+            self setclientomnvar("ui_securing", 0);
+            self setclientomnvar("ui_securing_progress", 0);
+            self unlink();
+            model delete();
+        }
+        wait 0.01;
+    }
+}
+
+game_bar()
+{
+    self endon("stopgamebar");
+   	self setclientomnvar("ui_securing", 1);
+
+    progress = 0;
+
+    for(i=0; i<100; i++)
+    {
+        self setclientomnvar("ui_securing_progress", progress);
+        progress += 0.01;
+        waitframe();
+    }
+
+    self setclientomnvar("ui_securing", 0);
+    self setclientomnvar("ui_securing_progress", 0);
+}
+
 toggle_tilt(bind, i, pers)
 {
     index = pers + "_" + i;
@@ -73,35 +119,6 @@ stz_tilt_bind(bind, endonstring)
             self setplayerangles((self.angles[0],self.angles[1],0));   
             self.tilting = 0;
         }
-    }
-}
-
-care_package_stall(bind, endonstring)
-{
-    self notify("stop" + endonstring);
-    self endon("stop" + endonstring);
-    self endon("disconnect");
-
-    for(;;)
-    {
-        self waittill(bind);
-        if (self isonladder() || self ismantling()) continue;
-
-        if (!self in_menu())
-        {
-            model = spawn("script_model", self.origin);
-            model setmodel("tag_origin");
-            self playerlinkto(model);
-            self thread game_bar();
-            wait 0.1;
-            self waittill(bind);
-            self notify("stopgamebar");
-            self setclientomnvar("ui_securing", 0);
-            self setclientomnvar("ui_securing_progress", 0);
-            self unlink();
-            model delete();
-        }
-        wait 0.01;
     }
 }
 
@@ -346,6 +363,11 @@ illusioncanswapbind(bind, endonstring)
         }
         wait 0.1;
     }
+}
+
+illusion()
+{
+    instashoot();
 }
 
 toggle_lunge_bind(bind, i, pers)

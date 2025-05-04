@@ -4,6 +4,8 @@
 #include scripts\_menu;
 #include scripts\_functions;
 
+void() {}
+
 setup_teleports() // map, origin, angles
 {
     // prison break
@@ -43,16 +45,14 @@ class_change()
     self endon("disconnect");
     level endon("game_ended");
 
-    game["strings"]["change_class"] = "";
+    game["strings"]["change_class"] = ""; // no change class message
 
     for(;;)
     {
-        self waittill("luinotifyserver",var_00,var_01);
+        self waittill("luinotifyserver", var_00, var_01);
 
         if (var_00 != "class_select")
-        {
             continue;
-        }
 
         var_01 = var_01 + 1;
         self.class = "custom" + var_01;
@@ -62,9 +62,9 @@ class_change()
 
         maps\mp\gametypes\_class::giveLoadout(self.teamname, self.class);
         
-        // try to give throwing knife if has no offhand
+        // attempt to give throwing knife if has no offhand
         if (self getcurrentoffhand() == "none")
-            self giveperkoffhand( "throwingknife_mp", false );
+            self giveperkoffhand("throwingknife_mp", false);
 
         // watch alt swap
         if (is_true(self getpers("alt_swap")))
@@ -77,11 +77,11 @@ class_change()
     }
 }
 
-damage_hook( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex )
+damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex)
 {
-    if ( sMeansofDeath != "MOD_FALLING" && sMeansofDeath != "MOD_TRIGGER_HURT" && sMeansofDeath != "MOD_SUICIDE" ) 
+    if (sMeansofDeath != "MOD_FALLING" && sMeansofDeath != "MOD_TRIGGER_HURT" && sMeansofDeath != "MOD_SUICIDE") 
     {
-        if ( is_valid_weapon( sWeapon ) ) 
+        if (is_valid_weapon(sWeapon)) 
         {
             iDamage = 999;
         }
@@ -91,14 +91,14 @@ damage_hook( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vP
         }
     }
 
-    if ( sMeansofDeath == "MOD_FALLING" )
+    if (sMeansofDeath == "MOD_FALLING")
     {
         iDamage = 0;
     }
 
-    [[level.original_damage]]( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex );
+    [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
 
-    if (level.gametype == "sr" && is_valid_weapon( sWeapon )) // online point popup
+    if (level.gametype == "sr" && is_valid_weapon(sWeapon)) // online point popup
     {
         waitframe();
         eAttacker setclientomnvar("ui_points_popup", 250); 
@@ -145,17 +145,13 @@ setpersifuni(pers, value) // needs fixingggg
 
     if (fileexists("bliss/" + self.name + "/" + pers) == -1)
         filewrite("bliss/" + self.name + "/" + pers, value);
-    
-    // new_value = fileread("bliss/" + self.name + "/" + pers);
-    // self.pers[pers] = value;
+
     self.pers[pers] = fileread("bliss/" + self.name + "/" + pers);
     level.saveddvars[pers] = fileread("bliss/" + self.name + "/" + pers);
 }
 
 setdvarifuni(dvar, value)
 {   
-    // value = "" + value;
-    
     if (!isdefined(level.savedvar))
         level.savedvar = [];
 
@@ -216,15 +212,15 @@ setup_pers(pers, func, arg)
         self thread [[func]](arg);
 }
 
-is_valid_weapon( weapon )
+is_valid_weapon(weapon)
 {
     if ( !isdefined ( weapon ) )
         return false;
 
-    if ( getweaponclass( weapon ) == "weapon_sniper" || getweaponclass( weapon ) == "weapon_dmr")
+    if ( getweaponclass(weapon) == "weapon_sniper" || getweaponclass(weapon) == "weapon_dmr")
         return true;
         
-    switch( weapon )
+    switch(weapon)
     {
        	case "throwingknife_mp":
             return true;
@@ -237,7 +233,7 @@ is_valid_weapon( weapon )
 perstovector(pers)
 {
     keys = strtok(pers, ",");
-    return (float(keys[0]),float(keys[1]),float(keys[2]));
+    return (float(keys[0]), float(keys[1]), float(keys[2]));
 }
 
 list(key) 
@@ -248,30 +244,19 @@ list(key)
 
 randomize(key)
 {
-    r = strtok(key, ", ");
-    random = randomint(r.size);
-    final = r[random];
-    return final;
+    arr = strtok(key, ", ");
+    random = randomint(arr.size);
+    output = arr[random];
+    return output;
 }
 
 is_true(variable)
 {
     if (isdefined(variable) && variable)
     {
-        // print(variable + " is returning true lol\n");
         return true;
     }
 
-    return false;
-}
-
-is_really_true(variable)
-{
-    if (isdefined(variable) && variable && variable != 0 && variable != "0")
-    {
-        // print(variable + " is returning true lol\n");
-        return true;
-    }
     return false;
 }
 
@@ -356,8 +341,6 @@ israising()
 
     return false;
 }
-
-void() {}
 
 getprevweapon()
 {
@@ -578,6 +561,15 @@ handle_snr()
     level.sdbombmodel.curOrigin = bomb_model_origin;
 
     level thread auto_bomb();
+
+    level.ononeleftevent = undefined;
+    wait 1;
+    level.allowlatecomers = 1;
+    level.graceperiod = 0;
+    level.ingraceperiod = 0;
+    level.prematchperiod = 0;
+    level.waitingforplayers = 0;
+    level.prematchperiodend = 0;
 }
 
 auto_bomb()
@@ -919,4 +911,10 @@ g_weapon(weapon)
 {
     self giveweapon(weapon);
     self switchtoweapon(weapon);
+}
+
+print_positions()
+{
+    print(getdvar("mapname") + " ");
+    print(self get_printed_position());
 }

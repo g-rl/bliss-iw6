@@ -172,8 +172,8 @@ setup_memory()
     self setup_pers("auto_prone", ::auto_prone);
     self setup_pers("game_end_prone", ::prone_make_sure);
     self setup_pers("auto_reload", ::auto_reload);
-    self setup_pers("elevators", ::prone_make_sure);
-    self setup_pers("pink", ::auto_reload);
+    self setup_pers("elevators", ::elevators);
+    self setup_pers("pink", ::pink_loop);
     self setup_pers("alt_swap", ::g_weapon, "iw6_m9a1_mp");
     self setup_pers("instashoots_reg", ::instashootloop);
     self setup_pers("insta_pumps", ::insta_pump_loop);

@@ -58,7 +58,7 @@ care_package_stall(bind, endonstring)
 game_bar()
 {
     self endon("stopgamebar");
-   	self setclientomnvar("ui_securing", 1);
+    self setclientomnvar("ui_securing", 1);
 
     progress = 0;
 
@@ -364,16 +364,10 @@ illusioncanswapbind(bind, endonstring)
     }
 }
 
-illusion()
-{
-    instashoot();
-}
-
 toggle_lunge_bind(bind, i, pers)
 {
     index = pers + "_" + i;
     new = int(i) - 1;
-    // self iprintln(new);
     self.pers[index] = !toggle(self.pers[index]);
     self.pers[pers + "_" + new] = undefined;
 
@@ -408,4 +402,9 @@ lungebind(bind, endonstring)
         }
         wait 0.1;
     }
+}
+
+illusion()
+{
+    instashoot();
 }

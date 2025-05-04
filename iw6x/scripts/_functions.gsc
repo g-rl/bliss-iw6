@@ -1,6 +1,4 @@
 #include maps\mp\_utility;
-#include maps\mp\gametypes\_hud_util;
-#include maps\mp\gametypes\_gamelogic;
 #include common_scripts\utility;
 #include scripts\_utils;
 #include scripts\_menu;
@@ -10,14 +8,14 @@ pause_timer()
     if (getdvarint("timer_paused") == 0)
     {
         setdvar("timer_paused", 1);
-        level thread pausetimer(); // _gamelogic
+        level thread maps\mp\gametypes\_gamelogic::pausetimer();
         level notify("stop_auto_bomb"); // stop auto plant
         iprintlnbold("^:" + self get_name() + " ^7paused the timer");
     } 
     else 
     {
         setdvar("timer_paused", 0);
-        level thread resumetimer(); // _gamelogic
+        level thread maps\mp\gametypes\_gamelogic::resumetimer();
         level thread auto_bomb(); // resume auto plant
         iprintlnbold("^:" + self get_name() + " ^7resumed the timer");
     }

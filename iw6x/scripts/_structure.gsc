@@ -1,5 +1,4 @@
 #include maps\mp\_utility;
-#include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
 #include scripts\_utils;
 #include scripts\_functions;
@@ -102,7 +101,7 @@ render_menu_options()
         self add_increment("smooth canswap time", increment_controls, ::smooth_can_time, float(self getpers("smooth_can_time")), 0.1, 1, 0.1);
         self add_toggle("always canswap", undefined, ::toggle_always_canswap, self.pers["always_canswap"]);
         self add_toggle("equipment swaps", undefined, ::toggle_eq_swap, self.pers["eq_swap"]);
-        self add_toggle("instant equipment", undefined, ::toggle_instant_eq, self.pers["instant_eq"]);\
+        self add_toggle("instant equipment", undefined, ::toggle_instant_eq, self.pers["instant_eq"]);
         self add_toggle("auto prone", undefined, ::toggle_auto_prone, self.pers["auto_prone"]);
         self add_toggle("auto prone (game end)", "only prones at end of round", ::toggle_game_end_prone, self.pers["game_end_prone"]);
         self add_toggle("auto reload", undefined, ::toggle_auto_reload, self.pers["auto_reload"]);

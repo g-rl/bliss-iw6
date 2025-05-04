@@ -43,7 +43,6 @@ initial_variable()
     self set_menu("bliss");
     self set_title(self get_menu());
 
-    self thread pers_catcher(); // setup persistence
     self thread setup_teleports(); // setup teleports for map if any
     self thread save_file_watch(); // save settings to a folder
     self thread bliss_watermark(); // so watermark shows on first spawn

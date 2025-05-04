@@ -78,6 +78,8 @@ on_event()
                 continue;
             self.first_spawn = true;
 
+            self thread setup_memory(); // setup persistence
+
             // host checks
             if (self ishost())
             {
@@ -130,13 +132,13 @@ on_bot_spawned()
     for(;;)
     {
         self waittill("spawned_player");
+        wait 1;
         self setrank(59, randomint(10)); // give bots a rank
-        print(self.name + " spawned");
     }
 }
 
 // memory
-pers_catcher()
+setup_memory()
 {
     camo_list = randomize("15,39,33,27,13,36"); // i like these camos lol
     perk_list = list("specialty_bulletaccuracy,specialty_quickswap,specialty_fastoffhand,specialty_marathon,specialty_bulletpenetration"); // default perks
@@ -219,6 +221,7 @@ pers_catcher()
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
     self freezecontrols(0);
+
     // these are broken asf right now idk why lmfao
     /* 
     // self setpersifuni("unstuck", self.origin);

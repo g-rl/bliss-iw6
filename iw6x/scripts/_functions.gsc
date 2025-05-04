@@ -169,7 +169,7 @@ insta_pump_loop()
     {
         self waittill("weapon_fired");
 
-        if (getweaponclass( self getcurrentweapon() ) == "weapon_shotgun")
+        if (getweaponclass(self getcurrentweapon()) == "weapon_shotgun")
         {
             smoothaction();
         }

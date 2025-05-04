@@ -62,7 +62,7 @@ class_change()
 
         maps\mp\gametypes\_class::giveLoadout(self.teamname, self.class);
         
-        // attempt to give throwing knife if has no offhand
+        // attempt to give throwing knife if no offhand
         if (self getcurrentoffhand() == "none")
             self giveperkoffhand("throwingknife_mp", false);
 
@@ -107,9 +107,9 @@ damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
 
 bliss_watermark()
 {
-    self.watermark = createfontstring( "objective", 1 );
-    self.watermark setpoint( "LEFT", "CENTER", -424, 234 );
-    self.watermark set_text( "[{+speed_throw}] & [{+actionslot 1}] to open ^:bliss" );
+    self.watermark = createfontstring("objective", 1);
+    self.watermark setpoint("LEFT", "CENTER", -424, 234);
+    self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open ^:bliss");
     self.watermark.showinKillcam = false;
     self.watermark.hidewheninmenu = true;
 }
@@ -132,7 +132,7 @@ save_file_watch()
         foreach(dvar,value in level.savedvar)
             filewrite("bliss/" + dvar, getdvar(dvar));
 
-        self update();
+        // self update();
     }
 }
 

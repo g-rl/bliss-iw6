@@ -224,11 +224,11 @@ add_bind_menu(name, func, pers, end_on) // lol im so lazy bro idc
         index = i + 1;
         prev_index = index - 1;
         end_on = pers;
-        self add_toggle( option, undefined, func, self.pers[pers + "_" + index], undefined, bind, index, end_on, prev_index);
+        self add_toggle(option, undefined, func, self.pers[pers + "_" + index], undefined, bind, index, end_on, prev_index);
     }
 }
 
-add_bind_index( menu)
+add_bind_index(menu)
 {
     self.is_bind_menu = true;
     self add_option(menu, undefined, ::new_menu, menu);

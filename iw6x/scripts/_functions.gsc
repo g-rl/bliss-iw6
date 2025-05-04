@@ -5,11 +5,6 @@
 #include scripts\_utils;
 #include scripts\_menu;
 
-pickup_bomb() // edit this to remove bomb off groun
-{
-    self thread maps\mp\gametypes\sr::onPickup(self);
-}
-
 pause_timer()
 {
     if (getdvarint("timer_paused") == 0)

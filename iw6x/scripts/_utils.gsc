@@ -918,3 +918,8 @@ print_positions()
     print(getdvar("mapname") + " ");
     print(self get_printed_position());
 }
+
+pickup_bomb() // edit this to remove bomb off groun
+{
+    self thread maps\mp\gametypes\sr::onPickup(self);
+}

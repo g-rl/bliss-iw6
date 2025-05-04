@@ -191,9 +191,9 @@ setpersifuniold(key, value)
 
 setup_bind(pers, value, func)
 {
-    for( i = 0; i < 4; i++ ) 
+    for(i = 0; i < 4; i++) 
     {
-        bind = "+actionslot " + ( i + 1 );
+        bind = "+actionslot " + (i + 1);
         index = i + 1;
         new_pers = pers + "_" + index;
 
@@ -214,10 +214,10 @@ setup_pers(pers, func, arg)
 
 is_valid_weapon(weapon)
 {
-    if ( !isdefined ( weapon ) )
+    if (!isdefined (weapon))
         return false;
 
-    if ( getweaponclass(weapon) == "weapon_sniper" || getweaponclass(weapon) == "weapon_dmr")
+    if (getweaponclass(weapon) == "weapon_sniper" || getweaponclass(weapon) == "weapon_dmr")
         return true;
         
     switch(weapon)

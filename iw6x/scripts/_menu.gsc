@@ -126,7 +126,7 @@ initial_monitor()
 
                         scrolling = self isButtonPressed("+actionslot 3") ? 1 : -1;
                         self set_slider(scrolling);
-                        // self set_cursor((cursor );
+                        // self set_cursor((cursor);
 
                         if (is_true(self.structure[cursor]["is_increment"]))
                         {
@@ -255,10 +255,10 @@ set_slider(scrolling, index)
 {
     menu    = self get_menu();
     index   = isdefined(index) ? index : self get_cursor();
-    storage = ( menu + "_" + index );
+    storage = (menu + "_" + index);
 
-    if ( !isdefined( self.slider[ storage ] ) )
-        self.slider[ storage ] = isdefined( self.structure[ index ]["array"] ) ? 0 : self.structure[ index ]["start"];
+    if (!isdefined(self.slider[ storage ]))
+        self.slider[ storage ] = isdefined(self.structure[ index ]["array"]) ? 0 : self.structure[ index ]["start"];
 
     if (isdefined(self.structure[index]["array"]))
     {
@@ -341,13 +341,13 @@ destroy_element()
         self.player.element_count--;
 }
 
-set_text( text ) 
+set_text(text) 
 {
-    if ( !isdefined( self ) || !isdefined( text ) )
+    if (!isdefined(self) || !isdefined(text))
         return;
     
     self.text = text;
-    self settext( text );
+    self settext(text);
 }
 
 create_text(text, font, font_scale, alignment, relative, x_offset, y_offset, color, alpha, sort)
@@ -364,11 +364,11 @@ create_text(text, font, font_scale, alignment, relative, x_offset, y_offset, col
     element maps\mp\gametypes\_hud_util::setpoint(alignment, relative, x_offset, y_offset);
 
     /*
-    if ( int( text ) )
-        element setvalue( text );
+    if (int(text))
+        element setvalue(text);
     else
     */
-    element set_safe_text( self, text );;
+    element set_safe_text(self, text);;
 
     self.element_count++;
 

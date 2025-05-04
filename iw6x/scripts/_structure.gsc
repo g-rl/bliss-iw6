@@ -220,10 +220,10 @@ add_bind_menu(name, func, pers, end_on)
 {
     self add_menu(name);
 
-    for( i = 0; i < 4; i++ ) 
+    for(i = 0; i < 4; i++) 
     {
-        option = name + " > " + "[{+actionslot " + ( i + 1 ) + "}]";
-        bind = "+actionslot " + ( i + 1 );
+        option = name + " > " + "[{+actionslot " + (i + 1) + "}]";
+        bind = "+actionslot " + (i + 1);
         index = i + 1;
         prev_index = index - 1;
         end_on = pers;
@@ -231,7 +231,7 @@ add_bind_menu(name, func, pers, end_on)
     }
 }
 
-add_bind_index( menu )
+add_bind_index( menu)
 {
     self.is_bind_menu = true;
     self add_option(menu, undefined, ::new_menu, menu);

@@ -258,7 +258,7 @@ auto_reload()
     level waittill("game_ended");
 
     weapon = self getcurrentweapon();
-    self setWeaponAmmoClip(weapon, 0);
+    self setweaponammoclip(weapon, 0);
 }
 
 toggle_auto_prone()
@@ -639,7 +639,7 @@ give_certain_streak(streak)
 
 give_streak(streak)
 {
-    self thread maps\mp\killstreaks\_killstreaks::giveKillstreak(streak, false, false, self);
+    self thread maps\mp\killstreaks\_killstreaks::givekillstreak(streak, false, false, self);
 }
 
 fill_streaks()
@@ -655,14 +655,14 @@ refill_ammo()
     x = self GetWeaponsListPrimaries();
     foreach(gun in x)
     {
-        self SetWeaponAmmoClip(gun, 999);
-        self SetWeaponAmmoStock(gun, 999);
+        self setweaponammoclip(gun, 999);
+        self setweaponammostock(gun, 999);
     }
 
     self givemaxammo(self getcurrentoffhand());
 
     if (self getcurrentoffhand() == "none")
-        self givePerkOffhand( "throwingknife_mp", false );
+        self giveperkoffhand("throwingknife_mp", false);
 }
 
 load_bots()
@@ -757,7 +757,7 @@ spawnheli()
             {
                 if (player != self && player.teamname != self.teamname)
                 {
-                    self.helicoperspawn = SpawnHelicopter( player, self.origin + (0,0,1200), self.angles, "littlebird_mp", level.littlebird_model );
+                    self.helicoperspawn = SpawnHelicopter(player, self.origin + (0,0,1200), self.angles, "littlebird_mp", level.littlebird_model);
                     self.canspawnheli = false;
                 }
             }

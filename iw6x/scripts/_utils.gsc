@@ -972,3 +972,12 @@ pickup_bomb() // edit this to remove bomb off groun
 {
     self thread maps\mp\gametypes\sr::onPickup(self);
 }
+
+reload_bomb()
+{
+    if (getdvarint("timer_paused") == 1)
+    {
+        level thread maps\mp\gametypes\_gamelogic::pausetimer(); // _gamelogic
+        level notify("stop_auto_bomb"); // stop auto plant
+    }
+}

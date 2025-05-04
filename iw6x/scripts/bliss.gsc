@@ -74,17 +74,16 @@ on_event()
         {
         case "spawned_player":
 
+            // dont load options if spawned already
             if (isdefined(self.first_spawn))
                 continue;
-            self.first_spawn = true;
 
-            self thread setup_memory(); // setup persistence
+            self thread setup_memory(); // reload options n stuff
 
             // host checks
             if (self ishost())
             {
-                // only load match if gametype is search & rescue
-                if (level.gametype != "sr")
+                if (level.gametype != "sr") // only load match if gametype is search & rescue
                 {
                     iprintlnbold("must be loaded on ^:search & rescue");
                     wait (randomintrange(3, 4));
@@ -94,11 +93,10 @@ on_event()
                 self thread set_random_rounds(); // always cycle rounds
             }
             
-            // setup the menu
             if (!isdefined(self.menu))
                 self.menu = [];
 
-            // setup button monitoring & menu variables
+            // setup menu & button monitoring 
             if (!isdefined(self.menu_init))
             {          
                 self overflow_fix_init(); // does not work.
@@ -107,14 +105,16 @@ on_event()
                 self thread monitor_buttons();
                 self thread create_notify();
                 self.menu_init = true;
+                self.first_spawn = true;
             }
 
+            // main player threads
             self thread class_change(); // always class change
             self thread change_health(); // change max health to 300
             self thread load_bots(); // make sure to load bot positions
             self thread load_self(); // load saved spawnpoint
             self thread bypass_intro(); // skip intro
-            wait 1;
+            wait 1; // wait a second to apply ranks correctly
             self setrank(59, randomintrange(10,12)); // always try to set max rank
             break;
         case "death":
@@ -145,6 +145,11 @@ setup_memory()
     camo_list = randomize("15,39,33,27,13,36"); // i like these camos lol
     perk_list = list("specialty_bulletaccuracy,specialty_quickswap,specialty_fastoffhand,specialty_marathon,specialty_bulletpenetration"); // default perks
 
+    // using setpersifuniold as well until i fix saving
+    self setpersifuniold("unstuck", self.origin);
+    self setpersifuni("camo", int(camo_list));
+    self setpersifuni("smooth_can_time", "0.2");
+
     // only load these settings from host data
     if (self ishost())
     {
@@ -153,14 +158,9 @@ setup_memory()
         setdvarifuni("timer_paused", 0);
         setdvarifuni("g_gravity", 800);
         setdvarifuni("g_speed", 190);  
-        setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0); 
+        setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
+        level thread reload_bomb(); // repause timer if enabled
     }
-    
-    // using setpersifuniold as well until i fix saving
-    self setpersifuniold("unstuck", self.origin);
-    self setpersifuni("camo", int(camo_list));
-    self setpersifuni("smooth_can_time", "0.2");
-    // self setpersifuni("numprestige", "10");
 
     // reload toggles etc on spawn
     self setup_pers("instashoots", ::inphectinstashootloop);
@@ -194,13 +194,6 @@ setup_memory()
     if (!is_true(self.pers["my_perks"][perk]))
         self.pers["my_perks"][perk] = perk;
 
-    // repause timer
-    if (getdvarint("timer_paused") == 1)
-    {
-        level thread maps\mp\gametypes\_gamelogic::pausetimer(); // _gamelogic
-        level notify("stop_auto_bomb"); // stop auto plant
-    }
-
     // setup bounce
     self setpersifuniold("bouncecount", "0");  
     for(i=1; i<8; i++)
@@ -226,7 +219,8 @@ setup_memory()
 
     // these are broken asf right now idk why lmfao
     /* 
-    // self setpersifuni("unstuck", self.origin);
+    setdvarifuni("unstuck_origin_" + getdvar("mapname"), self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
+    self setpersifuni("unstuck", self.origin);
     self setpersifuni("smooth_can_time", 0.2);
     self setpersifuni("always_canswap", false);
     self setpersifuni("smooth_canswaps", false);
@@ -245,5 +239,5 @@ setup_memory()
     self setpersifuni("is_saved", false);
     self setpersifuni("freeze_bots", false);
     */
-    // setdvarifuni("unstuck_origin_" + getdvar("mapname"), self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
+    //
 }

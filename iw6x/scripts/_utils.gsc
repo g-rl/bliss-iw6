@@ -286,7 +286,7 @@ button_monitor(button)
     }
 }
 
-isButtonPressed(button)
+isbuttonpressed(button)
 {
     return self.button_pressed[button];
 }

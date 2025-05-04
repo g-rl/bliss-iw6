@@ -60,7 +60,7 @@ initial_monitor()
         {
             if (!self in_menu())
             {
-                if (self adsButtonPressed() && self isButtonPressed("+actionslot 1"))
+                if (self adsButtonPressed() && self isbuttonpressed("+actionslot 1"))
                 {
                     if (is_true(self.option_interact))
                     {  
@@ -79,7 +79,7 @@ initial_monitor()
                 cursor = self get_cursor();
 
                 // force close if melee pressed
-                if (self isButtonPressed("+melee_zoom"))
+                if (self isbuttonpressed("+melee_zoom"))
                 {
                     self close_menu();
                     self playlocalsound("mp_intel_fail");
@@ -103,28 +103,28 @@ initial_monitor()
 
                     wait 0.2;
                 }
-                else if (self isButtonPressed("+actionslot 2") && !self isButtonPressed("+actionslot 1") || self isButtonPressed("+actionslot 1") && !self isButtonPressed("+actionslot 2")) // up & down
+                else if (self isbuttonpressed("+actionslot 2") && !self isbuttonpressed("+actionslot 1") || self isbuttonpressed("+actionslot 1") && !self isbuttonpressed("+actionslot 2")) // up & down
                 {
                     if (isdefined(self.structure) && self.structure.size >= 2)
                     {
                         if (is_true(self.option_interact))
                             self playlocalsound("grenade_pickup");
 
-                        scrolling = self isButtonPressed("+actionslot 2") ? 1 : -1;
+                        scrolling = self isbuttonpressed("+actionslot 2") ? 1 : -1;
                         self set_cursor((cursor + scrolling));
                         self update_scrolling(scrolling);
                         self notify("selected_option");
                     }
                     wait 0.07;
                 }
-                else if (self isButtonPressed("+actionslot 4") && !self isButtonPressed("+actionslot 3") || self isButtonPressed("+actionslot 3") && !self isButtonPressed("+actionslot 4"))
+                else if (self isbuttonpressed("+actionslot 4") && !self isbuttonpressed("+actionslot 3") || self isbuttonpressed("+actionslot 3") && !self isbuttonpressed("+actionslot 4"))
                 {
                     if (is_true(self.structure[cursor]["slider"]))
                     {
                         if (is_true(self.option_interact))
                             self playlocalsound("scavenger_pack_pickup");
 
-                        scrolling = self isButtonPressed("+actionslot 3") ? 1 : -1;
+                        scrolling = self isbuttonpressed("+actionslot 3") ? 1 : -1;
                         self set_slider(scrolling);
                         // self set_cursor((cursor);
 
@@ -136,7 +136,7 @@ initial_monitor()
                     }
                     wait 0.07;
                 }
-                else if (self isButtonPressed("+gostand"))
+                else if (self isbuttonpressed("+gostand"))
                 {
                     if (isdefined(self.structure[cursor]["function"]))
                     {

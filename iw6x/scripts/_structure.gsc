@@ -216,7 +216,7 @@ player_index(menu, player)
     }
 }
 
-add_bind_menu(name, func, pers, end_on)
+add_bind_menu(name, func, pers, end_on) // lol im so lazy bro idc
 {
     self add_menu(name);
 

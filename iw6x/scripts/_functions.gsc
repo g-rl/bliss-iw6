@@ -28,7 +28,6 @@ toggle_perk(perk) // toggle & store perks
     if (!self _hasperk(perk))
     {
         self _setperk(perk, false);
-
         self.pers["my_perks"][perk] = perk;
         self iprintln("^:" + perk + " ^7given");
     }
@@ -191,12 +190,12 @@ elevators()
 
     for(;;)
     {
-        if (self adsButtonPressed() && self isButtonPressed("+stance") && self isOnGround() && !self isOnLadder() && !self isMantling())
+        if (self adsbuttonpressed() && self isbuttonpressed("+stance") && self isonground() && !self isonladder() && !self ismantling())
         {
             self thread elevator_logic();
             wait 0.25;
         }
-        else if (self JumpButtonPressed())
+        else if (self jumpbuttonpressed())
         {
             self thread stop_elevator();
             wait 0.05;
@@ -301,7 +300,7 @@ auto_prone()
     {
         self waittill("weapon_fired", weapon);
 
-        if (self isOnGround() || self isOnLadder() || self isMantling() || isdefined(self.elevating))
+        if (self isonground() || self isonladder() || self ismantling() || isdefined(self.elevating))
         {
             wait 0.05;
             continue;

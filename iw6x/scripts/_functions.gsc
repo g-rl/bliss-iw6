@@ -21,7 +21,7 @@ pause_timer()
     }
 }
 
-toggle_perk(perk) // toggle & store perks
+toggle_perk(perk) // toggle & store perk data
 {
     if (!self _hasperk(perk))
     {
@@ -58,7 +58,7 @@ drop_canswap()
     weapons = randomize("iw6_mk14_mp_mk14scope,iw6_svu_mp_svuscope,iw6_sc2010_mp,iw6_bren_mp,iw6_usr_mp_usrscope,iw6_l115a3_mp_l115a3scope,iw6_microtar_mp,iw6_vks_mp_vksscope,iw6_dlcweap03_mp_dlcweap03scope,iw6_k7_mp,iw6_maul_mp,iw6_lsat_mp,iw6_ak12_mp,iw6_arx160_mp,iw6_dlcweap01_mp,iw6_pp19_mp,iw6_vepr_mp,iw6_microtar_mp,iw6_dlcweap03_mp,iw6_mts255_mp,iw6_sc2010_mp,iw6_gm6helisnipe_mp,iw6_l115a3_mp,iw6_m27_mp,iw6_kriss_mp,iw6_cbjms_mp");
     self giveweapon(weapons);
     self switchtoweapon(weapons);
-    self setdropcamo(weapons, self getpers("camo"));
+    self setdropcamo(weapons, self getpers("camo")); // apply camo to weapon
 }
 
 weapon_settings(setting)
@@ -159,9 +159,8 @@ insta_pump_loop()
         self waittill("weapon_fired");
 
         if (getweaponclass(self getcurrentweapon()) == "weapon_shotgun")
-        {
             smoothaction();
-        }
+
         wait 0.1;
     }
 }
@@ -210,7 +209,7 @@ elevator_logic()
     self endon("disconnect");
 
     self.elevator = spawn("script_origin", self.origin, 1);
-    self playerLinkTo(self.elevator, undefined);
+    self playerlinkto(self.elevator, undefined);
 
     for(;;)
     {
@@ -329,7 +328,7 @@ loop_auto_prone()
 
     for(;;)
     {
-        self setStance("prone");
+        self setstance("prone");
         wait .01;
     }
 }
@@ -379,7 +378,7 @@ toggle_freeze_bots()
         ents = getentarray();
         foreach(ent in ents)
         if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
-            ent FreezeControls(false);
+            ent freezecontrols(false);
     }
 }
 
@@ -394,7 +393,7 @@ freeze_loop()
         ents = getentarray();
         foreach(ent in ents)
         if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
-            ent FreezeControls(true);
+            ent freezecontrols(true);
         wait 0.05;
     }
 }
@@ -521,9 +520,7 @@ instashootloop()
     {
         self waittill("weapon_change");
         if (is_valid_weapon(self getcurrentweapon()))
-        {
             instashoot();
-        }
     }
 }
 
@@ -552,9 +549,7 @@ inphectinstashootloop()
         if (israising())
         {
             if (self attackbuttonpressed())
-            {
                 instashoot();
-            }
             wait 0.1;
         }
         wait 0.05;

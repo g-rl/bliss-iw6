@@ -124,9 +124,7 @@ render_menu_options()
         self add_menu(menu);
         opt = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
         foreach(option in opt)
-        {
             self add_category(option);
-        }
         break;
     default:
         if (is_true(self.is_bind_menu))

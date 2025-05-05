@@ -6,7 +6,15 @@
 #include scripts\_structure;
 #include scripts\bliss;
 
-// lets create the menu now
+bliss_watermark()
+{
+    self.watermark = createfontstring("objective", 1);
+    self.watermark setpoint("LEFT", "CENTER", -424, 234);
+    self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open ^:bliss");
+    self.watermark.showinKillcam = false;
+    self.watermark.hidewheninmenu = true;
+}
+
 initial_precache()
 {
     foreach(shader in list("shader"))
@@ -64,7 +72,6 @@ initial_monitor()
                 {
                     if (is_true(self.option_interact))
                     {  
-                        // self thread maps\mp\_flashgrenades::applyFlash(0.1, 0.5);
                         self playlocalsound("mp_intel_received");
                         self playlocalsound("tactical_spawn");
                     }
@@ -734,7 +741,6 @@ flicker_shaders()
         self.menu["hud"]["background"][0].color = (0.886275, 0, 0.682353);
         if (first)
             first = false;
-        // (0, 0.278431, 1), (0.54902, 0.168627, 0.929412), (0.768627, 0, 0.823529), (0.886275, 0, 0.682353), (0.976471, 0, 0.560784), (1, 0, 0.443137), (1, 0.231373, 0.337255), (1, 0.352941, 0.207843), (1, 0.478431, 0)
         wait 0.05;
     }
 }
@@ -745,7 +751,6 @@ close_menu()
     self clear_option();
     self clear_all(self.menu["hud"]);
     self thread bliss_watermark();
-    // self setclientomnvar("ui_vanguard", 0);
     self notify("exit_menu");
 }
 
@@ -785,7 +790,7 @@ create_summary(summary)
 create_option()
 {
     self clear_option();
-    self render_menu_options();
+    self structure();
 
     if (!isdefined(self.structure) || !self.structure.size)
         self add_option("nothing to display..");
@@ -984,4 +989,175 @@ update_menu(menu, cursor, force)
         if (isdefined(self) && self in_menu())
             self create_option();
     }
+}
+
+// overflow fix that doesnt work
+
+overflow_fix_init()
+{
+    self.stringTable = [];
+    self.stringTableEntryCount = 0;
+    self.textTable = [];
+    self.textTableEntryCount = 0;
+    if (!isdefined(level.anchorText))
+    {
+        level.anchorText = createServerFontString("default", 1.5);
+        level.anchorText setText("anchor");
+        level.anchorText.alpha = 0;
+        level.stringCount = 0;
+        level thread overflow_monitor();
+    }
+}
+
+overflow_monitor()
+{
+    level endon("game_ended");
+
+    for(;;)
+    {
+        wait 0.05;
+
+        if (level.stringCount >= 50)
+        {
+            level.anchorText clearAllTextAfterHudElem();
+            level.stringCount = 0;
+
+            players = level.players;
+            foreach(player in players)
+            {
+                if (!isdefined(player))
+                    continue;
+
+                player purge_text_table();
+                player purge_string_table();
+                player recreate_text();
+            }
+        }
+    }
+}
+
+set_safe_text(player, text)
+{
+    stringId = player get_string_id(text);
+    if (stringId == -1)
+    {
+        player add_string_table_entry(text);
+        stringId = player get_string_id(text);
+    }
+    player edit_text_table_entry(self.textTableIndex, stringId);
+    self settext(text);
+}
+
+recreate_text()
+{
+    foreach(entry in self.textTable)
+        entry.element set_safe_text(self, lookup_string_by_id(entry.stringId));
+}
+
+add_string_table_entry(string)
+{
+    entry = spawnStruct();
+    entry.id = self.stringTableEntryCount;
+    entry.string = string;
+    self.stringTable[self.stringTable.size] = entry;
+    self.stringTableEntryCount++;
+    level.stringCount++;
+}
+
+lookup_string_by_id(id)
+{
+    string = "";
+    foreach(entry in self.stringTable)
+    {
+        if (entry.id == id)
+        {
+            string = entry.string;
+            break;
+        }
+    }
+    return string;
+}
+
+get_string_id(string)
+{
+    id = -1;
+    foreach(entry in self.stringTable)
+    {
+        if (entry.string == string)
+        {
+            id = entry.id;
+            break;
+        }
+    }
+    return id;
+}
+
+get_string_table_entry(id)
+{
+    stringTableEntry = -1;
+    foreach(entry in self.stringTable)
+    {
+        if (entry.id == id)
+        {
+            stringTableEntry = entry;
+            break;
+        }
+    }
+    return stringTableEntry;
+}
+
+purge_string_table()
+{
+    stringTable = [];
+    foreach(entry in self.textTable)
+    {
+        stringTable[stringTable.size] = get_string_table_entry(entry.stringId);
+    }
+    self.stringTable = stringTable;
+}
+
+purge_text_table()
+{
+    textTable = [];
+    foreach(entry in self.textTable)
+    {
+        if (entry.id != -1)
+        {
+            textTable[textTable.size] = entry;
+        }
+    }
+    self.textTable = textTable;
+}
+
+edit_text_table_entry(id, stringId)
+{
+    foreach(entry in self.textTable)
+    {
+        if (entry.id == id)
+        {
+            entry.stringId = stringId;
+            break;
+        }
+    }
+}
+
+delete_text_table_entry(id)
+{
+    foreach(entry in self.textTable)
+    {
+        if (entry.id == id)
+        {
+            entry.id = -1;
+            entry.stringId = -1;
+        }
+    }
+}
+
+clear(player)
+{
+    if (self.type == "text")
+        player delete_text_table_entry(self.textTableIndex);
+
+    if (isdefined(self))
+        self destroy();
 }

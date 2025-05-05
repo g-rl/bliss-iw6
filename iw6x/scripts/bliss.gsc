@@ -82,13 +82,7 @@ on_event()
             // host checks
             if (self ishost())
             {
-                if (level.gametype != "sr") // only load match if gametype is search & rescue
-                {
-                    iprintlnbold("must be loaded on ^:search & rescue");
-                    wait (randomintrange(3, 4));
-                    exitlevel();
-                    return;
-                }
+                self thread check_snr(); // kick player if gametype is not s&r
                 self thread set_random_rounds(); // always cycle rounds
             }
             
@@ -187,7 +181,6 @@ setup_memory()
     self setup_bind("glide", false, ::glidebind);
     self setup_bind("care_package", false, ::care_package_stall);
     self setup_bind("tilt", false, ::stz_tilt_bind);
-
     // give and save perks 
     foreach(perk in perk_list)
     if (!is_true(self.pers["my_perks"][perk]))
@@ -208,6 +201,12 @@ setup_memory()
         {
             level.camoarray[level.camoarray.size] = i;
         }
+    }
+
+    if (getdvarint("bouncecount") >= 1)
+    {
+        self notify("stop_bounce_loop");
+        self thread bounce_loop(); // watch for placed bounces
     }
 
     // so everything applies correctly

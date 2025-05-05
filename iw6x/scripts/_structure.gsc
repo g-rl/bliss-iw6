@@ -5,21 +5,20 @@
 #include scripts\_menu;
 #include scripts\_binds;
 
-// menu structure
-render_menu_options()
+structure()
 {
     menu = self get_menu();
 
     if (!isdefined(menu))
         menu = "unassigned";
 
-    // change options msg
     increment_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, no jump needed to select";
     slider_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, [{+gostand}] to select";
+    credits = "made with <3 by @nyli2b";
+    menu_info = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
     current_camo = "current camo: " + self getpers("camo");
     first_weapon = self weapname(self getcurrentweapon());
     next_weapon = self weapname(self getnextweapon());
-    credits = "made with <3 by @nyli2b";
 
     switch(menu)
     {
@@ -33,66 +32,10 @@ render_menu_options()
         self add_option("clients", credits, ::new_menu, "all clients");
         self add_option("menu info", credits, ::new_menu, "menu info");
         break;
-    case "teleports":
-        self.is_bind_menu = false;
-        map = getdvar("mapname");
-        self add_menu("teleports - " + getdvar("mapname"));
-        for(i = 0; i < self.bliss["teleports"][map][0].size; i++) 
-        {
-            self add_option(self.bliss["teleports"][map][0][i], undefined, ::set_position, self.bliss["teleports"][map][1][i], self.bliss["teleports"][map][2][i]);
-        }
-        break;
-    case "camos":
-        self add_menu("camos");
-        foreach(camo in level.camoarray)
-            self add_option("camo " + camo, current_camo, ::change_camo, camo);
-        break;
-    case "binds":
-        self add_menu(menu);
-        self add_bind_index("sprint loop");
-        self add_bind_index("lunge");
-        self add_bind_index("smooth");
-        self add_bind_index("mala");
-        self add_bind_index("illusion");
-        self add_bind_index("glide");
-        self add_bind_index("care package stall");
-        self add_bind_index("tilt screen");
-        // self add_bind_index("gunlock");
-        break;
-    case "weapons":
-        self.is_bind_menu = false;
-        self add_menu("weapons - " + first_weapon + " & " + next_weapon);
-        self add_increment("set camo", increment_controls, ::change_camo, int(self getpers("camo")), 10, 46, 1);
-        self add_array("settings", slider_controls, ::weapon_settings, list("refill ammo,drop canswap,drop weapon,take weapon"));
-        self add_array("perks", slider_controls, ::toggle_perk, list("specialty_fastsprintrecovery,specialty_fastreload,specialty_lightweight,specialty_marathon,specialty_pitcher,specialty_sprintreload,specialty_quickswap,specialty_bulletaccuracy,specialty_quickdraw,specialty_silentkill,specialty_blindeye,specialty_quieter,specialty_incog,specialty_gpsjammer,specialty_paint,specialty_scavenger,specialty_detectexplosive,specialty_selectivehearing,specialty_comexp,specialty_falldamage,specialty_regenfaster,specialty_sharp_focus,specialty_stun_resistance,specialty_explosivedamage"));
-        self add_array("killstreaks", slider_controls, ::give_certain_streak, list("fill all,care package,ammo crate,vests,kem strike,oracle,odin"));
-        break;
-    case "lobby":
-        map = getdvar("mapname");
-        self.is_bind_menu = false;
-        self add_menu("lobby - " + getdvar("mapname"));
-        if (is_true(self.bliss["teleports"][map][3])) // add all teleports from utils
-            self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
-        self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
-        self add_option("spawn bot", undefined, ::spawnbot);
-        self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
-        self add_option("pickup bomb", undefined, ::pickup_bomb);
-        self add_array("bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
-        // self add_array("helicopters", slider_controls, ::manage_heli, list("spawn,delete"));
-        self add_option("give vish", undefined, ::give_vish);
-        self add_option("give cowboy", undefined, ::give_cowboy);
-        self add_option("unstuck", "go back to your first spawn", ::unstuck);
-        if (is_true(level.is_debug) && self get_name() == "catchet")
-            self add_option("print position", undefined, ::print_positions);
-        self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
-        self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
-        self add_increment("killcam time", increment_controls, ::change_killcam_time, getdvarfloat("scr_killcam_time"), 1, 10, 0.5);
-        self add_increment("timescale", increment_controls, ::change_timescale, getdvarfloat("timescale"), 0.25, 10, 0.25);
-        break;
     case "toggles":
         self.is_bind_menu = false;
         self add_menu("toggles");
-        self add_option("binds", "my lazy binds menu lol", ::new_menu, "binds");
+        self add_option("anims", "my lazy binds menu lol", ::new_menu, "anims");
         self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         self add_toggle("instashoots [inphect]", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
@@ -109,6 +52,56 @@ render_menu_options()
         self add_toggle("alt swaps", "only gives a third weapon", ::toggle_alt_swaps, self.pers["alt_swap"]);
         self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
         break;
+    case "lobby":
+        map = getdvar("mapname");
+        self.is_bind_menu = false;
+        self add_menu("lobby - " + getdvar("mapname"));
+        if (is_true(self.bliss["teleports"][map][3])) // add all teleports from utils
+            self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
+        self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
+        self add_option("spawn bot", undefined, ::spawnbot);
+        self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
+        self add_option("pickup bomb", undefined, ::pickup_bomb);
+        self add_array("bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
+        self add_option("give vish", undefined, ::give_vish);
+        self add_option("give cowboy", undefined, ::give_cowboy);
+        self add_option("unstuck", "go back to your first spawn", ::unstuck);
+        if (is_true(level.is_debug) && self get_name() == "catchet")
+            self add_option("print position", undefined, ::print_positions);
+        self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
+        self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
+        self add_increment("killcam time", increment_controls, ::change_killcam_time, getdvarfloat("scr_killcam_time"), 1, 10, 0.5);
+        self add_increment("timescale", increment_controls, ::change_timescale, getdvarfloat("timescale"), 0.25, 10, 0.25);
+        break;
+    case "weapons":
+        self.is_bind_menu = false;
+        self add_menu("weapons - " + first_weapon + " & " + next_weapon);
+        self add_increment("set camo", increment_controls, ::change_camo, int(self getpers("camo")), 10, 46, 1);
+        self add_array("settings", slider_controls, ::weapon_settings, list("refill ammo,drop canswap,drop weapon,take weapon"));
+        self add_array("perks", slider_controls, ::toggle_perk, list("specialty_fastsprintrecovery,specialty_fastreload,specialty_lightweight,specialty_marathon,specialty_pitcher,specialty_sprintreload,specialty_quickswap,specialty_bulletaccuracy,specialty_quickdraw,specialty_silentkill,specialty_blindeye,specialty_quieter,specialty_incog,specialty_gpsjammer,specialty_paint,specialty_scavenger,specialty_detectexplosive,specialty_selectivehearing,specialty_comexp,specialty_falldamage,specialty_regenfaster,specialty_sharp_focus,specialty_stun_resistance,specialty_explosivedamage"));
+        self add_array("killstreaks", slider_controls, ::give_certain_streak, list("fill all,care package,ammo crate,vests,kem strike,oracle,odin"));
+        break;
+    case "teleports":
+        self.is_bind_menu = false;
+        map = getdvar("mapname");
+        self add_menu("teleports - " + getdvar("mapname"));
+        for(i = 0; i < self.bliss["teleports"][map][0].size; i++) 
+        {
+            self add_option(self.bliss["teleports"][map][0][i], undefined, ::set_position, self.bliss["teleports"][map][1][i], self.bliss["teleports"][map][2][i]);
+        }
+        break;
+    case "anims":
+        self add_menu(menu);
+        self add_bind_index("sprint loop");
+        self add_bind_index("lunge");
+        self add_bind_index("smooth");
+        self add_bind_index("mala");
+        self add_bind_index("illusion");
+        self add_bind_index("glide");
+        self add_bind_index("care package stall");
+        self add_bind_index("tilt screen");
+        // self add_bind_index("gunlock");
+        break;
     case "all clients":
         self.is_bind_menu = false;
         self add_menu(menu);
@@ -122,9 +115,8 @@ render_menu_options()
     case "menu info":
         self.is_bind_menu = false;
         self add_menu(menu);
-        opt = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
-        foreach(option in opt)
-            self add_category(option);
+        foreach(opt in menu_info)
+            self add_category(opt);
         break;
     default:
         if (is_true(self.is_bind_menu))

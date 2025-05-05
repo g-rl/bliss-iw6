@@ -105,113 +105,58 @@ damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
     }
 }
 
-bliss_watermark()
+handle_snr()
 {
-    self.watermark = createfontstring("objective", 1);
-    self.watermark setpoint("LEFT", "CENTER", -424, 234);
-    self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open ^:bliss");
-    self.watermark.showinKillcam = false;
-    self.watermark.hidewheninmenu = true;
-}
+    // always attacking
+    game["switchedsides"] = false;
+    game["attackers"] = "allies";
 
-fileread(file)
-{
-    filesetdvar(file);
-    return getdvar("panelafile");
-}
-
-save_file_watch()
-{
-    for(;;)
+    while (!isdefined(level.sdbomb))
     {
-        self waittill_any("opened_menu", "exit_menu", "selected_option");
-        
-        foreach(pers,value in level.saveddvars)
-            filewrite("bliss/" + self.name + "/" + pers, "" + self getpers(pers));
+        wait 0.05;
+    }
 
-        foreach(dvar,value in level.savedvar)
-            filewrite("bliss/" + dvar, getdvar(dvar));
+    while (!isdefined(level.bombzones) || level.bombzones.size < 1)
+    {
+        wait 0.05;
+    }
 
-        // self update();
+    level.sdbombmodel hide();
+    level.sdbomb hide();
+
+    bombzone_origin = level.bombzones[0].origin - (0, 0, 7.875);
+    level.sdbomb.origin = bombzone_origin;
+    level.sdbomb.curOrigin = bombzone_origin;
+
+    bomb_model_origin = level.bombzones[0].origin - (0, 0, 17.875);
+    level.sdbombmodel.origin = bomb_model_origin;
+    level.sdbombmodel.curOrigin = bomb_model_origin;
+
+    level thread auto_bomb();
+
+    level.ononeleftevent = undefined;
+    wait 1;
+    level.allowlatecomers = 1;
+    level.graceperiod = 0;
+    level.ingraceperiod = 0;
+    level.prematchperiod = 0;
+    level.waitingforplayers = 0;
+    level.prematchperiodend = 0;
+}
+
+check_snr()
+{
+    if (level.gametype != "sr") // only load match if gametype is search & rescue
+    {
+        iprintlnbold("must be loaded on ^:search & rescue");
+        wait (randomintrange(3, 4));
+        self maps\mp\_flashgrenades::applyflash(1,1);
+        self playlocalsound("copycat_steal_class");
+        wait 1;
+        exitlevel();
+        return;
     }
 }
-
-setpersifuni(pers, value) // needs fixingggg
-{
-    value = "" + value;
-
-    if (!isdefined(level.saveddvars))
-        level.saveddvars = [];
-
-    if (fileexists("bliss/" + self.name + "/" + pers) == -1)
-        filewrite("bliss/" + self.name + "/" + pers, value);
-
-    self.pers[pers] = fileread("bliss/" + self.name + "/" + pers);
-    level.saveddvars[pers] = fileread("bliss/" + self.name + "/" + pers);
-}
-
-setdvarifuni(dvar, value)
-{   
-    if (!isdefined(level.savedvar))
-        level.savedvar = [];
-
-    if (fileexists("bliss/" + dvar) == -1)
-        filewrite("bliss/" + dvar, value);
-
-    setdvar(dvar, fileread("bliss/" + dvar));
-
-    level.savedvar[dvar] = value;
-    waitframe();
-}
-
-toggle_pers(pers)
-{
-    if (!isdefined(self.pers[pers])) self.pers[pers] = false;
-    self.pers[pers] = !self.pers[pers];
-}
-
-setpers(key, value)
-{
-    self.pers[key] = value;
-    print(key + " to" + value + "\n ");
-}
-
-getpers(key)
-{
-    return self.pers[key];
-}
-
-setpersifuniold(key, value)
-{
-    if (!isdefined(self.pers[key]))
-    {
-        self.pers[key] = value;
-    }
-}
-
-setup_bind(pers, value, func)
-{
-    for(i = 0; i < 4; i++) 
-    {
-        bind = "+actionslot " + (i + 1);
-        index = i + 1;
-        new_pers = pers + "_" + index;
-
-        self setpersifuniold(new_pers, value);
-
-        if (is_true(self getpers(new_pers)))
-        {
-            self thread [[func]](bind, pers);
-        }
-    }
-}
-
-setup_pers(pers, func, arg)
-{
-    if (is_true(self getpers(pers)))
-        self thread [[func]](arg);
-}
-
 is_valid_weapon(weapon)
 {
     if (!isdefined (weapon))
@@ -533,45 +478,6 @@ random_message()
     return m[randomint(m.size)];
 }
 
-handle_snr()
-{
-    // always attacking
-    game["switchedsides"] = false;
-    game["attackers"] = "allies";
-
-    while (!isdefined(level.sdbomb))
-    {
-        wait 0.05;
-    }
-
-    while (!isdefined(level.bombzones) || level.bombzones.size < 1)
-    {
-        wait 0.05;
-    }
-
-    level.sdbombmodel hide();
-    level.sdbomb hide();
-
-    bombzone_origin = level.bombzones[0].origin - (0, 0, 7.875);
-    level.sdbomb.origin = bombzone_origin;
-    level.sdbomb.curOrigin = bombzone_origin;
-
-    bomb_model_origin = level.bombzones[0].origin - (0, 0, 17.875);
-    level.sdbombmodel.origin = bomb_model_origin;
-    level.sdbombmodel.curOrigin = bomb_model_origin;
-
-    level thread auto_bomb();
-
-    level.ononeleftevent = undefined;
-    wait 1;
-    level.allowlatecomers = 1;
-    level.graceperiod = 0;
-    level.ingraceperiod = 0;
-    level.prematchperiod = 0;
-    level.waitingforplayers = 0;
-    level.prematchperiodend = 0;
-}
-
 auto_bomb()
 {
     level endon("stop_auto_bomb");
@@ -670,6 +576,8 @@ weapname(weap)
 spawnbot()
 {
     executecommand("spawnbot");
+    wait 2;
+    self thread load_bots(); // in case a save is set b4 bot spawn lol
 }
 
 genie(a, b) 
@@ -681,181 +589,12 @@ genie(a, b)
     return output;
 }
 
-isInArray(array, text)
+isinarray(array, text)
 {
-    for(e=0;e<array.size;e++)
-        if (array[e] == text)
+    for(i=0; i < array.size; i++)
+        if (array[i] == text)
             return true;
     return false;
-}
-
-overflow_fix_init()
-{
-    self.stringTable = [];
-    self.stringTableEntryCount = 0;
-    self.textTable = [];
-    self.textTableEntryCount = 0;
-    if (!isdefined(level.anchorText))
-    {
-        level.anchorText = createServerFontString("default", 1.5);
-        level.anchorText setText("anchor");
-        level.anchorText.alpha = 0;
-        level.stringCount = 0;
-        level thread overflow_monitor();
-    }
-}
-
-overflow_monitor()
-{
-    level endon("game_ended");
-
-    for(;;)
-    {
-        wait 0.05;
-
-        if (level.stringCount >= 50)
-        {
-            level.anchorText clearAllTextAfterHudElem();
-            level.stringCount = 0;
-
-            players = level.players;
-            foreach(player in players)
-            {
-                if (!isdefined(player))
-                    continue;
-
-                player purge_text_table();
-                player purge_string_table();
-                player recreate_text();
-            }
-        }
-    }
-}
-
-set_safe_text(player, text)
-{
-    stringId = player get_string_id(text);
-    if (stringId == -1)
-    {
-        player add_string_table_entry(text);
-        stringId = player get_string_id(text);
-    }
-    player edit_text_table_entry(self.textTableIndex, stringId);
-    self settext(text);
-}
-
-recreate_text()
-{
-    foreach(entry in self.textTable)
-        entry.element set_safe_text(self, lookup_string_by_id(entry.stringId));
-}
-
-add_string_table_entry(string)
-{
-    entry = spawnStruct();
-    entry.id = self.stringTableEntryCount;
-    entry.string = string;
-    self.stringTable[self.stringTable.size] = entry;
-    self.stringTableEntryCount++;
-    level.stringCount++;
-}
-
-lookup_string_by_id(id)
-{
-    string = "";
-    foreach(entry in self.stringTable)
-    {
-        if (entry.id == id)
-        {
-            string = entry.string;
-            break;
-        }
-    }
-    return string;
-}
-
-get_string_id(string)
-{
-    id = -1;
-    foreach(entry in self.stringTable)
-    {
-        if (entry.string == string)
-        {
-            id = entry.id;
-            break;
-        }
-    }
-    return id;
-}
-
-get_string_table_entry(id)
-{
-    stringTableEntry = -1;
-    foreach(entry in self.stringTable)
-    {
-        if (entry.id == id)
-        {
-            stringTableEntry = entry;
-            break;
-        }
-    }
-    return stringTableEntry;
-}
-
-purge_string_table()
-{
-    stringTable = [];
-    foreach(entry in self.textTable)
-    {
-        stringTable[stringTable.size] = get_string_table_entry(entry.stringId);
-    }
-    self.stringTable = stringTable;
-}
-
-purge_text_table()
-{
-    textTable = [];
-    foreach(entry in self.textTable)
-    {
-        if (entry.id != -1)
-        {
-            textTable[textTable.size] = entry;
-        }
-    }
-    self.textTable = textTable;
-}
-
-edit_text_table_entry(id, stringId)
-{
-    foreach(entry in self.textTable)
-    {
-        if (entry.id == id)
-        {
-            entry.stringId = stringId;
-            break;
-        }
-    }
-}
-
-delete_text_table_entry(id)
-{
-    foreach(entry in self.textTable)
-    {
-        if (entry.id == id)
-        {
-            entry.id = -1;
-            entry.stringId = -1;
-        }
-    }
-}
-
-clear(player)
-{
-    if (self.type == "text")
-        player delete_text_table_entry(self.textTableIndex);
-
-    if (isdefined(self))
-        self destroy();
 }
 
 handle_camo()
@@ -980,4 +719,102 @@ reload_bomb()
         level thread maps\mp\gametypes\_gamelogic::pausetimer(); // _gamelogic
         level notify("stop_auto_bomb"); // stop auto plant
     }
+}
+
+fileread(file)
+{
+    filesetdvar(file);
+    return getdvar("panelafile");
+}
+
+save_file_watch()
+{
+    for(;;)
+    {
+        self waittill_any("opened_menu", "exit_menu", "selected_option");
+        
+        foreach(pers,value in level.saveddvars)
+            filewrite("bliss/" + self.name + "/" + pers, "" + self getpers(pers));
+
+        foreach(dvar,value in level.savedvar)
+            filewrite("bliss/" + dvar, getdvar(dvar));
+
+        // self update();
+    }
+}
+
+setpersifuni(pers, value) // needs fixingggg
+{
+    value = "" + value;
+
+    if (!isdefined(level.saveddvars))
+        level.saveddvars = [];
+
+    if (fileexists("bliss/" + self.name + "/" + pers) == -1)
+        filewrite("bliss/" + self.name + "/" + pers, value);
+
+    self.pers[pers] = fileread("bliss/" + self.name + "/" + pers);
+    level.saveddvars[pers] = fileread("bliss/" + self.name + "/" + pers);
+}
+
+setdvarifuni(dvar, value)
+{   
+    if (!isdefined(level.savedvar))
+        level.savedvar = [];
+
+    if (fileexists("bliss/" + dvar) == -1)
+        filewrite("bliss/" + dvar, value);
+
+    setdvar(dvar, fileread("bliss/" + dvar));
+
+    level.savedvar[dvar] = value;
+    waitframe();
+}
+
+toggle_pers(pers)
+{
+    if (!isdefined(self.pers[pers])) self.pers[pers] = false;
+    self.pers[pers] = !self.pers[pers];
+}
+
+setpers(key, value)
+{
+    self.pers[key] = value;
+    print(key + " to" + value + "\n ");
+}
+
+getpers(key)
+{
+    return self.pers[key];
+}
+
+setpersifuniold(key, value)
+{
+    if (!isdefined(self.pers[key]))
+    {
+        self.pers[key] = value;
+    }
+}
+
+setup_bind(pers, value, func)
+{
+    for(i = 0; i < 4; i++) 
+    {
+        bind = "+actionslot " + (i + 1);
+        index = i + 1;
+        new_pers = pers + "_" + index;
+
+        self setpersifuniold(new_pers, value);
+
+        if (is_true(self getpers(new_pers)))
+        {
+            self thread [[func]](bind, pers);
+        }
+    }
+}
+
+setup_pers(pers, func, arg)
+{
+    if (is_true(self getpers(pers)))
+        self thread [[func]](arg);
 }

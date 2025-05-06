@@ -653,7 +653,6 @@ open_menu(menu)
     self set_procedure();
     self create_option();
     self.watermark destroy();
-    // self setclientomnvar("ui_vanguard", 1);
     self thread flicker_shaders();
     self notify("opened_menu");
 }

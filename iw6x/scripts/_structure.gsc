@@ -24,7 +24,6 @@ structure()
     {
     case "bliss":
         self.is_bind_menu = false;
-        // self add_menu("bliss - " + random_message());
         self add_menu("bliss");
         self add_option("toggles", credits, ::new_menu, "toggles");
         self add_option("lobby", credits, ::new_menu, "lobby");
@@ -35,7 +34,7 @@ structure()
     case "toggles":
         self.is_bind_menu = false;
         self add_menu("toggles");
-        self add_option("anims", "my lazy binds menu lol", ::new_menu, "anims");
+        self add_option("anims", "might crash ur game", ::new_menu, "anims");
         self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         self add_toggle("instashoots [inphect]", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
@@ -100,7 +99,6 @@ structure()
         self add_bind_index("glide");
         self add_bind_index("care package stall");
         self add_bind_index("tilt screen");
-        // self add_bind_index("gunlock");
         break;
     case "all clients":
         self.is_bind_menu = false;

@@ -84,6 +84,8 @@ damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
         if (is_valid_weapon(sWeapon)) 
         {
             iDamage = 999;
+            eattacker playlocalsound("tactical_spawn");
+            eattacker playlocalsound("copycat_steal_class");
         }
         else
         {
@@ -97,7 +99,7 @@ damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
     }
 
     [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
-
+    
     if (level.gametype == "sr" && is_valid_weapon(sWeapon)) // online point popup
     {
         waitframe();
@@ -150,13 +152,15 @@ check_snr()
     {
         iprintlnbold("must be loaded on ^:search & rescue");
         wait (randomintrange(3, 4));
-        self maps\mp\_flashgrenades::applyflash(1,1);
+        iprintlnbold("must be loaded on ^:search & rescue");
+        self maps\mp\_flashgrenades::applyflash(10,1);
         self playlocalsound("copycat_steal_class");
         wait 1;
         exitlevel();
         return;
     }
 }
+
 is_valid_weapon(weapon)
 {
     if (!isdefined (weapon))
@@ -222,7 +226,7 @@ button_monitor(button)
     self.button_pressed[button] = false;
     self NotifyOnPlayerCommand("button_pressed_" + button, button);
 
-    while(1)
+    for(;;)
     {
         self waittill("button_pressed_" + button);
         self.button_pressed[button] = true;
@@ -376,7 +380,7 @@ remove_camo_next()
     self giveweapon(x);
 }
 
-set_camo(camo)
+setcamo(camo)
 {   
     x = self getcurrentweapon();
 
@@ -423,7 +427,7 @@ setdropcamo(weapons, camo)
     self dropitem(x + "_camo" + camo);
 }
 
-set_camo_next(camo)
+setcamonext(camo)
 {
     x = self getnextweapon();
     
@@ -523,7 +527,7 @@ set_random_rounds()
     random_round_axis = randomint(3);
     random_round_ally = randomint(3);
     rounds_played = random_round_axis + random_round_ally;
-    level waittill("final_killcam_done");
+    level waittill("final_killcam_done"); // set on final_killcam_done so it doesnt reset at first round end
     game["roundsWon"]["axis"] = random_round_axis;
     game["roundsWon"]["allies"] = random_round_ally;
     game["roundsplayed"] = rounds_played;
@@ -566,8 +570,8 @@ set_perks()
 
 weapname(weap)
 {
-    array = strtok(getweaponbasename(weap),"_");
-    if (isSubStr(array[0],"iw6"))
+    array = strtok(getweaponbasename(weap), "_");
+    if (issubstr(array[0], "iw6"))
     return array[1];
     else 
     return array[0];
@@ -599,8 +603,8 @@ isinarray(array, text)
 
 handle_camo()
 {
-    self set_camo(self getpers("camo"));
-    self set_camo_next(self getpers("camo"));
+    self setcamo(self getpers("camo"));
+    self setcamonext(self getpers("camo"));
 }
 
 kick_player(player)
@@ -699,6 +703,7 @@ g_weapon(weapon)
 {
     self giveweapon(weapon);
     self switchtoweapon(weapon);
+    self setcamo(self getpers("camo"));
 }
 
 print_positions()
@@ -707,16 +712,18 @@ print_positions()
     print(self get_printed_position());
 }
 
-pickup_bomb() // edit this to remove bomb off groun
+pickup_bomb()
 {
-    self thread maps\mp\gametypes\sr::onPickup(self);
+    // self thread maps\mp\gametypes\sr::onPickup(self);
+    self thread [[level.sdBomb.onPickup]](self); // try calling it like this ?
+    level.sdBomb maps\mp\gametypes\_gameobjects::setVisibleTeam("none");
 }
 
 reload_bomb()
 {
     if (getdvarint("timer_paused") == 1)
     {
-        level thread maps\mp\gametypes\_gamelogic::pausetimer(); // _gamelogic
+        level thread maps\mp\gametypes\_gamelogic::pausetimer();
         level notify("stop_auto_bomb"); // stop auto plant
     }
 }

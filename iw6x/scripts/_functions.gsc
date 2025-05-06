@@ -47,8 +47,8 @@ change_camo(value)
     }
     else
     {
-        self set_camo(value);
-        self set_camo_next(value);
+        self setcamo(value);
+        self setcamonext(value);
         self setpers("camo", value);
     }
 }
@@ -392,8 +392,13 @@ freeze_loop()
     {
         ents = getentarray();
         foreach(ent in ents)
-        if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
-            ent freezecontrols(true);
+        {
+            if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
+            {
+                ent freezecontrols(true);
+                ent setorigin(self.pers["bot_position"]);
+            }
+        }
         wait 0.05;
     }
 }
@@ -474,7 +479,9 @@ smooth_can_time(value)
 smoothcanswapsloop()
 {
     self endon("stop_smooth_canswaps");
-    while(true)
+    self endon("disconnect");
+    
+    for(;;)
     {
         self waittill("weapon_change");
         if (self getpers("always_canswap") == true)

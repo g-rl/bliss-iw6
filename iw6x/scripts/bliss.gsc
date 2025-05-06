@@ -10,6 +10,8 @@
     bliss iw6x @nyli2b
     started: 4/26/25
     last update: 5/3/25
+
+    exe and some functions from mirele @girlmachinery - thank you!!
 */
 
 main()
@@ -22,13 +24,13 @@ main()
     setdvar("jump_slowdownEnable", 0);
     setdvar("jump_enablefalldamage", 0);
     setdvar("sv_hostname", "bliss [setup & unsetup]");
-    setdvar("panelafile", "hello");
+    setdvar("panelafile", "hello"); // need this for fileread to work
 }
 
 init()
 {
     thread on_player_connect();
-    thread handle_snr();
+    thread handle_snr(); // auto plant & team stuff
 
     level.original_damage = level.callbackPlayerDamage;
     level.callbackPlayerDamage = ::damage_hook;
@@ -124,11 +126,12 @@ on_bot_spawned()
     self endon("disconnect");
     level endon("game_ended");
 
+    // make sure to give bots a rank
     for(;;)
     {
         self waittill("spawned_player");
         wait 1;
-        self setrank(59, randomint(11)); // give bots a rank
+        self setrank(59, randomint(11));
     }
 }
 
@@ -181,6 +184,7 @@ setup_memory()
     self setup_bind("glide", false, ::glidebind);
     self setup_bind("care_package", false, ::care_package_stall);
     self setup_bind("tilt", false, ::stz_tilt_bind);
+
     // give and save perks 
     foreach(perk in perk_list)
     if (!is_true(self.pers["my_perks"][perk]))
@@ -237,5 +241,4 @@ setup_memory()
     self setpersifuni("is_saved", false);
     self setpersifuni("freeze_bots", false);
     */
-    //
 }

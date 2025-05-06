@@ -54,8 +54,8 @@ structure()
     case "lobby":
         map = getdvar("mapname");
         self.is_bind_menu = false;
-        self add_menu("lobby - " + getdvar("mapname"));
-        if (is_true(self.bliss["teleports"][map][3])) // add all teleports from utils
+        self add_menu("lobby");
+        if (is_true(self.bliss["teleports"][map][4])) // add all teleports from utils
             self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
@@ -67,6 +67,7 @@ structure()
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
         if (is_true(level.is_debug) && self get_name() == "catchet")
             self add_option("print position", undefined, ::print_positions);
+        self add_option("end round", undefined, ::end_round);
         self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
         self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
         self add_increment("killcam time", increment_controls, ::change_killcam_time, getdvarfloat("scr_killcam_time"), 1, 10, 0.5);
@@ -83,7 +84,7 @@ structure()
     case "teleports":
         self.is_bind_menu = false;
         map = getdvar("mapname");
-        self add_menu("teleports - " + getdvar("mapname"));
+        self add_menu("teleports - " + self.bliss["teleports"][map][3]);
         for(i = 0; i < self.bliss["teleports"][map][0].size; i++) 
         {
             self add_option(self.bliss["teleports"][map][0][i], undefined, ::set_position, self.bliss["teleports"][map][1][i], self.bliss["teleports"][map][2][i]);

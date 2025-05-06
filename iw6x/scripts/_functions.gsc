@@ -3,6 +3,11 @@
 #include scripts\_utils;
 #include scripts\_menu;
 
+end_round()
+{
+    maps\mp\gametypes\sr::sd_endGame(game["attackers"], game["end_reason"][game["defenders"]+"_eliminated"]);
+}
+
 pause_timer()
 {
     if (getdvarint("timer_paused") == 0)
@@ -42,8 +47,8 @@ change_camo(value)
     if ("" + value == "none")
     {
         self setpers("camo", "none");
-        self remove_camo();
-        self remove_camo_next();
+        self removecamo();
+        self removecamonext();
     }
     else
     {

@@ -12,32 +12,37 @@ setup_teleports() // map, origin, angles
     self.bliss["teleports"]["mp_prisonbreak"][0] = ["main spot", "cool spot"];
     self.bliss["teleports"]["mp_prisonbreak"][1] = [(-1746.18, 541.934, 1291.4), (1219.91, 2726, 1716.29)];
     self.bliss["teleports"]["mp_prisonbreak"][2] = [(4.548, -76.0089, 0), (12.196, -136.675, 0)];
+    self.bliss["teleports"]["mp_prisonbreak"][3] = "prison break";
 
     // freight 
     self.bliss["teleports"]["mp_frag"][0] = ["main ele spot", "ladder spot"];
     self.bliss["teleports"]["mp_frag"][1] = [(-125.857, 1424.61, 521.782), (1027.63, 1862.34, 407.484)];
     self.bliss["teleports"]["mp_frag"][2] = [(4.65798, -29.2957, 0), (3.54736, 122.79, 0)];
+    self.bliss["teleports"]["mp_frag"][3] = "freight";
 
     // stormfront
     self.bliss["teleports"]["mp_fahrenheit"][0] = ["middle of map", "ledge spot", "window", "cool spot", "cool spot 2"];
     self.bliss["teleports"]["mp_fahrenheit"][1] = [(1367.68, -1172.25, 858.979), (1068.29, -1852.73, 898.659), (246.793, -2347.9, 916.256), (-1975.21, -2755.56, 827.43), (427.899, 199.001, 986.933)];
     self.bliss["teleports"]["mp_fahrenheit"][2] = [(2.93884, -172.057, 0), (1.42822, -158.434, 0), (2.93859, -72.4658, 0), (6.25, 36.0297, 0), (3.19824, -3.83984, 0)];
+    self.bliss["teleports"]["mp_fahrenheit"][3] = "stormfront";
 
     // sovereign
     self.bliss["teleports"]["mp_sovereign"][0] = ["ledge spot"];
     self.bliss["teleports"]["mp_sovereign"][1] = [(550.173, 1769.26, 405.901)];
     self.bliss["teleports"]["mp_sovereign"][2] = [(4.53735, 146.508, 0)];
+    self.bliss["teleports"]["mp_sovereign"][4] = "sovereign";
 
     // bayview
     self.bliss["teleports"]["mp_ca_rumble"][0] = ["main spot", "a cool oom", "another oom"];
     self.bliss["teleports"]["mp_ca_rumble"][1] = [(-440.559, -1221.58, 247.484), (1062.15, 1423.32, 403.902), (-983.862, 495.13, 533.309)];
     self.bliss["teleports"]["mp_ca_rumble"][2] = [(10.5043, 52.0311, 0), (1.06995, -16.6333, 0), (-0.0946045, -138.186, 0)];
-
+    self.bliss["teleports"]["mp_ca_rumble"][3] = "bayview";
+    
     // if map has options, add teleports menu 
     if (is_true(self.bliss["teleports"][getdvar("mapname")][1]))
-        self.bliss["teleports"][getdvar("mapname")][3] = true;
+        self.bliss["teleports"][getdvar("mapname")][4] = true;
     else
-        self.bliss["teleports"][getdvar("mapname")][3] = false;
+        self.bliss["teleports"][getdvar("mapname")][4] = false;
 }
 
 class_change()
@@ -343,7 +348,7 @@ giveweapongood(gun)
    self setweaponammostock(self.getgun[gun], self.getstock[gun]);
 }
 
-remove_camo()
+removecamo()
 {
     x = self getcurrentweapon();
     self takeweapon(x);
@@ -362,7 +367,7 @@ remove_camo()
     self setspawnweapon(x);
 }
 
-remove_camo_next()
+removecamonext()
 {
     x = self getcurrentweapon();
     self takeweapon(x);

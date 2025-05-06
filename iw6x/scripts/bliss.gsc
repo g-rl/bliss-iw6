@@ -20,6 +20,7 @@ main()
     setdvar("pm_bouncing", 1);
     setdvar("g_playercollision", 0);
     setdvar("g_playerejection", 0);
+    setdvar("g_enableelevators", 1);
     setdvar("bg_surfacePenetration", 999999);
     setdvar("jump_slowdownEnable", 0);
     setdvar("jump_enablefalldamage", 0);
@@ -213,7 +214,7 @@ setup_memory()
         self thread bounce_loop(); // watch for placed bounces
     }
 
-    // so everything applies correctly
+    // apply weapon stuff after everything
     self handle_camo(); // handle camos from menu selection for both weapons 
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not

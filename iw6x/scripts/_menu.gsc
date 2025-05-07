@@ -528,6 +528,7 @@ add_array(text, summary, function, array, argument_1, argument_2, argument_3)
     self.structure[self.structure.size] = option;
 }
 
+/*
 add_bind(text, summary, function, argument_1, argument_2, argument_3)
 {
     option               = [];
@@ -542,6 +543,22 @@ add_bind(text, summary, function, argument_1, argument_2, argument_3)
     option["argument_3"] = argument_3;
 
     self.structure[self.structure.size] = option;
+}
+*/
+
+add_bind(name, func, pers, end_on) // lol im so lazy bro idc
+{
+    self add_menu(name);
+
+    for(i = 0; i < 4; i++) 
+    {
+        option = name + " > " + "[{+actionslot " + (i + 1) + "}]";
+        bind = "+actionslot " + (i + 1);
+        index = i + 1;
+        prev_index = index - 1;
+        end_on = pers;
+        self add_toggle(option, undefined, func, self.pers[pers + "_" + index], undefined, bind, index, end_on, prev_index);
+    }
 }
 
 actionslot_notify_map(slot)

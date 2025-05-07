@@ -34,7 +34,7 @@ structure()
     case "toggles":
         self.is_bind_menu = false;
         self add_menu("toggles");
-        self add_option("anims", "might crash ur game", ::new_menu, "anims");
+        self add_option("anims", "some might crash ur game", ::new_menu, "anims");
         self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         self add_toggle("instashoots [inphect]", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
@@ -62,8 +62,8 @@ structure()
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
         self add_option("pickup bomb", undefined, ::pickup_bomb);
         self add_array("bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
-        self add_option("give vish", undefined, ::give_vish);
-        self add_option("give cowboy", undefined, ::give_cowboy);
+        self add_option("cowboy", undefined, ::give_cowboy);
+        self add_option("vish", undefined, ::give_vish);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
         if (is_true(level.is_debug) && self get_name() == "catchet")
             self add_option("print position", undefined, ::print_positions);
@@ -136,31 +136,31 @@ bind_index(menu)
     switch(menu) 
     {
         case "sprint loop":
-            self add_bind_menu(menu, ::toggle_sprint_loop, "sprint_loop");
+            self add_bind(menu, ::toggle_sprint_loop, "sprint_loop");
             break;
         case "lunge":
-            self add_bind_menu(menu, ::toggle_lunge_bind, "lunge");
+            self add_bind(menu, ::toggle_lunge_bind, "lunge");
             break;
         case "mala":
-            self add_bind_menu(menu, ::toggle_mala, "mala");
+            self add_bind(menu, ::toggle_mala, "mala");
             break;
         case "illusion":
-            self add_bind_menu(menu, ::toggle_illusion, "illusion");
+            self add_bind(menu, ::toggle_illusion, "illusion");
             break;
         case "smooth":
-            self add_bind_menu(menu, ::toggle_smooth, "smooth");
+            self add_bind(menu, ::toggle_smooth, "smooth");
             break;
         case "gunlock":
-            self add_bind_menu(menu, ::toggle_gunlock, "gunlock");
+            self add_bind(menu, ::toggle_gunlock, "gunlock");
             break;
         case "glide":
-            self add_bind_menu(menu, ::toggle_glide, "glide");
+            self add_bind(menu, ::toggle_glide, "glide");
             break;
         case "care package stall":
-            self add_bind_menu(menu, ::toggle_stall, "stall");
+            self add_bind(menu, ::toggle_stall, "stall");
             break;
         case "tilt screen":
-            self add_bind_menu(menu, ::toggle_tilt, "tilt");
+            self add_bind(menu, ::toggle_tilt, "tilt");
             break;
         case "unassigned":
             self add_menu(menu);
@@ -201,21 +201,6 @@ player_index(menu, player)
         self add_menu("error");
         self add_option("unable to load " + menu);
         break;
-    }
-}
-
-add_bind_menu(name, func, pers, end_on) // lol im so lazy bro idc
-{
-    self add_menu(name);
-
-    for(i = 0; i < 4; i++) 
-    {
-        option = name + " > " + "[{+actionslot " + (i + 1) + "}]";
-        bind = "+actionslot " + (i + 1);
-        index = i + 1;
-        prev_index = index - 1;
-        end_on = pers;
-        self add_toggle(option, undefined, func, self.pers[pers + "_" + index], undefined, bind, index, end_on, prev_index);
     }
 }
 

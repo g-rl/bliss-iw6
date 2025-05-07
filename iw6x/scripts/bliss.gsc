@@ -56,7 +56,7 @@ on_player_connect()
         }
         else
         {
-            player thread on_bot_spawned();
+            player thread on_bot_spawned(); // just to set ranks lowkey lol
         }
     }
 }

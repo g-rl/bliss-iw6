@@ -30,7 +30,7 @@ setup_teleports() // map, origin, angles
     self.bliss["teleports"]["mp_sovereign"][0] = ["ledge spot"];
     self.bliss["teleports"]["mp_sovereign"][1] = [(550.173, 1769.26, 405.901)];
     self.bliss["teleports"]["mp_sovereign"][2] = [(4.53735, 146.508, 0)];
-    self.bliss["teleports"]["mp_sovereign"][4] = "sovereign";
+    self.bliss["teleports"]["mp_sovereign"][3] = "sovereign";
 
     // bayview
     self.bliss["teleports"]["mp_ca_rumble"][0] = ["main spot", "a cool oom", "another oom"];
@@ -87,28 +87,18 @@ damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
     if (sMeansofDeath != "MOD_FALLING" && sMeansofDeath != "MOD_TRIGGER_HURT" && sMeansofDeath != "MOD_SUICIDE") 
     {
         if (is_valid_weapon(sWeapon)) 
-        {
             iDamage = 999;
-            eattacker playlocalsound("tactical_spawn");
-            eattacker playlocalsound("copycat_steal_class");
-        }
-        else
-        {
-            iDamage = 1;
-        }
-    }
 
-    if (sMeansofDeath == "MOD_FALLING")
-    {
-        iDamage = 0;
-    }
+        if (sMeansofDeath == "MOD_FALLING")
+            iDamage = 0;
 
-    [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
+        [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
     
-    if (level.gametype == "sr" && is_valid_weapon(sWeapon)) // online point popup
-    {
-        waitframe();
-        eAttacker setclientomnvar("ui_points_popup", 250); 
+        if (level.gametype == "sr" && is_valid_weapon(sWeapon)) // online point popup
+        {
+            waitframe();
+            eAttacker setclientomnvar("ui_points_popup", 250); 
+        }
     }
 }
 
@@ -139,16 +129,7 @@ handle_snr()
     level.sdbombmodel.origin = bomb_model_origin;
     level.sdbombmodel.curOrigin = bomb_model_origin;
 
-    level thread auto_bomb();
-
-    level.ononeleftevent = undefined;
-    wait 1;
-    level.allowlatecomers = 1;
-    level.graceperiod = 0;
-    level.ingraceperiod = 0;
-    level.prematchperiod = 0;
-    level.waitingforplayers = 0;
-    level.prematchperiodend = 0;
+    level thread auto_plant();
 }
 
 check_snr()
@@ -156,7 +137,7 @@ check_snr()
     if (level.gametype != "sr") // only load match if gametype is search & rescue
     {
         iprintlnbold("must be loaded on ^:search & rescue");
-        wait (randomintrange(3, 4));
+        wait (randomintrange(2, 3));
         iprintlnbold("must be loaded on ^:search & rescue");
         self maps\mp\_flashgrenades::applyflash(10,1);
         self playlocalsound("copycat_steal_class");
@@ -168,17 +149,16 @@ check_snr()
 
 is_valid_weapon(weapon)
 {
-    if (!isdefined (weapon))
+    if (!isdefined(weapon))
         return false;
 
-    if (getweaponclass(weapon) == "weapon_sniper" || getweaponclass(weapon) == "weapon_dmr")
+    if (getweaponclass(weapon) == "weapon_sniper" || getweaponclass(weapon) == "weapon_dmr") // allow sniper & marksman rifle
         return true;
         
     switch(weapon)
     {
        	case "throwingknife_mp":
             return true;
-              
         default:
             return false;        
     }
@@ -298,54 +278,54 @@ israising()
 
 getprevweapon()
 {
-   z = self getweaponslistprimaries();
-   x = self getcurrentweapon();
+    z = self getweaponslistprimaries();
+    x = self getcurrentweapon();
 
-   for(i = 0 ; i < z.size ; i++)
-   {
-      if (x == z[i])
-      {
-         y = i - 1;
-         if (y < 0)
+    for(i = 0 ; i < z.size ; i++)
+    {
+        if (x == z[i])
+        {
+            y = i - 1;
+            if (y < 0)
             y = z.size - 1;
 
-         if (isdefined(z[y]))
+            if (isdefined(z[y]))
             return z[y];
-         else
+            else
             return z[0];
-      }
-   }
+        }
+    }
 }
 
 getnextweapon()
 {
-   z = self getweaponslistprimaries();
-   x = self getcurrentweapon();
-   for(i = 0 ; i < z.size ; i++)
-   {
-      if (x == z[i])
-      {
-         if (isdefined(z[i + 1]))
+    z = self getweaponslistprimaries();
+    x = self getcurrentweapon();
+    for(i = 0 ; i < z.size ; i++)
+    {
+        if (x == z[i])
+        {
+            if (isdefined(z[i + 1]))
             return z[i + 1];
-         else
+            else
             return z[0];
-      }
-   }
+        }
+    }
 }
 
 takeweapongood(gun)
 {
-   self.getgun[gun] = gun;
-   self.getclip[gun] =  self getweaponammoclip(gun);
-   self.getstock[gun] = self getweaponammostock(gun);
-   self takeweapon(gun);
+    self.getgun[gun] = gun;
+    self.getclip[gun] =  self getweaponammoclip(gun);
+    self.getstock[gun] = self getweaponammostock(gun);
+    self takeweapon(gun);
 }
 
 giveweapongood(gun)
 {
-   self giveweapon(self.getgun[gun]);
-   self setweaponammoclip(self.getgun[gun], self.getclip[gun]);
-   self setweaponammostock(self.getgun[gun], self.getstock[gun]);
+    self giveweapon(self.getgun[gun]);
+    self setweaponammoclip(self.getgun[gun], self.getclip[gun]);
+    self setweaponammostock(self.getgun[gun], self.getstock[gun]);
 }
 
 removecamo()
@@ -472,26 +452,11 @@ setup_teams()
     }
 }
 
-random_message()
+auto_plant() // player is always attacker
 {
-    name = self get_name();
-    weapon_name = self weapname(self getcurrentweapon());
-    m = [];
-    m[m.size] = name;
-    m[m.size] = "by @nyli2b";
-    m[m.size] = "made with <3";
-    m[m.size] = "iw6x";
-    m[m.size] = "playing as " + name;
-    m[m.size] = "holding a " + weapon_name;  
+    level endon("stop_auto_plant");
 
-    return m[randomint(m.size)];
-}
-
-auto_bomb()
-{
-    level endon("stop_auto_bomb");
-
-    // revert time if timer pause
+    // revert time if timer pause so it still auto plants
     if (isdefined(level.saved_time))
         time = level.saved_time;
     else
@@ -501,7 +466,7 @@ auto_bomb()
     {
         time++;
         level.saved_time = time;
-        if (time == 148) // get a better way to do this probably
+        if (time == 148)
         {
             players = level.players;
             foreach (player in players)
@@ -585,7 +550,7 @@ weapname(weap)
 spawnbot()
 {
     executecommand("spawnbot");
-    wait 2;
+    wait 4; // give time for bot to spawn in
     self thread load_bots(); // in case a save is set b4 bot spawn lol
 }
 
@@ -729,7 +694,7 @@ reload_bomb()
     if (getdvarint("timer_paused") == 1)
     {
         level thread maps\mp\gametypes\_gamelogic::pausetimer();
-        level notify("stop_auto_bomb"); // stop auto plant
+        level notify("stop_auto_plant"); // stop auto plant
     }
 }
 
@@ -829,4 +794,19 @@ setup_pers(pers, func, arg)
 {
     if (is_true(self getpers(pers)))
         self thread [[func]](arg);
+}
+
+random_message()
+{
+    name = self get_name();
+    weapon_name = self weapname(self getcurrentweapon());
+    m = [];
+    m[m.size] = name;
+    m[m.size] = "by @nyli2b";
+    m[m.size] = "made with <3";
+    m[m.size] = "iw6x";
+    m[m.size] = "playing as " + name;
+    m[m.size] = "holding a " + weapon_name;  
+
+    return m[randomint(m.size)];
 }

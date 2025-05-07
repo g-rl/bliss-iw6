@@ -20,9 +20,9 @@ main()
     setdvar("pm_bouncing", 1);
     setdvar("g_playercollision", 0);
     setdvar("g_playerejection", 0);
-    setdvar("g_enableelevators", 1);
+    setdvar("g_enableelevators", 1); // wont get stuck with fake eles as much
     setdvar("bg_surfacePenetration", 999999);
-    setdvar("jump_slowdownEnable", 0);
+    setdvar("jump_slowdownenable", 0);
     setdvar("jump_enablefalldamage", 0);
     setdvar("sv_hostname", "bliss [setup & unsetup]");
     setdvar("panelafile", "hello"); // need this for fileread to work
@@ -127,11 +127,10 @@ on_bot_spawned()
     self endon("disconnect");
     level endon("game_ended");
 
-    // make sure to give bots a rank
     for(;;)
     {
         self waittill("spawned_player");
-        wait 1;
+        wait 1; // wait a sec or they wont set 
         self setrank(59, randomint(11));
     }
 }

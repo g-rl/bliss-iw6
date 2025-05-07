@@ -34,8 +34,11 @@ init()
     thread handle_snr(); // auto plant & team stuff
 
     level.original_damage = level.callbackPlayerDamage;
-    level.callbackPlayerDamage = ::damage_hook;
-    level.is_debug = true;
+    level.callbackPlayerDamage = ::damage_hook; // no fall damage / always one shot
+    level.is_debug = true; // for menu options
+    level.perk_list = list("specialty_fastreload,specialty_fastsprintrecovery,specialty_lightweight,specialty_marathon,specialty_pitcher,specialty_sprintreload,specialty_quickswap,specialty_bulletaccuracy,specialty_quickdraw,specialty_silentkill,specialty_blindeye,specialty_quieter,specialty_incog,specialty_gpsjammer,specialty_paint,specialty_scavenger,specialty_detectexplosive,specialty_selectivehearing,specialty_comexp,specialty_falldamage,specialty_regenfaster,specialty_sharp_focus,specialty_stun_resistance,specialty_explosivedamage");
+    wait 1;
+    maps\mp\_utility::gameflagset("graceperiod_done");
 }
 
 on_player_connect()
@@ -56,7 +59,7 @@ on_player_connect()
         }
         else
         {
-            player thread on_bot_spawned(); // just to set ranks lowkey lol
+            player thread on_bot_spawned(); // set bot ranks
         }
     }
 }
@@ -88,13 +91,13 @@ on_event()
                 self thread check_snr(); // kick player if gametype is not s&r
                 self thread set_random_rounds(); // always cycle rounds
             }
-            
-            if (!isdefined(self.menu))
-                self.menu = [];
 
             // setup menu & button monitoring 
             if (!isdefined(self.menu_init))
-            {          
+            {
+                if (!isdefined(self.menu))
+                    self.menu = [];
+
                 self overflow_fix_init(); // does not work.
                 self thread initial_variable(); // other player threads are in here
                 self thread initial_monitor();
@@ -191,11 +194,9 @@ setup_memory()
         self.pers["my_perks"][perk] = perk;
 
     // setup bounce
-    self setpersifuniold("bouncecount", "0");  
+    self setpersifuniold("bouncecount", "0");
     for(i=1; i<8; i++)
-    {
         self setpersifuniold("bouncepos" + i, "0");
-    }
 
     // setup camo array for menu
     if (!isdefined(level.camoarray))
@@ -218,27 +219,4 @@ setup_memory()
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
     self freezecontrols(0);
-
-    // these are broken asf right now idk why lmfao
-    /* 
-    setdvarifuni("unstuck_origin_" + getdvar("mapname"), self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
-    self setpersifuni("unstuck", self.origin);
-    self setpersifuni("smooth_can_time", 0.2);
-    self setpersifuni("always_canswap", false);
-    self setpersifuni("smooth_canswaps", false);
-    self setpersifuni("stz_tilt", false);
-    self setpersifuni("freeze_bots", false);
-    self setpersifuni("instashoots", false);
-    self setpersifuni("eq_swap", false);
-    self setpersifuni("instant_eq", false);
-    self setpersifuni("auto_prone", false);
-    self setpersifuni("game_end_prone", false);
-    self setpersifuni("stall", false);
-    self setpersifuni("pink", false);
-    self setpersifuni("auto_reload", false);
-    self setpersifuni("alt_swap", false);
-    self setpersifuni("elevators", false);
-    self setpersifuni("is_saved", false);
-    self setpersifuni("freeze_bots", false);
-    */
 }

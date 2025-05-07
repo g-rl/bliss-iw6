@@ -60,14 +60,15 @@ structure()
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
-        self add_option("pickup bomb", undefined, ::pickup_bomb);
+        if(level.gametype == "sr") self add_option("pickup bomb", undefined, ::pickup_bomb);
         self add_array("bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
         self add_option("cowboy", undefined, ::give_cowboy);
         self add_option("vish", undefined, ::give_vish);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
         if (is_true(level.is_debug) && self get_name() == "catchet")
             self add_option("print position", undefined, ::print_positions);
-        self add_option("end round", undefined, ::end_round);
+        if(level.gametype == "sr") self add_option("end round", undefined, ::end_round);
+        if(level.gametype == "dm") self add_option("fast last", undefined, ::fast_last); 
         self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
         self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
         self add_increment("killcam time", increment_controls, ::change_killcam_time, getdvarfloat("scr_killcam_time"), 1, 10, 0.5);
@@ -78,7 +79,7 @@ structure()
         self add_menu("weapons - " + first_weapon + " & " + next_weapon);
         self add_increment("set camo", increment_controls, ::change_camo, int(self getpers("camo")), 10, 46, 1);
         self add_array("settings", slider_controls, ::weapon_settings, list("refill ammo,drop canswap,drop weapon,take weapon"));
-        self add_array("perks", slider_controls, ::toggle_perk, list("specialty_fastreload,specialty_fastsprintrecovery,specialty_lightweight,specialty_marathon,specialty_pitcher,specialty_sprintreload,specialty_quickswap,specialty_bulletaccuracy,specialty_quickdraw,specialty_silentkill,specialty_blindeye,specialty_quieter,specialty_incog,specialty_gpsjammer,specialty_paint,specialty_scavenger,specialty_detectexplosive,specialty_selectivehearing,specialty_comexp,specialty_falldamage,specialty_regenfaster,specialty_sharp_focus,specialty_stun_resistance,specialty_explosivedamage"));
+        self add_array("perks", slider_controls, ::toggle_perk, level.perk_list);
         self add_array("killstreaks", slider_controls, ::give_certain_streak, list("fill all,care package,ammo crate,vests,kem strike,oracle,odin"));
         break;
     case "teleports":

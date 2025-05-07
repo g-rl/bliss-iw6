@@ -14,14 +14,14 @@ pause_timer()
     {
         setdvar("timer_paused", 1);
         level thread maps\mp\gametypes\_gamelogic::pausetimer();
-        level notify("stop_auto_bomb"); // stop auto plant
+        level notify("stop_auto_plant"); // stop auto plant
         iprintlnbold("^:" + self get_name() + " ^7paused the timer");
     } 
     else 
     {
         setdvar("timer_paused", 0);
         level thread maps\mp\gametypes\_gamelogic::resumetimer();
-        level thread auto_bomb(); // resume auto plant
+        level thread auto_plant(); // resume auto plant
         iprintlnbold("^:" + self get_name() + " ^7resumed the timer");
     }
 }
@@ -99,32 +99,14 @@ toggle_alt_swaps()
     }
 }
 
-toggle_saved_pos()
-{
-    self.pers["is_saved"] = !toggle(self.pers["is_saved"]);
-
-    if (self getpers("is_saved"))
-    {
-        self setpers("saved_position", self.origin);
-    }
-    else
-    {
-        self setpers("saved_position", false);
-    }
-}
-
 toggle_instant_eq()
 {
     self.pers["instant_eq"] = !toggle(self.pers["instant_eq"]);
 
     if (self getpers("instant_eq"))
-    {
         self thread insta_eq_loop();
-    }
     else
-    {
         self notify("stop_insta_eq");
-    }
 }
 
 insta_eq_loop()
@@ -144,13 +126,9 @@ toggle_instant_pump()
     self.pers["insta_pumps"] = !toggle(self.pers["insta_pumps"]);
 
     if (self getpers("insta_pumps"))
-    {
         self thread insta_pump_loop();
-    }
     else
-    {
         self notify("stop_insta_pumps");
-    }
 }
 
 insta_pump_loop()
@@ -175,13 +153,9 @@ toggle_elevators()
     self.pers["elevators"] = !toggle(self.pers["elevators"]);
 
     if (self getpers("elevators"))
-    {
         self thread elevators();
-    }
     else
-    {
         self notify("stop_elevators");
-    }
 }
 
 elevators()
@@ -243,13 +217,9 @@ toggle_auto_reload()
     self.pers["auto_reload"] = !toggle(self.pers["auto_reload"]);
 
     if (self getpers("auto_reload"))
-    {
         self thread auto_reload();
-    }
     else
-    {
         self notify("stop_auto_reload");
-    }
 }
 
 auto_reload()
@@ -267,13 +237,9 @@ toggle_auto_prone()
     self.pers["auto_prone"] = !toggle(self.pers["auto_prone"]);
 
     if (self getpers("auto_prone"))
-    {
         self thread auto_prone();
-    }
     else
-    {
         self notify("stop_auto_prone");
-    }
 }
 
 toggle_game_end_prone()
@@ -281,13 +247,9 @@ toggle_game_end_prone()
     self.pers["game_end_prone"] = !toggle(self.pers["game_end_prone"]);
 
     if (self getpers("game_end_prone"))
-    {
         self thread prone_make_sure();
-    }
     else
-    {
         self notify("stop_game_end_prone");
-    }
 }
 
 auto_prone()
@@ -413,13 +375,9 @@ toggle_eq_swap()
     self.pers["eq_swap"] = !toggle(self.pers["eq_swap"]);
 
     if (self getpers("eq_swap"))
-    {
         self thread eq_swap_loop();
-    }
     else
-    {
         self notify("stop_eq_swap");
-    }
 }
 
 eq_swap_loop()
@@ -467,13 +425,9 @@ toggle_smooth_canswaps()
     self.pers["smooth_canswaps"] = !toggle(self.pers["smooth_canswaps"]);
 
     if (self getpers("smooth_canswaps"))
-    {
         self thread smoothcanswapsloop();
-    }
     else
-    {
         self notify("stop_smooth_canswaps");
-    }
 }
 
 smooth_can_time(value)
@@ -512,13 +466,9 @@ toggle_reg_instashoots()
     self.pers["instashoots_reg"] = !toggle(self.pers["instashoots_reg"]);
 
     if (self getpers("instashoots_reg"))
-    {
         self thread instashootloop();
-    }
     else
-    {
         self notify("stop_reg_instashoots");
-    }
 }
 
 instashootloop()
@@ -540,13 +490,9 @@ toggle_instashoots()
     self.pers["instashoots"] = !toggle(self.pers["instashoots"]);
 
     if (self getpers("instashoots"))
-    {
         self thread inphectinstashootloop();
-    }
     else
-    {
         self notify("stop_instashoots");
-    }
 }
 
 inphectinstashootloop()
@@ -565,12 +511,6 @@ inphectinstashootloop()
         }
         wait 0.05;
     }
-}
-
-change_health()
-{
-    self.maxhealth = 300;
-    self.health = self.maxhealth;
 }
 
 give_vish()
@@ -656,16 +596,19 @@ fill_streaks()
 refill_ammo()
 {
     x = self GetWeaponsListPrimaries();
+
     foreach(gun in x)
     {
         self setweaponammoclip(gun, 999);
         self setweaponammostock(gun, 999);
     }
 
-    self givemaxammo(self getcurrentoffhand());
+    self givemaxammo(self getcurrentoffhand()); // set twice just in case lol
 
     if (self getcurrentoffhand() == "none")
         self giveperkoffhand("throwingknife_mp", false);
+
+    self givemaxammo(self getcurrentoffhand());
 }
 
 load_bots()
@@ -678,6 +621,16 @@ load_bots()
                 player setorigin(self.pers["bot_position"]);
         }
     }
+}
+
+toggle_saved_pos()
+{
+    self.pers["is_saved"] = !toggle(self.pers["is_saved"]);
+
+    if (self getpers("is_saved"))
+        self setpers("saved_position", self.origin);
+    else
+        self setpers("saved_position", false);
 }
 
 load_self()
@@ -741,47 +694,6 @@ pink_loop()
     }
 }
 
-manage_heli(value)
-{
-    if (value == "spawn")
-        self thread spawnheli();
-    
-    if (value == "delete")
-        self thread deleteheli();
-}
-
-spawnheli()
-{
-    if (level.players.size > 1)
-    {
-        if (self.canspawnheli)
-        {
-            foreach(player in level.players)
-            {
-                if (player != self && player.teamname != self.teamname)
-                {
-                    self.helicoperspawn = SpawnHelicopter(player, self.origin + (0,0,1200), self.angles, "littlebird_mp", level.littlebird_model);
-                    self.canspawnheli = false;
-                }
-            }
-        }
-        else
-        self iprintlnbold("delete the heli first");
-    }
-    else
-    self iprintlnbold("spawn a bot");
-}
-
-deleteheli()
-{
-    if (isdefined(self.helicoperspawn))
-    {
-        self.helicoperspawn delete();
-        self.canspawnheli = true;
-        self iprintln("^:helicopter deleted");
-    }
-}
-
 manage_bounce(value)
 {
     if (value == "spawn")
@@ -798,7 +710,7 @@ spawn_bounce()
 
     self setpers("bouncecount", x);
     self setpers("bouncepos" + x, self getorigin()[0] + "," + self getorigin()[1] + "," + self getorigin()[2]);
-    self iprintln("^:spawned a bounce at " + self getorigin());
+    self iprintln("spawned a bounce at ^:" + self getorigin());
     
     if (x == 1)
     {
@@ -839,6 +751,22 @@ bounce_loop()
     }
 }
 
+fast_last()
+{
+    if(getdvar("g_gametype") == "dm")
+        self set_score(int(getwatcheddvar("scorelimit") - 1));
+    else
+        self iprintlnbold("must be ffa");
+}
+
+set_score(kills)
+{
+    self.score = kills;
+    self.pers["score"] = self.score;
+    self.kills = kills;
+    self.pers["kills"] = self.kills;
+}
+
 change_gravity(value)
 {
     setdvar("g_gravity", value);
@@ -858,4 +786,10 @@ change_timescale(value)
 {
     setdvar("timescale", float(value));
     setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
+}
+
+change_health()
+{
+    self.maxhealth = 300;
+    self.health = self.maxhealth;
 }

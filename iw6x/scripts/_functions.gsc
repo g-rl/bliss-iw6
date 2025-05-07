@@ -683,7 +683,7 @@ pink_loop()
         {
             if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
             {
-                if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100,300))
+                if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100,500))
                 {
                     ent dodamage(ent.health + 100, ent.origin, self, self);
                     waitframe();

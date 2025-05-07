@@ -38,6 +38,11 @@ setup_teleports() // map, origin, angles
     self.bliss["teleports"]["mp_ca_rumble"][2] = [(10.5043, 52.0311, 0), (1.06995, -16.6333, 0), (-0.0946045, -138.186, 0)];
     self.bliss["teleports"]["mp_ca_rumble"][3] = "bayview";
     
+    self.bliss["teleports"]["mp_flooded"][0] = ["cool barrier"];
+    self.bliss["teleports"]["mp_flooded"][1] = [(575.732, -1031.67, 1055.48)];
+    self.bliss["teleports"]["mp_flooded"][2] = [(4.21991, 104.564, 0)];
+    self.bliss["teleports"]["mp_flooded"][3] = "flooded";
+
     // if map has options, add teleports menu 
     if (is_true(self.bliss["teleports"][getdvar("mapname")][1]))
         self.bliss["teleports"][getdvar("mapname")][4] = true;

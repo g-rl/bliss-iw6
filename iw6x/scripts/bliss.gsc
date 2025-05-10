@@ -98,7 +98,7 @@ on_event()
                     self.menu = [];
 
                 self overflow_fix_init(); // does not work.
-                self thread initial_variable(); // other player threads are in here
+                self thread initial_variable(); // some other player threads are in here - _menu.gsc
                 self thread initial_monitor();
                 self thread monitor_buttons();
                 self thread create_notify();

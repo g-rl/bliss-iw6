@@ -17,12 +17,10 @@ toggle_stall(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("care package bind ^2on");
         self thread care_package_stall(bind, pers);
     }
     else
     {
-        self iprintln("care package bind ^1off");
         self notify("stop" + pers);
     }
 }
@@ -84,12 +82,10 @@ toggle_tilt(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("tilt screen bind ^2on");
         self thread stz_tilt_bind(bind, pers);
     }
     else
     {
-        self iprintln("tilt screen bind ^1off");
         self setplayerangles((self.angles[0],self.angles[1],0));   
         self.tilting = 0;
         self notify("stop" + pers);
@@ -133,12 +129,10 @@ toggle_glide(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("glide bind ^2on");
         self thread glidebind(bind, pers);
     }
     else
     {
-        self iprintln("glide bind ^1off");
         self notify("stop" + pers);
     }
 }
@@ -175,12 +169,10 @@ toggle_sprint_loop(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("sprint loop ^2on");
         self thread sprintloopbind(bind, pers);
     }
     else
     {
-        self iprintln("sprint loop ^1off");
         self notify("stop" + pers);
     }
 }
@@ -215,12 +207,10 @@ toggle_mala(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("mala bind ^2on");
         self thread malabind(bind, pers);
     }
     else
     {
-        self iprintln("mala bind ^1off");
         self notify("stop" + pers);
     }
 }
@@ -254,12 +244,10 @@ toggle_illusion(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("illusion canswap bind ^2on");
         self thread illusioncanswapbind(bind, pers);
     }
     else
     {
-        self iprintln("illusion canswap bind ^1off");
         self notify("stop" + pers);
     }
 }
@@ -295,12 +283,10 @@ toggle_gunlock(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("gunlock ^2on");
         self thread gunlockbind(bind, pers);
     }
     else
     {
-        self iprintln("gunlock ^1off");
         self notify("stop" + pers);
     }
 }
@@ -336,12 +322,10 @@ toggle_smooth(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("smooth bind ^2on");
         self thread smoothbind(bind, pers);
     }
     else
     {
-        self iprintln("smooth bind ^1off");
         self notify("stop" + pers);
     }
 }
@@ -375,12 +359,10 @@ toggle_lunge_bind(bind, i, pers)
 
     if (self.pers[index])
     {
-        self iprintln("lunge bind ^2on");
         self thread lungebind(bind, pers);
     }
     else
     {
-        self iprintln("lunge bind ^1off");
         self notify("stop" + pers);
     }
 }

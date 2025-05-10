@@ -788,6 +788,16 @@ change_timescale(value)
     setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
 }
 
+change_elevators(value)
+{
+    setdvar("g_enableelevators", value);
+}
+
+change_bouncing(value)
+{
+    setdvar("pm_bouncing", value);
+}
+
 change_health()
 {
     self.maxhealth = 300;

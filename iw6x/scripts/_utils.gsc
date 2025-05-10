@@ -318,6 +318,16 @@ getnextweapon()
     }
 }
 
+getcurrentweaponname()
+{
+    return self weapname(self getcurrentweapon());
+}
+
+getnextweaponname()
+{
+    return self weapname(self getnextweapon());
+}
+
 takeweapongood(gun)
 {
     self.getgun[gun] = gun;
@@ -591,6 +601,13 @@ kick_player(player)
     }
 
     kick(player getentitynumber());
+}
+
+kick_bots()
+{
+    foreach(player in level.players)
+        if (isbot(player))
+            kick(player getentitynumber());
 }
 
 me_to_player(player)

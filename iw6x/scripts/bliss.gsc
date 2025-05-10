@@ -9,7 +9,7 @@
 /*
     bliss iw6x @nyli2b
     started: 4/26/25
-    last update: 5/3/25
+    last update: 5/9/25
 
     exe and some functions from mirele @girlmachinery - thank you!!
 */
@@ -23,7 +23,7 @@ main()
     setdvar("g_enableelevators", 1); // wont get stuck with fake eles as much
     setdvar("bg_surfacePenetration", 999999);
     setdvar("jump_slowdownenable", 0);
-    setdvar("jump_enablefalldamage", 0);
+    // setdvar("jump_enablefalldamage", 0); // dont think i need this with damage_hook
     setdvar("sv_hostname", "bliss [setup & unsetup]");
     setdvar("panelafile", "hello"); // need this for fileread to work
 }
@@ -36,7 +36,6 @@ init()
     level.original_damage = level.callbackPlayerDamage;
     level.callbackPlayerDamage = ::damage_hook; // no fall damage / always one shot
     level.is_debug = true; // for menu options
-    level.perk_list = list("specialty_fastreload,specialty_fastsprintrecovery,specialty_lightweight,specialty_marathon,specialty_pitcher,specialty_sprintreload,specialty_quickswap,specialty_bulletaccuracy,specialty_quickdraw,specialty_silentkill,specialty_blindeye,specialty_quieter,specialty_incog,specialty_gpsjammer,specialty_paint,specialty_scavenger,specialty_detectexplosive,specialty_selectivehearing,specialty_comexp,specialty_falldamage,specialty_regenfaster,specialty_sharp_focus,specialty_stun_resistance,specialty_explosivedamage");
     wait 1;
     maps\mp\_utility::gameflagset("graceperiod_done");
 }

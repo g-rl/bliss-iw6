@@ -48,6 +48,8 @@ initial_variable()
     self.cursor   = [];
     self.previous = [];
 
+    self.bliss["perk_list"] = list("specialty_fastreload,specialty_fastsprintrecovery,specialty_lightweight,specialty_marathon,specialty_pitcher,specialty_sprintreload,specialty_quickswap,specialty_bulletaccuracy,specialty_quickdraw,specialty_silentkill,specialty_blindeye,specialty_quieter,specialty_incog,specialty_gpsjammer,specialty_paint,specialty_scavenger,specialty_detectexplosive,specialty_selectivehearing,specialty_comexp,specialty_falldamage,specialty_regenfaster,specialty_sharp_focus,specialty_stun_resistance,specialty_explosivedamage");
+
     self set_menu("bliss");
     self set_title(self get_menu());
 

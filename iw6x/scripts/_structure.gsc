@@ -14,11 +14,11 @@ structure()
 
     increment_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, no jump needed to select";
     slider_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, [{+gostand}] to select";
-    credits = "made with <3 by @nyli2b";
+    credits = "made with ^:<3^7 by @nyli2b";
     menu_info = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
     current_camo = "current camo: " + self getpers("camo");
-    first_weapon = self weapname(self getcurrentweapon());
-    next_weapon = self weapname(self getnextweapon());
+    my_weapons = self getcurrentweaponname() + " & " + self getnextweaponname();
+    bind_list = list("sprint loop,lunge,smooth,mala,illusion,glide,care package stall,tilt screen"); // looool
 
     switch(menu)
     {
@@ -34,10 +34,10 @@ structure()
     case "toggles":
         self.is_bind_menu = false;
         self add_menu("toggles");
-        self add_option("anims", "some might crash ur game", ::new_menu, "anims");
+        self add_option("binds", "some might crash ur game", ::new_menu, "binds");
         self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
-        self add_toggle("instashoots [inphect]", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
+        self add_toggle("instashoots (inphect)", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
         self add_toggle("instant pumps", undefined, ::toggle_instant_pump, self.pers["insta_pumps"]);
         self add_toggle("smooth canswap", undefined, ::toggle_smooth_canswaps, self.pers["smooth_canswaps"]);
         self add_increment("smooth canswap time", increment_controls, ::smooth_can_time, float(self getpers("smooth_can_time")), 0.1, 1, 0.1);
@@ -72,14 +72,16 @@ structure()
         self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
         self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
         self add_increment("killcam time", increment_controls, ::change_killcam_time, getdvarfloat("scr_killcam_time"), 1, 10, 0.5);
+        self add_increment("elevators", increment_controls, ::change_elevators, getdvarint("g_enableelevators"), 0, 1, 1);
+        self add_increment("bounces", increment_controls, ::change_bouncing, getdvarint("pm_bouncing"), 0, 1, 1);
         self add_increment("timescale", increment_controls, ::change_timescale, getdvarfloat("timescale"), 0.25, 10, 0.25);
         break;
     case "weapons":
         self.is_bind_menu = false;
-        self add_menu("weapons - " + first_weapon + " & " + next_weapon);
+        self add_menu("weapons - " + my_weapons);
         self add_increment("set camo", increment_controls, ::change_camo, int(self getpers("camo")), 10, 46, 1);
         self add_array("settings", slider_controls, ::weapon_settings, list("refill ammo,drop canswap,drop weapon,take weapon"));
-        self add_array("perks", slider_controls, ::toggle_perk, level.perk_list);
+        self add_array("perks", slider_controls, ::toggle_perk, self.bliss["perk_list"]);
         self add_array("killstreaks", slider_controls, ::give_certain_streak, list("fill all,care package,ammo crate,vests,kem strike,oracle,odin"));
         break;
     case "teleports":
@@ -87,20 +89,13 @@ structure()
         map = getdvar("mapname");
         self add_menu("teleports - " + self.bliss["teleports"][map][3]);
         for(i = 0; i < self.bliss["teleports"][map][0].size; i++) 
-        {
             self add_option(self.bliss["teleports"][map][0][i], undefined, ::set_position, self.bliss["teleports"][map][1][i], self.bliss["teleports"][map][2][i]);
-        }
         break;
-    case "anims":
+    case "binds":
+        self.is_bind_menu = true;
         self add_menu(menu);
-        self add_bind_index("sprint loop");
-        self add_bind_index("lunge");
-        self add_bind_index("smooth");
-        self add_bind_index("mala");
-        self add_bind_index("illusion");
-        self add_bind_index("glide");
-        self add_bind_index("care package stall");
-        self add_bind_index("tilt screen");
+        foreach(bind in bind_list)
+            self add_option(bind, undefined, ::new_menu, bind);
         break;
     case "all clients":
         self.is_bind_menu = false;
@@ -112,7 +107,7 @@ structure()
             self add_option(option_text, undefined, ::new_menu, "player option");
         }
         break;
-    case "menu info":
+    case "menu info": // remove this later maybe lmfao
         self.is_bind_menu = false;
         self add_menu(menu);
         foreach(opt in menu_info)
@@ -122,7 +117,9 @@ structure()
         if (is_true(self.is_bind_menu))
         {
             self bind_index(menu);
-        } else {
+        } 
+        else 
+        {
             self player_index(menu, self.select_player);
         }
         break;

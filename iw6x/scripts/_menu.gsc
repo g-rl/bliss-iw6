@@ -20,8 +20,8 @@ initial_precache()
     foreach(shader in list("shader"))
         precacheshader(shader);
 
-    foreach(model in list("model"))
-        precachemodel(shader);
+    foreach(model in list("mp_body_infected_a,head_mp_infected"))
+        precachemodel(model);
 }
 
 initial_variable()

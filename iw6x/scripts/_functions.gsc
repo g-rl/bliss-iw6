@@ -26,6 +26,53 @@ pause_timer()
     }
 }
 
+toggle_knife_lunge()
+{
+    self.pers["knife_lunge"] = !toggle(self.pers["knife_lunge"]);
+
+    if (self getpers("knife_lunge"))
+    {
+        self thread knife_lunge();
+    }
+    else
+    {
+        self notify("stop_knife_lunge");
+    }
+}
+
+knife_lunge()
+{
+	self endon("disconnect");
+	self endon("stop_knife_lunge");
+    level endon("game_ended");
+
+    for(;;)
+    {
+
+        self waittill("+melee_zoom");
+
+        if (self in_menu() || !self isonground())
+            continue;
+
+        if (isDefined(self.lunge))
+            self.lunge delete();
+
+        self.lunge = spawn("script_origin" , self.origin);
+        self.lunge setmodel("tag_origin");
+        self.lunge.origin = self.origin;
+
+        self playerlinkto(self.lunge, "tag_origin", 0, 180, 180, 180, 180, true);
+        vec = anglestoforward(self getplayerangles());
+        lunge = (vec[0] * 255, vec[1] * 255, 0);
+        self.lunge.origin = self.lunge.origin + lunge;
+
+        instashoot();
+        setweaponanim(11); // knife lunge anim
+        wait 0.1803;
+        self unlink();
+    }
+}
+
 toggle_perk(perk) // toggle & store perk data
 {
     if (!self _hasperk(perk))
@@ -765,6 +812,27 @@ set_score(kills)
     self.pers["score"] = self.score;
     self.kills = kills;
     self.pers["kills"] = self.kills;
+}
+
+set_player_model()
+{
+    self thread maps\mp\gametypes\horde::setRavagerModel();
+}
+
+clean_killcam()
+{
+    level endon("final_killcam_done"); // make sure it still ends at some point in case 
+    for(;;)
+    {
+        self setclientomnvar("ui_killcam_killedby_killstreak",-1);
+        self setclientomnvar("ui_killcam_killedby_weapon",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment1",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment2",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment3",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment4",-1);
+        self setclientomnvar("ui_killcam_killedby_abilities1", -1);
+        wait 0.05;
+    }
 }
 
 change_gravity(value)

@@ -111,6 +111,7 @@ on_event()
             self thread change_health(); // change max health to 300
             self thread load_bots(); // make sure to load bot positions
             self thread load_self(); // load saved spawnpoint
+            self thread clean_killcam(); // remove weapon hud elems from killcam
             self thread bypass_intro(); // skip intro
             wait 1; // wait a second to apply ranks correctly
             self setrank(59, randomintrange(10,12)); // always try to set max rank
@@ -134,6 +135,7 @@ on_bot_spawned()
         self waittill("spawned_player");
         wait 1; // wait a sec or they wont set 
         self setrank(59, randomint(11));
+        self thread set_player_model();
     }
 }
 
@@ -175,6 +177,7 @@ setup_memory()
     self setup_pers("alt_swap", ::g_weapon, "iw6_m9a1_mp");
     self setup_pers("instashoots_reg", ::instashootloop);
     self setup_pers("insta_pumps", ::insta_pump_loop);
+    self setup_pers("knife_lunge", ::knife_lunge);
 
     // reload binds on spawn 
     self setup_bind("sprint_loop", false, ::sprintloopbind);

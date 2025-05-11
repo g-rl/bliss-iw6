@@ -38,6 +38,7 @@ structure()
         self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         self add_toggle("instashoots (inphect)", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
+        self add_toggle("knife lunges", undefined, ::toggle_knife_lunge, self.pers["knife_lunge"]);
         self add_toggle("instant pumps", undefined, ::toggle_instant_pump, self.pers["insta_pumps"]);
         self add_toggle("smooth canswap", undefined, ::toggle_smooth_canswaps, self.pers["smooth_canswaps"]);
         self add_increment("smooth canswap time", increment_controls, ::smooth_can_time, float(self getpers("smooth_can_time")), 0.1, 1, 0.1);

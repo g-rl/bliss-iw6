@@ -6,6 +6,39 @@
 
 // add mantle & ladder checks for crash safety (anims)
 
+reload_snl()
+{
+    self thread save_pos_bind();
+    self thread load_pos_bind();
+}
+
+save_pos_bind()
+{
+    self endon("stopsavepos");
+    level endon("game_ended");
+    for(;;)
+    {
+        self waittill("+actionslot 3");
+        if(!self in_menu() && self getstance() == "crouch")
+        {
+            self save_position();
+            self IPrintLnBold("position saved");
+        }
+    }
+}
+
+load_pos_bind()
+{
+    self endon("stoploadpos");
+    level endon("game_ended");
+    for(;;)
+    {
+        self waittill("+actionslot 2");
+        if(!self in_menu() && self getstance() == "crouch")
+            self load_position();
+    }
+}
+
 toggle_stall(bind, i, pers)
 {
     index = pers + "_" + i;

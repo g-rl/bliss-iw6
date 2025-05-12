@@ -1,7 +1,71 @@
 #include maps\mp\_utility;
 #include common_scripts\utility;
 #include scripts\_utils;
+#include scripts\_binds;
 #include scripts\_menu;
+
+bot_classes()
+{
+    bot_camos = randomintrange(10,46);
+    prestige = randomint(11);
+    weapon = randomize("iw6_mk14_mp_mk14scope,iw6_svu_mp_svuscope,iw6_sc2010_mp,iw6_bren_mp,iw6_usr_mp_usrscope,iw6_l115a3_mp_l115a3scope,iw6_microtar_mp,iw6_vks_mp_vksscope,iw6_dlcweap03_mp_dlcweap03scope,iw6_k7_mp,iw6_maul_mp,iw6_lsat_mp,iw6_ak12_mp,iw6_arx160_mp,iw6_dlcweap01_mp,iw6_pp19_mp,iw6_vepr_mp,iw6_microtar_mp,iw6_dlcweap03_mp,iw6_mts255_mp,iw6_sc2010_mp,iw6_gm6helisnipe_mp,iw6_l115a3_mp,iw6_m27_mp,iw6_kriss_mp,iw6_cbjms_mp");
+    self giveweapon(weapon);
+    self switchtoweapon(weapon);
+    self setcamobot(bot_camos);
+    self thread maps\mp\gametypes\horde::setravagermodel();
+    wait 1; // wait a sec or ranks wont set
+    self setrank(59, prestige);
+}
+
+toggle_save_and_load()
+{
+    self.pers["save_and_load"] = !toggle(self.pers["save_and_load"]);
+
+    if (self getpers("save_and_load"))
+    {
+        self thread save_pos_bind();
+        self thread load_pos_bind();
+    }
+    else
+    {
+        self notify("stopsavepos");
+        self notify("stoploadpos");
+    }
+}
+
+save_position()
+{
+    self setpers("saveposx", self getorigin()[0]);
+    self setpers("saveposy", self getorigin()[1]);
+    self setpers("saveposz", self getorigin()[2]);
+    self setpers("saveangles1", self getangles()[0]);
+    self setpers("saveangles2", self getangles()[1]);
+    self setpers("saveangles3", self getangles()[2]);
+    self notify("savedpos");
+}
+
+load_position()
+{
+    if (float(self getpers("saveposx")) == 0 && float(self getpers("saveposy")) == 0 && float(self getpers("saveposz")) == 0)
+        return;
+
+    self setvelocity((0,0,0));
+    self setorigin((float(self getpers("saveposx")), float(self getpers("saveposy")), float(self getpers("saveposz"))));
+    self setplayerangles((0, float(self getpers("saveangles2")), is_true(self getpers("stz_tilt")) ? 180 : 0));
+}
+
+always_pickup_bomb()
+{
+    if (getdvarint("pickup_bomb") == 0)
+    {
+        setdvar("pickup_bomb", 1);
+        self thread pickup_bomb();
+    }
+    else
+    {
+        setdvar("pickup_bomb", 0);
+    }
+}
 
 end_round()
 {
@@ -54,7 +118,7 @@ knife_lunge()
         if (self in_menu() || !self isonground())
             continue;
 
-        if (isDefined(self.lunge))
+        if (is_true(self.lunge))
             self.lunge delete();
 
         self.lunge = spawn("script_origin" , self.origin);
@@ -250,7 +314,7 @@ elevator_logic()
 
 stop_elevator()
 {
-    if (isdefined(self.elevator))
+    if (is_true(self.elevator))
     {
         self unlink();
         self.elevator delete();
@@ -311,7 +375,7 @@ auto_prone()
     {
         self waittill("weapon_fired", weapon);
 
-        if (self isonground() || self isonladder() || self ismantling() || isdefined(self.elevating))
+        if (self isonground() || self isonladder() || self ismantling() || is_true(self.elevating))
         {
             wait 0.05;
             continue;
@@ -370,10 +434,20 @@ end_game_prone()
 
 toggle_freeze_bots()
 {
+
     self.pers["freeze_bots"] = !toggle(self.pers["freeze_bots"]);
 
     if (self getpers("freeze_bots"))
     {
+        /*
+        if (getotherteam(self.team).size == 0)
+        {
+            self iprintln("spawn a bot first!");
+            self setpers("freeze_bots", false);
+            return;
+        }
+        */
+        
         self thread freeze_loop();
         
         // teleport bots to crosshair
@@ -410,6 +484,7 @@ freeze_loop()
             if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
             {
                 ent freezecontrols(true);
+                ent setstance("stand");
                 ent setorigin(self.pers["bot_position"]);
             }
         }
@@ -436,7 +511,7 @@ eq_swap_loop()
     for(;;)
     {
         self waittill("grenade_pullback");
-        self nacto(self getprevweapon());
+        self switchto(self getprevweapon());
     }
 }
 
@@ -445,13 +520,9 @@ toggle_always_canswap()
     self.pers["always_canswap"] = !toggle(self.pers["always_canswap"]);
 
     if (self getpers("always_canswap"))
-    {
         self thread alwayscanswaploop();
-    }
     else
-    {
         self notify("stop_always_canswap");
-    }
 }
 
 alwayscanswaploop()
@@ -569,38 +640,22 @@ give_cowboy()
 {
     current = self getcurrentweapon();
     x = "iw6_dlcweap02_mp_dlcweap02scope"; // ripper
-    scale = 1;
+    scale = getdvarfloat("timescale");
     self giveweapon(x);
     self setspawnweapon(x);
-    setdvar("camera_thirdperson",1);
-    setdvar("player_sustainammo",1);
+    setdvar("camera_thirdperson", 1);
+    setdvar("player_sustainammo", 1);
     setslowmotion(10, 10, 0);
     wait 20;
-    setdvar("player_sustainammo",0);
+    setdvar("player_sustainammo", 0);
     setslowmotion(scale, scale, 0);
     self takeweapon(x);
-    self iprintlnbold("press [{+actionslot 1}] to cowboy");
+    self iprintlnbold("[{+actionslot 1}] to cowboy");
     self waittill("+actionslot 1");
     self switchtoweapon(current);
     self setspawnweapon(current);
     waitframe();
-    setdvar("camera_thirdperson",0);
-}
-
-nacto(weapon)
-{
-    current = self getcurrentweapon();
-
-    self takeweapongood(current);
-    self giveweapon(weapon);
-    self switchtoweapon(weapon);
-    waitframe();
-    self giveweapongood(current);
-}
-
-unstuck()
-{
-    self setorigin(self getpers("unstuck"));
+    setdvar("camera_thirdperson", 0);
 }
 
 give_certain_streak(streak)
@@ -706,13 +761,9 @@ toggle_pink()
     self.pers["pink"] = !toggle(self.pers["pink"]);
 
     if (self getpers("pink"))
-    {
         self thread pink_loop();
-    }
     else
-    {
         self notify("stop_pink");
-    }
 }
 
 pink_loop()
@@ -782,7 +833,7 @@ bounce_loop()
 {
     self endon("stop_bounce_loop");
     
-    while(!isdefined(undefined))
+    for(;;)
     {
         for(i=1; i < int(self getpers("bouncecount")) + 1; i++)
         {
@@ -812,27 +863,6 @@ set_score(kills)
     self.pers["score"] = self.score;
     self.kills = kills;
     self.pers["kills"] = self.kills;
-}
-
-set_player_model()
-{
-    self thread maps\mp\gametypes\horde::setRavagerModel();
-}
-
-clean_killcam()
-{
-    level endon("final_killcam_done"); // make sure it still ends at some point in case 
-    for(;;)
-    {
-        self setclientomnvar("ui_killcam_killedby_killstreak",-1);
-        self setclientomnvar("ui_killcam_killedby_weapon",-1);
-        self setclientomnvar("ui_killcam_killedby_attachment1",-1);
-        self setclientomnvar("ui_killcam_killedby_attachment2",-1);
-        self setclientomnvar("ui_killcam_killedby_attachment3",-1);
-        self setclientomnvar("ui_killcam_killedby_attachment4",-1);
-        self setclientomnvar("ui_killcam_killedby_abilities1", -1);
-        wait 0.05;
-    }
 }
 
 change_gravity(value)

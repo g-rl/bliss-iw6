@@ -671,6 +671,7 @@ open_menu(menu)
     self set_menu(menu);
     self set_procedure();
     self create_option();
+    setslowmotion(1, 1, 0);
     self.watermark destroy();
     self thread flicker_shaders();
     self notify("opened_menu");
@@ -769,6 +770,7 @@ close_menu()
     self clear_option();
     self clear_all(self.menu["hud"]);
     self thread bliss_watermark();
+    setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
     self notify("exit_menu");
 }
 

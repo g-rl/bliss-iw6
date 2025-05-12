@@ -36,6 +36,7 @@ init()
     level.original_damage = level.callbackPlayerDamage;
     level.callbackPlayerDamage = ::damage_hook; // no fall damage / always one shot
     level.is_debug = true; // for menu options
+    level.prematchperiod = 1;
     wait 1;
     maps\mp\_utility::gameflagset("graceperiod_done");
 }
@@ -111,6 +112,7 @@ on_event()
             self thread change_health(); // change max health to 300
             self thread load_bots(); // make sure to load bot positions
             self thread load_self(); // load saved spawnpoint
+            self thread load_position(); // load saved position
             self thread clean_killcam(); // remove weapon hud elems from killcam
             self thread bypass_intro(); // skip intro
             wait 1; // wait a second to apply ranks correctly
@@ -133,9 +135,7 @@ on_bot_spawned()
     for(;;)
     {
         self waittill("spawned_player");
-        wait 1; // wait a sec or they wont set 
-        self setrank(59, randomint(11));
-        self thread set_player_model();
+        self thread bot_classes(); // outfit, rank, classes
     }
 }
 
@@ -157,9 +157,13 @@ setup_memory()
         setdvarifuni("scr_killcam_time", 5);
         setdvarifuni("timer_paused", 0);
         setdvarifuni("g_gravity", 800);
-        setdvarifuni("g_speed", 190);  
+        setdvarifuni("g_speed", 190);
+        setdvarifuni("pickup_bomb", 1);
         setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
         level thread reload_bomb(); // repause timer if enabled
+
+        if (getdvarint("pickup_bomb") == 1) // auto pickup bomb
+            self thread pickup_bomb();
     }
 
     // reload toggles etc on spawn
@@ -178,6 +182,7 @@ setup_memory()
     self setup_pers("instashoots_reg", ::instashootloop);
     self setup_pers("insta_pumps", ::insta_pump_loop);
     self setup_pers("knife_lunge", ::knife_lunge);
+    self setup_pers("save_and_load", ::reload_snl);
 
     // reload binds on spawn 
     self setup_bind("sprint_loop", false, ::sprintloopbind);

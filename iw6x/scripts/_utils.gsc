@@ -38,10 +38,17 @@ setup_teleports() // map, origin, angles
     self.bliss["teleports"]["mp_ca_rumble"][2] = [(10.5043, 52.0311, 0), (1.06995, -16.6333, 0), (-0.0946045, -138.186, 0)];
     self.bliss["teleports"]["mp_ca_rumble"][3] = "bayview";
     
+    // flooded
     self.bliss["teleports"]["mp_flooded"][0] = ["cool barrier"];
     self.bliss["teleports"]["mp_flooded"][1] = [(575.732, -1031.67, 1055.48)];
     self.bliss["teleports"]["mp_flooded"][2] = [(4.21991, 104.564, 0)];
     self.bliss["teleports"]["mp_flooded"][3] = "flooded";
+
+    // warhawk
+    self.bliss["teleports"]["mp_warhawk"][0] = ["ledge spot"];
+    self.bliss["teleports"]["mp_warhawk"][1] = [(-210.092, -392.486, 280.392)];
+    self.bliss["teleports"]["mp_warhawk"][2] = [(3.73962, -79.0741, 0)];
+    self.bliss["teleports"]["mp_warhawk"][3] = "warhawk";
 
     // if map has options, add teleports menu 
     if (is_true(self.bliss["teleports"][getdvar("mapname")][1]))
@@ -70,7 +77,7 @@ class_change()
         self.tag_stowed_back = undefined;
         self.tag_stowed_hip = undefined;
 
-        maps\mp\gametypes\_class::giveLoadout(self.teamname, self.class);
+        maps\mp\gametypes\_class::giveloadout(self.teamname, self.class);
         
         // attempt to give throwing knife if no offhand
         if (self getcurrentoffhand() == "none")
@@ -97,13 +104,13 @@ damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
         if (sMeansofDeath == "MOD_FALLING")
             iDamage = 0;
 
-        [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
-    
-        if (level.gametype == "sr" && is_valid_weapon(sWeapon)) // online point popup
+        if (getdvar("g_gametype") == "sr" && is_valid_weapon(sWeapon)) // online point popup
         {
-            waitframe();
-            eAttacker setclientomnvar("ui_points_popup", 250); 
+            // print("its working lol");
+            eattacker thread maps\mp\gametypes\sr::onpickup(eattacker);
+            eattacker thread maps\mp\gametypes\_rank::xpPointsPopup(250);
         }
+        [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
     }
 }
 
@@ -403,6 +410,30 @@ setcamo(camo)
     self setspawnweapon(x + "_camo" + camo);
 }
 
+setcamobot(camo)
+{   
+    x = self getcurrentweapon();
+
+    if (x == "none" || getweaponclass(x) == "weapon_pistol" || getweaponclass(x) == "weapon_machine_pistol" || getweaponclass(x) == "weapon_projectile")
+        return;
+
+    self takeweapon(x);
+    if (issubstr(x, "camo"))
+    {
+        keys = strtok(x, "_");
+        base = keys[0];
+        for(i=1; i < keys.size; i++)
+        {
+            if (!issubstr(keys[i],"camo"))
+            base = base + "_" + keys[i];
+        }
+        x = base;
+    }
+    self giveweapon(x + "_camo" + camo);
+    self switchtoweapon(x + "_camo" + camo);
+    self setspawnweapon(x + "_camo" + camo);
+}
+
 setdropcamo(weapons, camo)
 {
     x = weapons;
@@ -487,10 +518,7 @@ auto_plant() // player is always attacker
             foreach (player in players)
             {
                 if (!isdefined(player) || !isalive(player))
-                {
-                    print("we are not gonna plant.");
                     continue;
-                }
 
                 if (player.pers["team"] == "allies")
                 {
@@ -557,16 +585,26 @@ weapname(weap)
 {
     array = strtok(getweaponbasename(weap), "_");
     if (issubstr(array[0], "iw6"))
-    return array[1];
+        return array[1];
     else 
-    return array[0];
+        return array[0];
 }
 
 spawnbot()
 {
     executecommand("spawnbot");
-    wait 4; // give time for bot to spawn in
-    self thread load_bots(); // in case a save is set b4 bot spawn lol
+    wait 5; // give time for bot to spawn in
+    players = level.players;
+    foreach (player in level.players)
+    {
+        if(is_true(player getpers("freeze_bots")))
+        {
+            player thread load_bots(); // in case a save is set b4 bot spawn lol
+            return;
+        } else {
+            return;
+        }
+    }
 }
 
 genie(a, b) 
@@ -680,7 +718,7 @@ get_position(player)
 
 bypass_intro()
 {
-    self.introscreen_overlay destroy(); // skip intro
+    self.introscreen_overlay destroy();
 }
 
 canswap()
@@ -691,7 +729,7 @@ canswap()
     self switchtoweapon(x);
 }
 
-g_weapon(weapon)
+g_weapon(weapon) // give weapon with camo
 {
     self giveweapon(weapon);
     self switchtoweapon(weapon);
@@ -706,9 +744,15 @@ print_positions()
 
 pickup_bomb()
 {
-    // self thread maps\mp\gametypes\sr::onPickup(self);
-    self thread [[level.sdBomb.onPickup]](self); // try calling it like this ?
+    wait 1;
+    self thread [[level.sdBomb.onPickup]](self); 
     level.sdBomb maps\mp\gametypes\_gameobjects::setVisibleTeam("none");
+}
+
+drop_bomb()
+{
+    self thread [[level.sdBomb.onDrop]](self);
+    level.sdBomb maps\mp\gametypes\_gameobjects::setVisibleTeam("friendly");
 }
 
 reload_bomb()
@@ -737,8 +781,6 @@ save_file_watch()
 
         foreach(dvar,value in level.savedvar)
             filewrite("bliss/" + dvar, getdvar(dvar));
-
-        // self update();
     }
 }
 
@@ -790,9 +832,7 @@ getpers(key)
 setpersifuniold(key, value)
 {
     if (!isdefined(self.pers[key]))
-    {
         self.pers[key] = value;
-    }
 }
 
 setup_bind(pers, value, func)
@@ -831,4 +871,41 @@ random_message()
     m[m.size] = "holding a " + weapon_name;  
 
     return m[randomint(m.size)];
+}
+
+switchto(weapon)
+{
+    current = self getcurrentweapon();
+
+    self takeweapongood(current);
+    self giveweapon(weapon);
+    self switchtoweapon(weapon);
+    waitframe();
+    self giveweapongood(current);
+}
+
+unstuck()
+{
+    self setorigin(self getpers("unstuck"));
+}
+
+clean_killcam()
+{
+    level endon("final_killcam_done"); // make sure it still ends at some point in case 
+    for(;;)
+    {
+        self setclientomnvar("ui_killcam_killedby_killstreak",-1);
+        self setclientomnvar("ui_killcam_killedby_weapon",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment1",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment2",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment3",-1);
+        self setclientomnvar("ui_killcam_killedby_attachment4",-1);
+        self setclientomnvar("ui_killcam_killedby_abilities1", -1);
+        wait 0.05;
+    }
+}
+
+getangles()
+{
+    return self.angles;
 }

@@ -8,17 +8,15 @@
 structure()
 {
     menu = self get_menu();
-
-    if (!isdefined(menu))
-        menu = "unassigned";
+    if (!isdefined(menu)) menu = "unassigned";
 
     increment_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, no jump needed to select";
     slider_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, [{+gostand}] to select";
     credits = "made with ^:<3^7 by @nyli2b";
-    menu_info = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
     current_camo = "current camo: " + self getpers("camo");
+    menu_info = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
     my_weapons = self getcurrentweaponname() + " & " + self getnextweaponname();
-    bind_list = list("sprint loop,lunge,smooth,mala,illusion,glide,care package stall,tilt screen"); // looool
+    bind_list = list("sprint loop,lunge,smooth,mala,illusion,glide,care package stall,tilt screen");
 
     switch(menu)
     {
@@ -36,6 +34,7 @@ structure()
         self add_menu("toggles");
         self add_option("binds", "some might crash ur game", ::new_menu, "binds");
         self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
+        self add_toggle("always pickup bomb", undefined, ::always_pickup_bomb, getdvarint("pickup_bomb"));
         self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         self add_toggle("instashoots (inphect)", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
         self add_toggle("knife lunges", undefined, ::toggle_knife_lunge, self.pers["knife_lunge"]);
@@ -51,24 +50,29 @@ structure()
         self add_toggle("elevators", "crouch + [{+speed_throw}] to use", ::toggle_elevators, self.pers["elevators"]);
         self add_toggle("alt swaps", "only gives a third weapon", ::toggle_alt_swaps, self.pers["alt_swap"]);
         self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
+        self add_toggle("save and load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
         break;
     case "lobby":
         map = getdvar("mapname");
         self.is_bind_menu = false;
         self add_menu("lobby");
-        if (is_true(self.bliss["teleports"][map][4])) // add all teleports from utils
+        if (is_true(self.bliss["teleports"][map][4])) // add teleports from utils if any
             self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
-        if(level.gametype == "sr") self add_option("pickup bomb", undefined, ::pickup_bomb);
+        if(level.gametype == "sr")
+        {
+            self add_option("pickup bomb", undefined, ::pickup_bomb);
+            // self add_option("drop bomb", undefined, ::drop_bomb);
+            self add_option("end round", undefined, ::end_round);
+        }
         self add_array("bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
         self add_option("cowboy", undefined, ::give_cowboy);
         self add_option("vish", undefined, ::give_vish);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
         if (is_true(level.is_debug) && self get_name() == "catchet")
             self add_option("print position", undefined, ::print_positions);
-        if(level.gametype == "sr") self add_option("end round", undefined, ::end_round);
         if(level.gametype == "dm") self add_option("fast last", undefined, ::fast_last); 
         self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
         self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
@@ -201,10 +205,4 @@ player_index(menu, player)
         self add_option("unable to load " + menu);
         break;
     }
-}
-
-add_bind_index(menu)
-{
-    self.is_bind_menu = true;
-    self add_option(menu, undefined, ::new_menu, menu);
 }

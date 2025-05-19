@@ -23,7 +23,6 @@ main()
     setdvar("g_enableelevators", 1); // wont get stuck with fake eles as much
     setdvar("bg_surfacePenetration", 999999);
     setdvar("jump_slowdownenable", 0);
-    // setdvar("jump_enablefalldamage", 0); // dont think i need this with damage_hook
     setdvar("sv_hostname", "bliss [setup & unsetup]");
     setdvar("panelafile", "hello"); // need this for fileread to work
 }
@@ -59,7 +58,7 @@ on_player_connect()
         }
         else
         {
-            player thread on_bot_spawned(); // set bot ranks
+            player thread on_bot_spawned(); // set bot ranks & classes
         }
     }
 }
@@ -113,8 +112,8 @@ on_event()
             self thread load_bots(); // make sure to load bot positions
             self thread load_self(); // load saved spawnpoint
             self thread load_position(); // load saved position
-            self thread clean_killcam(); // remove weapon hud elems from killcam
             self thread bypass_intro(); // skip intro
+            self thread clean_killcam(); // remove weapon hud elems from killcam
             wait 1; // wait a second to apply ranks correctly
             self setrank(59, randomintrange(10,12)); // always try to set max rank
             break;
@@ -160,10 +159,11 @@ setup_memory()
         setdvarifuni("g_speed", 190);
         setdvarifuni("pickup_bomb", 1);
         setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
-        level thread reload_bomb(); // repause timer if enabled
 
         if (getdvarint("pickup_bomb") == 1) // auto pickup bomb
             self thread pickup_bomb();
+
+        level thread reload_bomb(); // repause timer if enabled
     }
 
     // reload toggles etc on spawn
@@ -207,15 +207,12 @@ setup_memory()
 
     // setup camo array for menu
     if (!isdefined(level.camoarray))
-    {
         level.camoarray = [];
-        for(i=10; i<46; i++)
-        {
-            level.camoarray[level.camoarray.size] = i;
-        }
-    }
 
-    if (getdvarint("bouncecount") >= 1)
+    for(i=10; i<46; i++)
+        level.camoarray[level.camoarray.size] = i;
+
+    if (self getpers("bouncecount") >= 1)
     {
         self notify("stop_bounce_loop");
         self thread bounce_loop(); // watch for placed bounces

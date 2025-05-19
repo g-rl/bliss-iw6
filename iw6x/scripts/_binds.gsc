@@ -19,7 +19,7 @@ save_pos_bind()
     for(;;)
     {
         self waittill("+actionslot 3");
-        if(!self in_menu() && self getstance() == "crouch")
+        if (!self in_menu() && self getstance() == "crouch")
         {
             self save_position();
             self IPrintLnBold("position saved");
@@ -34,7 +34,7 @@ load_pos_bind()
     for(;;)
     {
         self waittill("+actionslot 2");
-        if(!self in_menu() && self getstance() == "crouch")
+        if (!self in_menu() && self getstance() == "crouch")
             self load_position();
     }
 }

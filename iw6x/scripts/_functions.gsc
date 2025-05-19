@@ -851,7 +851,7 @@ bounce_loop()
 
 fast_last()
 {
-    if(getdvar("g_gametype") == "dm")
+    if (getdvar("g_gametype") == "dm")
         self set_score(int(getwatcheddvar("scorelimit") - 1));
     else
         self iprintlnbold("must be ffa");

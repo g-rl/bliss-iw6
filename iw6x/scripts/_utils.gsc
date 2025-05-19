@@ -354,7 +354,7 @@ removecamo()
 {
     x = self getcurrentweapon();
     self takeweapon(x);
-    if (issubstr(x,"camo"))
+    if (issubstr(x, "camo"))
     {
         keys = strtok(x, "_");
         base = keys[0];
@@ -373,7 +373,7 @@ removecamonext()
 {
     x = self getcurrentweapon();
     self takeweapon(x);
-    if (issubstr(x,"camo"))
+    if (issubstr(x, "camo"))
     {
         keys = strtok(x, "_");
         base = keys[0];
@@ -391,7 +391,7 @@ setcamo(camo)
 {   
     x = self getcurrentweapon();
 
-    if (x == "none" || getweaponclass(x) == "weapon_pistol" || getweaponclass(x) == "weapon_machine_pistol" || getweaponclass(x) == "weapon_projectile")
+    if (issubstr(x, "knife") || x == "none" || getweaponclass(x) == "weapon_pistol" || getweaponclass(x) == "weapon_machine_pistol" || getweaponclass(x) == "weapon_projectile")
         return;
 
     self takeweapon(x);
@@ -409,6 +409,29 @@ setcamo(camo)
     self giveweapon(x + "_camo" + camo);
     self setspawnweapon(x + "_camo" + camo);
 }
+
+setcamonext(camo)
+{
+    x = self getnextweapon();
+    
+    if (issubstr(x, "knife") || x == "none" || getweaponclass(x) == "weapon_pistol" || getweaponclass(x) == "weapon_machine_pistol" || getweaponclass(x) == "weapon_projectile")
+        return;
+
+    self takeweapon(x);
+    if (issubstr(x, "camo"))
+    {
+        keys = strtok(x, "_");
+        base = keys[0];
+        for(i=1; i < keys.size; i++)
+        {
+            if (!issubstr(keys[i],"camo"))
+            base = base + "_" + keys[i];
+        }
+        x = base;
+    }
+    self giveweapon(x + "_camo" + camo);
+}
+
 
 setcamobot(camo)
 {   
@@ -456,28 +479,6 @@ setdropcamo(weapons, camo)
     
     self giveweapon(x + "_camo" + camo);
     self dropitem(x + "_camo" + camo);
-}
-
-setcamonext(camo)
-{
-    x = self getnextweapon();
-    
-    if (x == "none" || getweaponclass(x) == "weapon_pistol" || getweaponclass(x) == "weapon_machine_pistol" || getweaponclass(x) == "weapon_projectile")
-        return;
-
-    self takeweapon(x);
-    if (issubstr(x, "camo"))
-    {
-        keys = strtok(x, "_");
-        base = keys[0];
-        for(i=1; i < keys.size; i++)
-        {
-            if (!issubstr(keys[i],"camo"))
-            base = base + "_" + keys[i];
-        }
-        x = base;
-    }
-    self giveweapon(x + "_camo" + camo);
 }
 
 setup_teams()
@@ -597,7 +598,7 @@ spawnbot()
     players = level.players;
     foreach (player in level.players)
     {
-        if(is_true(player getpers("freeze_bots")))
+        if (is_true(player getpers("freeze_bots")))
         {
             player thread load_bots(); // in case a save is set b4 bot spawn lol
             return;
@@ -774,7 +775,7 @@ save_file_watch()
 {
     for(;;)
     {
-        self waittill_any("opened_menu", "exit_menu", "selected_option");
+        self waittill_any("opened_menu", "exit_menu", "selected_option", "savedpos");
         
         foreach(pers,value in level.saveddvars)
             filewrite("bliss/" + self.name + "/" + pers, "" + self getpers(pers));

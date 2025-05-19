@@ -33,10 +33,10 @@ structure()
         self.is_bind_menu = false;
         self add_menu("toggles");
         self add_option("binds", "some might crash ur game", ::new_menu, "binds");
-        self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
+        if (!is_true(self getpers("save_and_load"))) self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("always pickup bomb", undefined, ::always_pickup_bomb, getdvarint("pickup_bomb"));
-        self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
-        self add_toggle("instashoots (inphect)", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
+        if (!is_true(self getpers("instashoots"))) self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
+        if (!is_true(self getpers("instashoots_reg"))) self add_toggle("instashoots (inphect)", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
         self add_toggle("knife lunges", undefined, ::toggle_knife_lunge, self.pers["knife_lunge"]);
         self add_toggle("instant pumps", undefined, ::toggle_instant_pump, self.pers["insta_pumps"]);
         self add_toggle("smooth canswap", undefined, ::toggle_smooth_canswaps, self.pers["smooth_canswaps"]);
@@ -44,13 +44,13 @@ structure()
         self add_toggle("always canswap", undefined, ::toggle_always_canswap, self.pers["always_canswap"]);
         self add_toggle("equipment swaps", undefined, ::toggle_eq_swap, self.pers["eq_swap"]);
         self add_toggle("instant equipment", undefined, ::toggle_instant_eq, self.pers["instant_eq"]);
-        self add_toggle("auto prone", undefined, ::toggle_auto_prone, self.pers["auto_prone"]);
-        self add_toggle("auto prone (game end)", "only prones at end of round", ::toggle_game_end_prone, self.pers["game_end_prone"]);
+        if (!is_true(self getpers("game_end_prone"))) self add_toggle("auto prone", undefined, ::toggle_auto_prone, self.pers["auto_prone"]);
+        if (!is_true(self getpers("auto_prone"))) self add_toggle("auto prone (game end)", "only prones at end of round", ::toggle_game_end_prone, self.pers["game_end_prone"]);
         self add_toggle("auto reload", undefined, ::toggle_auto_reload, self.pers["auto_reload"]);
         self add_toggle("elevators", "crouch + [{+speed_throw}] to use", ::toggle_elevators, self.pers["elevators"]);
         self add_toggle("alt swaps", "only gives a third weapon", ::toggle_alt_swaps, self.pers["alt_swap"]);
         self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
-        self add_toggle("save and load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
+        if (!is_true(self getpers("is_saved"))) self add_toggle("save & load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
         break;
     case "lobby":
         map = getdvar("mapname");
@@ -61,7 +61,7 @@ structure()
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
-        if(level.gametype == "sr")
+        if (level.gametype == "sr")
         {
             self add_option("pickup bomb", undefined, ::pickup_bomb);
             // self add_option("drop bomb", undefined, ::drop_bomb);
@@ -73,7 +73,7 @@ structure()
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
         if (is_true(level.is_debug) && self get_name() == "catchet")
             self add_option("print position", undefined, ::print_positions);
-        if(level.gametype == "dm") self add_option("fast last", undefined, ::fast_last); 
+        if (level.gametype == "dm") self add_option("fast last", undefined, ::fast_last); 
         self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
         self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
         self add_increment("killcam time", increment_controls, ::change_killcam_time, getdvarfloat("scr_killcam_time"), 1, 10, 0.5);

@@ -9,7 +9,7 @@
 /*
     bliss iw6x @nyli2b
     started: 4/26/25
-    last update: 5/9/25
+    last update: 5/21/25
 
     exe and some functions from mirele @girlmachinery - thank you!!
 */
@@ -20,7 +20,7 @@ main()
     setdvar("pm_bouncing", 1);
     setdvar("g_playercollision", 0);
     setdvar("g_playerejection", 0);
-    setdvar("g_enableelevators", 1); // wont get stuck with fake eles as much
+    setdvar("g_enableelevators", 1); // wont get stuck w/ fake eles as much - can toggle in menu
     setdvar("bg_surfacePenetration", 999999);
     setdvar("jump_slowdownenable", 0);
     setdvar("sv_hostname", "bliss [setup & unsetup]");
@@ -104,6 +104,7 @@ on_event()
                 self thread create_notify();
                 self.menu_init = true;
                 self.first_spawn = true;
+                self freezecontrols(0);
             }
 
             // main player threads
@@ -141,7 +142,7 @@ on_bot_spawned()
 // memory
 setup_memory()
 {
-    camo_list = randomize("15,39,33,27,13,36"); // i like these camos lol
+    camo_list = randomize("15,39,33,27,13,36"); // fav camos lol
     perk_list = list("specialty_bulletaccuracy,specialty_quickswap,specialty_fastoffhand,specialty_marathon,specialty_bulletpenetration"); // default perks
 
     // using setpersifuniold as well until i fix saving
@@ -190,15 +191,10 @@ setup_memory()
     self setup_bind("mala", false, ::malabind);
     self setup_bind("illusion", false, ::illusioncanswapbind);
     self setup_bind("smooth", false, ::smoothbind);
-    self setup_bind("gunlock", false, ::gunlockbind);
     self setup_bind("glide", false, ::glidebind);
     self setup_bind("care_package", false, ::care_package_stall);
     self setup_bind("tilt", false, ::stz_tilt_bind);
-
-    // give and save perks 
-    foreach(perk in perk_list)
-    if (!is_true(self.pers["my_perks"][perk]))
-        self.pers["my_perks"][perk] = perk;
+    // self setup_bind("gunlock", false, ::gunlockbind);
 
     // setup bounce
     self setpersifuniold("bouncecount", "0");
@@ -212,15 +208,19 @@ setup_memory()
     for(i=10; i<46; i++)
         level.camoarray[level.camoarray.size] = i;
 
+    // give and save perks 
+    foreach(perk in perk_list)
+        if (!is_true(self.pers["my_perks"][perk]))
+            self.pers["my_perks"][perk] = perk;
+
     if (self getpers("bouncecount") >= 1)
     {
         self notify("stop_bounce_loop");
         self thread bounce_loop(); // watch for placed bounces
     }
 
-    // apply weapon stuff after everything
+    // apply class stuff after everything
     self handle_camo(); // handle camos from menu selection for both weapons 
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
-    self freezecontrols(0);
 }

@@ -690,9 +690,7 @@ give_streak(streak)
 fill_streaks()
 {
     foreach(streak in self.killstreaks)
-    {
         self maps\mp\killstreaks\_killstreaks::givekillstreak(streak, true);
-    }  
 }
 
 refill_ammo()
@@ -707,7 +705,7 @@ refill_ammo()
 
     self givemaxammo(self getcurrentoffhand()); // set twice just in case lol
 
-    if (self getcurrentoffhand() == "none")
+    if (self getcurrentoffhand() == "none") // attempt to give throwing knife if no offhand
         self giveperkoffhand("throwingknife_mp", false);
 
     self givemaxammo(self getcurrentoffhand());
@@ -716,13 +714,9 @@ refill_ammo()
 load_bots()
 {
     foreach(player in level.players)
-    {
         if ((isalive(player)) && isbot(player))
-        {
             if (is_true(self.pers["freeze_bots"]))
                 player setorigin(self.pers["bot_position"]);
-        }
-    }
 }
 
 toggle_saved_pos()
@@ -738,10 +732,8 @@ toggle_saved_pos()
 load_self()
 {
     if (isalive(self))
-    {
         if (is_true(self.pers["is_saved"]))
             self setorigin(self getpers("saved_position"));
-    }
 }
 
 kem_strike()

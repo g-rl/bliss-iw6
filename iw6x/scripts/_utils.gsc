@@ -199,9 +199,7 @@ randomize(key)
 is_true(variable)
 {
     if (isdefined(variable) && variable)
-    {
         return true;
-    }
 
     return false;
 }
@@ -709,12 +707,12 @@ change_player_team(player)
 
 get_printed_position()
 {
-    return (self.origin + ", " + self getPlayerAngles() + "\n");
+    return (self.origin + ", " + self getplayerangles() + "\n");
 }
 
 get_position(player)
 {
-    return (player.origin + ", " + player getPlayerAngles());
+    return (player.origin + ", " + player getplayerangles());
 }
 
 bypass_intro()
@@ -750,7 +748,7 @@ pickup_bomb()
     level.sdBomb maps\mp\gametypes\_gameobjects::setVisibleTeam("none");
 }
 
-drop_bomb()
+drop_bomb() // does not work
 {
     self thread [[level.sdBomb.onDrop]](self);
     level.sdBomb maps\mp\gametypes\_gameobjects::setVisibleTeam("friendly");
@@ -777,10 +775,10 @@ save_file_watch()
     {
         self waittill_any("opened_menu", "exit_menu", "selected_option", "savedpos");
         
-        foreach(pers,value in level.saveddvars)
+        foreach(pers, value in level.saveddvars)
             filewrite("bliss/" + self.name + "/" + pers, "" + self getpers(pers));
 
-        foreach(dvar,value in level.savedvar)
+        foreach(dvar, value in level.savedvar)
             filewrite("bliss/" + dvar, getdvar(dvar));
     }
 }
@@ -836,7 +834,7 @@ setpersifuniold(key, value)
         self.pers[key] = value;
 }
 
-setup_bind(pers, value, func)
+setup_bind(pers, value, func) // my bind system is so ugly but it works for now lol
 {
     for(i = 0; i < 4; i++) 
     {

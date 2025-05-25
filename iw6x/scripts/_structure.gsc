@@ -33,7 +33,7 @@ structure()
         self.is_bind_menu = false;
         self add_menu("toggles");
         self add_option("binds", "some might crash ur game", ::new_menu, "binds");
-        if (!is_true(self getpers("save_and_load"))) self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
+        if (!is_true(self getpers("save_and_load")) && getdvarint("enable_cheats") == 1) self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("always pickup bomb", undefined, ::always_pickup_bomb, getdvarint("pickup_bomb"));
         if (!is_true(self getpers("instashoots"))) self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         if (!is_true(self getpers("instashoots_reg"))) self add_toggle("instashoots (inphect)", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
@@ -49,15 +49,16 @@ structure()
         self add_toggle("auto reload", undefined, ::toggle_auto_reload, self.pers["auto_reload"]);
         self add_toggle("elevators", "crouch + [{+speed_throw}] to use", ::toggle_elevators, self.pers["elevators"]);
         self add_toggle("alt swaps", "only gives a third weapon", ::toggle_alt_swaps, self.pers["alt_swap"]);
-        self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
-        if (!is_true(self getpers("is_saved"))) self add_toggle("save & load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
+        if (getdvarint("enable_cheats") == 1) self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
+        if (!is_true(self getpers("is_saved")) && getdvarint("enable_cheats") == 1) self add_toggle("save & load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
         break;
     case "lobby":
         map = getdvar("mapname");
         self.is_bind_menu = false;
         self add_menu("lobby");
-        if (is_true(self.bliss["teleports"][map][4])) // add teleports from utils if any
+        if (is_true(self.bliss["teleports"][map][4]) && getdvarint("enable_cheats") == 1) // add teleports from utils if any
             self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
+        self add_toggle("enable cheats", undefined, ::enable_cheats, getdvarint("enable_cheats"));
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");

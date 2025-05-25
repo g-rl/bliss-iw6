@@ -828,6 +828,12 @@ getpers(key)
     return self.pers[key];
 }
 
+unsetpers(list)
+{
+    foreach(pers in list)
+        self setpers(pers, false);
+}
+
 setpersifuniold(key, value)
 {
     if (!isdefined(self.pers[key]))

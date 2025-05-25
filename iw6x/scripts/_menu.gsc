@@ -10,7 +10,7 @@ bliss_watermark()
 {
     self.watermark = createfontstring("objective", 1);
     self.watermark setpoint("LEFT", "CENTER", -424, 234);
-    self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open ^:bliss");
+    self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open " + self getpers("wm_color") + "bliss");
     self.watermark.showinKillcam = false;
     self.watermark.hidewheninmenu = true;
 }

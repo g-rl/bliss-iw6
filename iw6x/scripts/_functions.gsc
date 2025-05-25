@@ -67,6 +67,34 @@ always_pickup_bomb()
     }
 }
 
+enable_cheats()
+{
+    if (getdvarint("enable_cheats") == 0)
+    {
+        setdvar("enable_cheats", 1);
+        self setpers("wm_color", "^1");
+    }
+    else
+    {
+        setdvar("enable_cheats", 0);
+        self setpers("wm_color", "^:");
+        self thread watch_cheats();
+    }
+}
+
+watch_cheats()
+{
+    foreach(cheater in level.players) // unset it for all players
+    {
+        cheats = list("pink,save_and_load,is_saved,saved_position");
+        cheater unsetpers(cheats);
+
+        cheater notify("stopsavepos");
+        cheater notify("stoploadpos");
+        cheater notify("stop_pink");
+    }
+}
+
 end_round()
 {
     maps\mp\gametypes\sr::sd_endGame(game["attackers"], game["end_reason"][game["defenders"]+"_eliminated"]);

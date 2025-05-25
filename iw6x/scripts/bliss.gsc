@@ -150,6 +150,17 @@ setup_memory()
     self setpersifuni("camo", int(camo_list));
     self setpersifuni("smooth_can_time", "0.2");
 
+    // watermark color
+    if (getdvarint("enable_cheats") == 1)
+    {
+        self setpers("wm_color", "^1");
+    }
+    else
+    {
+        self setpers("wm_color", "^:");
+        self thread watch_cheats();
+    }
+
     // only load these settings from host data
     if (self ishost())
     {
@@ -159,6 +170,7 @@ setup_memory()
         setdvarifuni("g_gravity", 800);
         setdvarifuni("g_speed", 190);
         setdvarifuni("pickup_bomb", 1);
+        setdvarifuni("enable_cheats", 0);
         setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
 
         if (getdvarint("pickup_bomb") == 1) // auto pickup bomb

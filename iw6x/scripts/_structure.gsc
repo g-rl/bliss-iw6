@@ -13,7 +13,6 @@ structure()
     increment_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, no jump needed to select";
     slider_controls = "[{+actionslot 3}] / [{+actionslot 4}] to use slider, [{+gostand}] to select";
     credits = "made with ^:<3^7 by @nyli2b";
-    current_camo = "current camo: " + self getpers("camo");
     menu_info = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
     my_weapons = self getcurrentweaponname() + " & " + self getnextweaponname();
     bind_list = list("sprint loop,lunge,smooth,mala,illusion,glide,care package stall,tilt screen");
@@ -32,18 +31,19 @@ structure()
     case "toggles":
         self.is_bind_menu = false;
         self add_menu("toggles");
-        self add_option("binds", "some might crash ur game", ::new_menu, "binds");
+        self add_option("anims & binds", "some might crash the game lol", ::new_menu, "binds");
         if (!is_true(self getpers("save_and_load")) && getdvarint("enable_cheats") == 1) self add_toggle("set spawnpoint", "save where you spawn next round", ::toggle_saved_pos, self.pers["is_saved"]);
         self add_toggle("always pickup bomb", undefined, ::always_pickup_bomb, getdvarint("pickup_bomb"));
         if (!is_true(self getpers("instashoots"))) self add_toggle("instashoots", "only works on snipers", ::toggle_reg_instashoots, self.pers["instashoots_reg"]);
         if (!is_true(self getpers("instashoots_reg"))) self add_toggle("instashoots (inphect)", "for all weapons", ::toggle_instashoots, self.pers["instashoots"]);
         self add_toggle("knife lunges", undefined, ::toggle_knife_lunge, self.pers["knife_lunge"]);
-        self add_toggle("instant pumps", undefined, ::toggle_instant_pump, self.pers["insta_pumps"]);
         self add_toggle("smooth canswap", undefined, ::toggle_smooth_canswaps, self.pers["smooth_canswaps"]);
         self add_increment("smooth canswap time", increment_controls, ::smooth_can_time, float(self getpers("smooth_can_time")), 0.1, 1, 0.1);
         self add_toggle("always canswap", undefined, ::toggle_always_canswap, self.pers["always_canswap"]);
         self add_toggle("equipment swaps", undefined, ::toggle_eq_swap, self.pers["eq_swap"]);
+        self add_toggle("instant pumps", undefined, ::toggle_instant_pump, self.pers["instant_pumps"]);
         self add_toggle("instant equipment", undefined, ::toggle_instant_eq, self.pers["instant_eq"]);
+        self add_toggle("instant streaks", undefined, ::toggle_instant_streaks, self.pers["instant_streaks"]);
         if (!is_true(self getpers("game_end_prone"))) self add_toggle("auto prone", undefined, ::toggle_auto_prone, self.pers["auto_prone"]);
         if (!is_true(self getpers("auto_prone"))) self add_toggle("auto prone (game end)", "only prones at end of round", ::toggle_game_end_prone, self.pers["game_end_prone"]);
         self add_toggle("auto reload", undefined, ::toggle_auto_reload, self.pers["auto_reload"]);
@@ -58,9 +58,10 @@ structure()
         self add_menu("lobby");
         if (is_true(self.bliss["teleports"][map][4]) && getdvarint("enable_cheats") == 1) // add teleports from utils if any
             self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
-        self add_toggle("enable cheats", undefined, ::enable_cheats, getdvarint("enable_cheats"));
+        self add_option("dvars", undefined, ::new_menu, "dvars");
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
+        self add_toggle("enable cheats", undefined, ::enable_cheats, getdvarint("enable_cheats"));
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
         if (level.gametype == "sr")
         {
@@ -68,18 +69,23 @@ structure()
             // self add_option("drop bomb", undefined, ::drop_bomb);
             self add_option("end round", undefined, ::end_round);
         }
-        self add_array("bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
+        self add_array("manage bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
+        // self add_option("spawn dogtag", undefined, ::spawn_dogtag);
         self add_option("cowboy", undefined, ::give_cowboy);
         self add_option("vish", undefined, ::give_vish);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
         if (is_true(level.is_debug) && self get_name() == "catchet")
             self add_option("print position", undefined, ::print_positions);
-        if (level.gametype == "dm") self add_option("fast last", undefined, ::fast_last); 
+        if (level.gametype == "dm") self add_option("fast last", undefined, ::fast_last); // add ffa support later
+        break;
+    case "dvars":
+        self.is_bind_menu = false;
+        self add_menu("dvars");
+        self add_toggle("elevators", undefined, ::change_elevators, getdvarint("g_enableelevators"));
+        self add_toggle("bounces", undefined, ::change_bouncing, getdvarint("pm_bouncing"));
         self add_increment("gravity", increment_controls, ::change_gravity, getdvarint("g_gravity"), 400, 800, 25);
         self add_increment("move speed", increment_controls, ::change_speed, getdvarint("g_speed"), 190, 800, 10);
         self add_increment("killcam time", increment_controls, ::change_killcam_time, getdvarfloat("scr_killcam_time"), 1, 10, 0.5);
-        self add_increment("elevators", increment_controls, ::change_elevators, getdvarint("g_enableelevators"), 0, 1, 1);
-        self add_increment("bounces", increment_controls, ::change_bouncing, getdvarint("pm_bouncing"), 0, 1, 1);
         self add_increment("timescale", increment_controls, ::change_timescale, getdvarfloat("timescale"), 0.25, 10, 0.25);
         break;
     case "weapons":
@@ -100,7 +106,7 @@ structure()
     case "binds":
         self.is_bind_menu = true;
         self add_menu(menu);
-        foreach(bind in bind_list)
+        foreach (bind in bind_list)
             self add_option(bind, undefined, ::new_menu, bind);
         break;
     case "all clients":
@@ -116,18 +122,14 @@ structure()
     case "menu info": // remove this later maybe lmfao
         self.is_bind_menu = false;
         self add_menu(menu);
-        foreach(opt in menu_info)
+        foreach (opt in menu_info)
             self add_category(opt);
         break;
-    default:
+    default: // shitty bind menu solution (but works :3)
         if (is_true(self.is_bind_menu))
-        {
             self bind_index(menu);
-        } 
         else 
-        {
             self player_index(menu, self.select_player);
-        }
         break;
     }
 }
@@ -171,12 +173,8 @@ bind_index(menu)
             self add_option("this menu is unassigned");
             break;
         default:
-            is_error = true;
-            if (is_error) 
-            {
-                self add_menu("error");
-                self add_option(("unable to load bind menu " + menu));
-            }
+            self add_menu("error");
+            self add_option("unable to load " + menu);
             break;
     }
 }

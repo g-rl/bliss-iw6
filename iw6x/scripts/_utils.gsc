@@ -105,11 +105,8 @@ damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
             iDamage = 0;
 
         if (getdvar("g_gametype") == "sr" && is_valid_weapon(sWeapon)) // online point popup
-        {
-            // print("its working lol");
-            eattacker thread maps\mp\gametypes\sr::onpickup(eattacker);
             eattacker thread maps\mp\gametypes\_rank::xpPointsPopup(250);
-        }
+
         [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
     }
 }
@@ -121,14 +118,10 @@ handle_snr()
     game["attackers"] = "allies";
 
     while (!isdefined(level.sdbomb))
-    {
         wait 0.05;
-    }
 
     while (!isdefined(level.bombzones) || level.bombzones.size < 1)
-    {
         wait 0.05;
-    }
 
     level.sdbombmodel hide();
     level.sdbomb hide();
@@ -190,9 +183,9 @@ list(key)
 
 randomize(key)
 {
-    arr = strtok(key, ", ");
-    random = randomint(arr.size);
-    output = arr[random];
+    array = strtok(key, ", ");
+    random = randomint(array.size);
+    output = array[random];
     return output;
 }
 
@@ -219,7 +212,7 @@ button_monitor(button)
     self endon("disconnect");
 
     self.button_pressed[button] = false;
-    self NotifyOnPlayerCommand("button_pressed_" + button, button);
+    self notifyonplayercommand("button_pressed_" + button, button);
 
     for(;;)
     {
@@ -253,10 +246,8 @@ monitor_buttons()
 
 create_notify()
 {
-    foreach(value in strtok("+sprint,+actionslot 1,+actionslot 2,+actionslot 3,+actionslot 4,+frag,+smoke,+melee,+melee_zoom,+stance,+gostand,+switchseat,+usereload", ",")) 
-    {
-        self NotifyOnPlayerCommand(value, value);
-    }
+    foreach (value in strtok("+sprint,+actionslot 1,+actionslot 2,+actionslot 3,+actionslot 4,+frag,+smoke,+melee,+melee_zoom,+stance,+gostand,+switchseat,+usereload", ",")) 
+        self notifyonplayercommand(value, value);
 }
 
 bullet_trace() 
@@ -271,7 +262,7 @@ get_name()
     if (name[0] != "[")
         return name;
 
-    for(i = (name.size - 1); i >= 0; i--)
+    for(i = (name.size - 1); i >= 0; i--) // cut clantags out of name
         if (name[i] == "]")
             break;
 
@@ -358,7 +349,7 @@ removecamo()
         base = keys[0];
         for(i=1;i<keys.size;i++)
         {
-            if (!issubstr(keys[i],"camo"))
+            if (!issubstr(keys[i], "camo"))
             base = base + "_" + keys[i];
         }
         x = base;
@@ -377,7 +368,7 @@ removecamonext()
         base = keys[0];
         for(i=1;i<keys.size;i++)
         {
-            if (!issubstr(keys[i],"camo"))
+            if (!issubstr(keys[i], "camo"))
             base = base + "_" + keys[i];
         }
         x = base;
@@ -399,7 +390,7 @@ setcamo(camo)
         base = keys[0];
         for(i=1; i < keys.size; i++)
         {
-            if (!issubstr(keys[i],"camo"))
+            if (!issubstr(keys[i], "camo"))
             base = base + "_" + keys[i];
         }
         x = base;
@@ -422,7 +413,7 @@ setcamonext(camo)
         base = keys[0];
         for(i=1; i < keys.size; i++)
         {
-            if (!issubstr(keys[i],"camo"))
+            if (!issubstr(keys[i], "camo"))
             base = base + "_" + keys[i];
         }
         x = base;
@@ -445,7 +436,7 @@ setcamobot(camo)
         base = keys[0];
         for(i=1; i < keys.size; i++)
         {
-            if (!issubstr(keys[i],"camo"))
+            if (!issubstr(keys[i], "camo"))
             base = base + "_" + keys[i];
         }
         x = base;
@@ -469,7 +460,7 @@ setdropcamo(weapons, camo)
         base = keys[0];
         for(i=1; i < keys.size; i++)
         {
-            if (!issubstr(keys[i],"camo"))
+            if (!issubstr(keys[i], "camo"))
             base = base + "_" + keys[i];
         }
         x = base;
@@ -497,7 +488,7 @@ setup_teams()
     }
 }
 
-auto_plant() // player is always attacker
+auto_plant() // player is always gonna be attacker
 {
     level endon("stop_auto_plant");
 
@@ -571,7 +562,7 @@ getcrosshair()
 
 set_perks()
 {
-    foreach(perk in self.pers["my_perks"])
+    foreach (perk in self.pers["my_perks"])
     {
         if (self.pers["my_perks"].size == 0)
             return;
@@ -642,7 +633,7 @@ kick_player(player)
 
 kick_bots()
 {
-    foreach(player in level.players)
+    foreach (player in level.players)
         if (isbot(player))
             kick(player getentitynumber());
 }
@@ -775,10 +766,10 @@ save_file_watch()
     {
         self waittill_any("opened_menu", "exit_menu", "selected_option", "savedpos");
         
-        foreach(pers, value in level.saveddvars)
+        foreach (pers, value in level.saveddvars)
             filewrite("bliss/" + self.name + "/" + pers, "" + self getpers(pers));
 
-        foreach(dvar, value in level.savedvar)
+        foreach (dvar, value in level.savedvar)
             filewrite("bliss/" + dvar, getdvar(dvar));
     }
 }
@@ -830,7 +821,7 @@ getpers(key)
 
 unsetpers(list)
 {
-    foreach(pers in list)
+    foreach (pers in list)
         self setpers(pers, false);
 }
 
@@ -913,4 +904,12 @@ clean_killcam()
 getangles()
 {
     return self.angles;
+}
+
+is_valid_ent(ent)
+{
+    if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
+        return true;
+    
+    return false;
 }

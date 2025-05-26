@@ -17,10 +17,10 @@ bliss_watermark()
 
 initial_precache()
 {
-    foreach(shader in list("shader"))
+    foreach (shader in list("shader"))
         precacheshader(shader);
 
-    foreach(model in list("mp_body_infected_a,head_mp_infected"))
+    foreach (model in list("mp_body_infected_a,head_mp_infected"))
         precachemodel(model);
 }
 
@@ -55,9 +55,20 @@ initial_variable()
 
     self thread setup_teleports(); // setup teleports for map if any
     self thread save_file_watch(); // save settings to a folder
-    self thread bliss_watermark(); // so watermark shows on first spawn
 
     self setclientomnvar("ui_round_end_match_bonus", randomintrange(200,1600)); // random match bonus
+
+    if (getdvarint("enable_cheats") == 1)
+    {
+        self setpers("wm_color", "^1");
+    }
+    else
+    {
+        self setpers("wm_color", "^:");
+        self thread watch_cheats();
+    }
+
+    self thread bliss_watermark(); // so watermark shows on first spawn
 }
 
 initial_monitor()
@@ -458,7 +469,7 @@ clear_all(array)
     {
         if (isarray(array[keys[i]]))
         {
-            foreach(key in array[keys[i]])
+            foreach (key in array[keys[i]])
                 if (isdefined(key))
                     key destroy_element();
         }
@@ -994,7 +1005,7 @@ update_menu(menu, cursor, force)
 
     if (isdefined(menu) && isdefined(cursor))
     {
-        foreach(player in level.players)
+        foreach (player in level.players)
         {
             if (!isdefined(player) || !player in_menu())
                 continue;
@@ -1043,7 +1054,7 @@ overflow_monitor()
             level.stringCount = 0;
 
             players = level.players;
-            foreach(player in players)
+            foreach (player in players)
             {
                 if (!isdefined(player))
                     continue;
@@ -1070,7 +1081,7 @@ set_safe_text(player, text)
 
 recreate_text()
 {
-    foreach(entry in self.textTable)
+    foreach (entry in self.textTable)
         entry.element set_safe_text(self, lookup_string_by_id(entry.stringId));
 }
 
@@ -1087,7 +1098,7 @@ add_string_table_entry(string)
 lookup_string_by_id(id)
 {
     string = "";
-    foreach(entry in self.stringTable)
+    foreach (entry in self.stringTable)
     {
         if (entry.id == id)
         {
@@ -1101,7 +1112,7 @@ lookup_string_by_id(id)
 get_string_id(string)
 {
     id = -1;
-    foreach(entry in self.stringTable)
+    foreach (entry in self.stringTable)
     {
         if (entry.string == string)
         {
@@ -1115,7 +1126,7 @@ get_string_id(string)
 get_string_table_entry(id)
 {
     stringTableEntry = -1;
-    foreach(entry in self.stringTable)
+    foreach (entry in self.stringTable)
     {
         if (entry.id == id)
         {
@@ -1129,7 +1140,7 @@ get_string_table_entry(id)
 purge_string_table()
 {
     stringTable = [];
-    foreach(entry in self.textTable)
+    foreach (entry in self.textTable)
     {
         stringTable[stringTable.size] = get_string_table_entry(entry.stringId);
     }
@@ -1139,7 +1150,7 @@ purge_string_table()
 purge_text_table()
 {
     textTable = [];
-    foreach(entry in self.textTable)
+    foreach (entry in self.textTable)
     {
         if (entry.id != -1)
         {
@@ -1151,7 +1162,7 @@ purge_text_table()
 
 edit_text_table_entry(id, stringId)
 {
-    foreach(entry in self.textTable)
+    foreach (entry in self.textTable)
     {
         if (entry.id == id)
         {
@@ -1163,7 +1174,7 @@ edit_text_table_entry(id, stringId)
 
 delete_text_table_entry(id)
 {
-    foreach(entry in self.textTable)
+    foreach (entry in self.textTable)
     {
         if (entry.id == id)
         {

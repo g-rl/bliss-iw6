@@ -4,8 +4,6 @@
 #include scripts\_menu;
 #include scripts\_functions;
 
-// add mantle & ladder checks for crash safety (anims)
-
 reload_snl()
 {
     self thread save_pos_bind();
@@ -22,7 +20,9 @@ save_pos_bind()
         if (!self in_menu() && self getstance() == "crouch")
         {
             self save_position();
-            self IPrintLnBold("position saved");
+            self iprintlnbold("position saved");
+            wait 0.6;
+            self iprintlnbold(" ");
         }
     }
 }
@@ -49,13 +49,9 @@ toggle_stall(bind, i, pers)
     wait 0.05;
 
     if (self.pers[index])
-    {
         self thread care_package_stall(bind, pers);
-    }
     else
-    {
         self notify("stop" + pers);
-    }
 }
 
 care_package_stall(bind, endonstring)
@@ -201,13 +197,9 @@ toggle_sprint_loop(bind, i, pers)
     wait 0.05;
 
     if (self.pers[index])
-    {
         self thread sprintloopbind(bind, pers);
-    }
     else
-    {
         self notify("stop" + pers);
-    }
 }
 
 sprintloopbind(bind, endonstring) 
@@ -239,13 +231,9 @@ toggle_mala(bind, i, pers)
     wait 0.05;
 
     if (self.pers[index])
-    {
         self thread malabind(bind, pers);
-    }
     else
-    {
         self notify("stop" + pers);
-    }
 }
 
 malabind(bind, endonstring) 
@@ -276,13 +264,9 @@ toggle_illusion(bind, i, pers)
     wait 0.05;
 
     if (self.pers[index])
-    {
         self thread illusioncanswapbind(bind, pers);
-    }
     else
-    {
         self notify("stop" + pers);
-    }
 }
 
 illusioncanswapbind(bind, endonstring) 
@@ -315,13 +299,9 @@ toggle_gunlock(bind, i, pers)
     wait 0.05;
 
     if (self.pers[index])
-    {
         self thread gunlockbind(bind, pers);
-    }
     else
-    {
         self notify("stop" + pers);
-    }
 }
 
 gunlockbind(bind, endonstring) 
@@ -354,13 +334,9 @@ toggle_smooth(bind, i, pers)
     wait 0.05;
 
     if (self.pers[index])
-    {
         self thread smoothbind(bind, pers);
-    }
     else
-    {
         self notify("stop" + pers);
-    }
 }
 
 smoothbind(bind, endonstring) 
@@ -391,13 +367,9 @@ toggle_lunge_bind(bind, i, pers)
     wait 0.05;
 
     if (self.pers[index])
-    {
         self thread lungebind(bind, pers);
-    }
     else
-    {
         self notify("stop" + pers);
-    }
 }
 
 lungebind(bind, endonstring) 

@@ -17,10 +17,8 @@
 main()
 {
     setdvar("sv_cheats", 1);
-    setdvar("pm_bouncing", 1);
     setdvar("g_playercollision", 0);
     setdvar("g_playerejection", 0);
-    setdvar("g_enableelevators", 1); // wont get stuck w/ fake eles as much - can toggle in menu
     setdvar("bg_surfacePenetration", 999999);
     setdvar("jump_slowdownenable", 0);
     setdvar("sv_hostname", "bliss [setup & unsetup]");
@@ -79,8 +77,7 @@ on_event()
         case "spawned_player":
 
             // dont load options if spawned already
-            if (isdefined(self.first_spawn))
-                continue;
+            if (isdefined(self.first_spawn)) continue;
 
             self thread setup_memory(); // reload options n stuff
 
@@ -150,18 +147,7 @@ setup_memory()
     self setpersifuni("camo", int(camo_list));
     self setpersifuni("smooth_can_time", "0.2");
 
-    // watermark color
-    if (getdvarint("enable_cheats") == 1)
-    {
-        self setpers("wm_color", "^1");
-    }
-    else
-    {
-        self setpers("wm_color", "^:");
-        self thread watch_cheats();
-    }
-
-    // only load these settings from host data
+    // only load dvar settings from host data
     if (self ishost())
     {
         setdvarifuni("timescale", 1);
@@ -171,6 +157,8 @@ setup_memory()
         setdvarifuni("g_speed", 190);
         setdvarifuni("pickup_bomb", 1);
         setdvarifuni("enable_cheats", 0);
+        setdvarifuni("pm_bouncing", 1);
+        setdvarifuni("g_enableelevators", 1); // wont get stuck w/ fake eles as much - can toggle in menu
         setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
 
         if (getdvarint("pickup_bomb") == 1) // auto pickup bomb
@@ -186,6 +174,8 @@ setup_memory()
     self setup_pers("freeze_bots", ::freeze_loop);
     self setup_pers("eq_swap", ::eq_swap_loop);
     self setup_pers("instant_eq", ::insta_eq_loop);
+    self setup_pers("instant_streaks", ::insta_streaks_loop);
+    self setup_pers("instant_pumps", ::insta_pump_loop);
     self setup_pers("auto_prone", ::auto_prone);
     self setup_pers("game_end_prone", ::prone_make_sure);
     self setup_pers("auto_reload", ::auto_reload);
@@ -193,7 +183,6 @@ setup_memory()
     self setup_pers("pink", ::pink_loop);
     self setup_pers("alt_swap", ::g_weapon, "iw6_m9a1_mp");
     self setup_pers("instashoots_reg", ::instashootloop);
-    self setup_pers("insta_pumps", ::insta_pump_loop);
     self setup_pers("knife_lunge", ::knife_lunge);
     self setup_pers("save_and_load", ::reload_snl);
 
@@ -221,9 +210,9 @@ setup_memory()
         level.camoarray[level.camoarray.size] = i;
 
     // give and save perks 
-    foreach(perk in perk_list)
-        if (!is_true(self.pers["my_perks"][perk]))
-            self.pers["my_perks"][perk] = perk;
+    foreach (perk in perk_list)
+    if (!is_true(self.pers["my_perks"][perk]))
+        self.pers["my_perks"][perk] = perk;
 
     if (self getpers("bouncecount") >= 1)
     {

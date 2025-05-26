@@ -3,15 +3,33 @@
 #include scripts\_utils;
 #include scripts\_binds;
 #include scripts\_menu;
+#include maps\mp\gametypes\sr;
 
+spawn_dogtag()
+{
+    ents = getentarray();
+    cross = self getcrosshair();
+
+    foreach (ent in ents) // there should only be one bot on the other team so this will work
+    {
+        if (is_valid_ent(ent))
+        {
+            level thread spawndogtags_stub(ent, self); // doesnt spawn on crosshair & needs to be fixed
+        }
+    }
+}
 bot_classes()
 {
     bot_camos = randomintrange(10,46);
-    prestige = randomint(11);
+    prestige = randomint(13); // go 2 over
     weapon = randomize("iw6_mk14_mp_mk14scope,iw6_svu_mp_svuscope,iw6_sc2010_mp,iw6_bren_mp,iw6_usr_mp_usrscope,iw6_l115a3_mp_l115a3scope,iw6_microtar_mp,iw6_vks_mp_vksscope,iw6_dlcweap03_mp_dlcweap03scope,iw6_k7_mp,iw6_maul_mp,iw6_lsat_mp,iw6_ak12_mp,iw6_arx160_mp,iw6_dlcweap01_mp,iw6_pp19_mp,iw6_vepr_mp,iw6_microtar_mp,iw6_dlcweap03_mp,iw6_mts255_mp,iw6_sc2010_mp,iw6_gm6helisnipe_mp,iw6_l115a3_mp,iw6_m27_mp,iw6_kriss_mp,iw6_cbjms_mp");
+    /*
     self giveweapon(weapon);
     self switchtoweapon(weapon);
     self setcamobot(bot_camos);
+    */
+    self setpers("camo", bot_camos);
+    self g_weapon(weapon);
     self thread maps\mp\gametypes\horde::setravagermodel();
     wait 1; // wait a sec or ranks wont set
     self setrank(59, prestige);
@@ -84,7 +102,7 @@ enable_cheats()
 
 watch_cheats()
 {
-    foreach(cheater in level.players) // unset it for all players
+    foreach (cheater in level.players) // unset it for all players
     {
         cheats = list("pink,save_and_load,is_saved,saved_position");
         cheater unsetpers(cheats);
@@ -140,15 +158,15 @@ knife_lunge()
 
     for(;;)
     {
-
         self waittill("+melee_zoom");
 
         if (self in_menu() || !self isonground())
             continue;
+        
+        if (is_true(self.is_lunging)) continue; // maybe helps prevent crashing
+        if (is_true(self.lunge)) self.lunge delete();
 
-        if (is_true(self.lunge))
-            self.lunge delete();
-
+        self.is_lunging = true;
         self.lunge = spawn("script_origin" , self.origin);
         self.lunge setmodel("tag_origin");
         self.lunge.origin = self.origin;
@@ -162,6 +180,7 @@ knife_lunge()
         setweaponanim(11); // knife lunge anim
         wait 0.1803;
         self unlink();
+        self.is_lunging = undefined;
     }
 }
 
@@ -202,7 +221,7 @@ drop_canswap()
     weapons = randomize("iw6_mk14_mp_mk14scope,iw6_svu_mp_svuscope,iw6_sc2010_mp,iw6_bren_mp,iw6_usr_mp_usrscope,iw6_l115a3_mp_l115a3scope,iw6_microtar_mp,iw6_vks_mp_vksscope,iw6_dlcweap03_mp_dlcweap03scope,iw6_k7_mp,iw6_maul_mp,iw6_lsat_mp,iw6_ak12_mp,iw6_arx160_mp,iw6_dlcweap01_mp,iw6_pp19_mp,iw6_vepr_mp,iw6_microtar_mp,iw6_dlcweap03_mp,iw6_mts255_mp,iw6_sc2010_mp,iw6_gm6helisnipe_mp,iw6_l115a3_mp,iw6_m27_mp,iw6_kriss_mp,iw6_cbjms_mp");
     self giveweapon(weapons);
     self switchtoweapon(weapons);
-    self setdropcamo(weapons, self getpers("camo")); // apply camo to weapon
+    self setdropcamo(weapons, self getpers("camo")); // apply camo to weapon before dropping
 }
 
 weapon_settings(setting)
@@ -260,19 +279,42 @@ insta_eq_loop()
     }
 }
 
+toggle_instant_streaks()
+{
+    self.pers["instant_streaks"] = !toggle(self.pers["instant_streaks"]);
+
+    if (self getpers("instant_streaks"))
+        self thread insta_streaks_loop();
+    else
+        self notify("stop_insta_streaks");
+}
+
+insta_streaks_loop()
+{
+    self endon("stop_insta_streaks");
+    self endon("disconnect");
+
+    for(;;)
+    {
+        self waittill("grenade_pullback", grenade);
+        if (iskillstreakweapon(grenade))
+            setweaponanimtime(0);
+    }
+}
+
 toggle_instant_pump()
 {
-    self.pers["insta_pumps"] = !toggle(self.pers["insta_pumps"]);
+    self.pers["instant_pumps"] = !toggle(self.pers["instant_pumps"]);
 
-    if (self getpers("insta_pumps"))
+    if (self getpers("instant_pumps"))
         self thread insta_pump_loop();
     else
-        self notify("stop_insta_pumps");
+        self notify("stop_instant_pumps");
 }
 
 insta_pump_loop()
 {
-    self endon("stop_insta_pumps");
+    self endon("stop_instant_pumps");
     self endon("disconnect");
     level endon("game_ended");
 
@@ -480,7 +522,7 @@ toggle_freeze_bots()
         
         // teleport bots to crosshair
         ents = getentarray();
-        foreach(ent in ents)
+        foreach (ent in ents)
         if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
         {
             ent setorigin(self getcrosshair());
@@ -492,7 +534,7 @@ toggle_freeze_bots()
         self notify("stop_freeze");
 
         ents = getentarray();
-        foreach(ent in ents)
+        foreach (ent in ents)
         if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
             ent freezecontrols(false);
     }
@@ -507,7 +549,7 @@ freeze_loop()
     for(;;)
     {
         ents = getentarray();
-        foreach(ent in ents)
+        foreach (ent in ents)
         {
             if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
             {
@@ -538,7 +580,11 @@ eq_swap_loop()
 
     for(;;)
     {
-        self waittill("grenade_pullback");
+        self waittill("grenade_pullback", grenade);
+
+        if (iskillstreakweapon(grenade)) // so you can still pull out streaks lol
+            continue;
+
         self switchto(self getprevweapon());
     }
 }
@@ -717,7 +763,7 @@ give_streak(streak)
 
 fill_streaks()
 {
-    foreach(streak in self.killstreaks)
+    foreach (streak in self.killstreaks)
         self maps\mp\killstreaks\_killstreaks::givekillstreak(streak, true);
 }
 
@@ -725,7 +771,7 @@ refill_ammo()
 {
     x = self GetWeaponsListPrimaries();
 
-    foreach(gun in x)
+    foreach (gun in x)
     {
         self setweaponammoclip(gun, 999);
         self setweaponammostock(gun, 999);
@@ -741,7 +787,7 @@ refill_ammo()
 
 load_bots()
 {
-    foreach(player in level.players)
+    foreach (player in level.players)
         if ((isalive(player)) && isbot(player))
             if (is_true(self.pers["freeze_bots"]))
                 player setorigin(self.pers["bot_position"]);
@@ -797,7 +843,7 @@ pink_loop()
         self waittill("weapon_fired");
         ents = getentarray();
         center = self getcrosshair();
-        foreach(ent in ents)
+        foreach (ent in ents)
         {
             if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
             {
@@ -885,6 +931,95 @@ set_score(kills)
     self.pers["kills"] = self.kills;
 }
 
+
+spawndogtags_stub( victim, attacker )
+{
+	//killstreak players don't get eliminated so don't drop tags
+	if ( IsAgent( victim ) )
+	{
+		return;
+	}
+	
+	//no tags while in heli-sniper
+	if ( victim maps\mp\killstreaks\_killstreaks::isUsingHeliSniper() )
+	{
+		return;
+	}
+
+	//give credit to the owner of the killstreak player
+	if ( IsAgent( attacker ) )
+	{
+		attacker = attacker.owner;
+	}
+
+	enemy_team = getOtherTeam(victim.team);
+
+	pos = victim.origin + (0,0,14);
+
+	if ( isDefined( level.dogtags[victim.guid] ) )
+	{
+		PlayFx( level.conf_fx["vanish"], level.dogtags[victim.guid].curOrigin );
+		level.dogtags[victim.guid] notify( "reset" );	
+	}
+	else
+	{
+		visuals[0] = spawn( "script_model", attacker getcrosshair() );
+		visuals[0] SetClientOwner( victim );
+		visuals[0] setModel( "prop_dogtags_foe_iw6" );
+		visuals[1] = spawn( "script_model", attacker getcrosshair() );
+		visuals[1] SetClientOwner( victim );
+		visuals[1] setModel( "prop_dogtags_friend_iw6" );
+		
+		trigger = spawn( "trigger_radius", attacker getcrosshair(), 0, 32, 32 );
+		
+		level.dogtags[victim.guid] = maps\mp\gametypes\_gameobjects::createUseObject( "any", trigger, visuals, (0,0,16) );
+		
+		maps\mp\gametypes\_objpoints::deleteObjPoint( level.dogtags[victim.guid].objPoints["allies"] );
+		maps\mp\gametypes\_objpoints::deleteObjPoint( level.dogtags[victim.guid].objPoints["axis"] );		
+		
+		level.dogtags[victim.guid] maps\mp\gametypes\_gameobjects::setUseTime( 0 );
+		level.dogtags[victim.guid].onUse = ::onUse;
+		level.dogtags[victim.guid].victim = victim;
+		level.dogtags[victim.guid].victimTeam = victim.team;
+		
+		level thread clearOnVictimDisconnect( victim );
+		victim thread tagTeamUpdater( level.dogtags[victim.guid] );
+	}	
+	
+	level.dogtags[victim.guid].curOrigin = pos;
+	level.dogtags[victim.guid].trigger.origin = pos;
+	level.dogtags[victim.guid].visuals[0].origin = pos;
+	level.dogtags[victim.guid].visuals[1].origin = pos;
+	level.dogtags[victim.guid] maps\mp\gametypes\_gameobjects::initializeTagPathVariables();
+	
+	level.dogtags[victim.guid] maps\mp\gametypes\_gameobjects::allowUse( "any" );	
+			
+	level.dogtags[victim.guid].visuals[0] thread showToTeam( level.dogtags[victim.guid], getOtherTeam( victim.team ) );
+	level.dogtags[victim.guid].visuals[1] thread showToTeam( level.dogtags[victim.guid], victim.team );
+	level.dogtags[victim.guid].attacker = attacker;
+	
+	objective_icon( level.dogtags[victim.guid].teamObjIds[victim.team], "waypoint_dogtags_friendlys" );
+	objective_position( level.dogtags[victim.guid].teamObjIds[victim.team], pos );
+	objective_state( level.dogtags[victim.guid].teamObjIds[victim.team], "active" );
+	Objective_Team( level.dogtags[victim.guid].teamObjIds[victim.team], victim.team );
+	
+	objective_icon( level.dogtags[victim.guid].teamObjIds[enemy_team], "waypoint_dogtags" );
+	objective_position( level.dogtags[victim.guid].teamObjIds[enemy_team], pos );
+	objective_state( level.dogtags[victim.guid].teamObjIds[enemy_team], "active" );
+	Objective_Team( level.dogtags[victim.guid].teamObjIds[enemy_team], enemy_team );	
+	
+	playSoundAtPos( pos, "mp_killconfirm_tags_drop" );
+	
+	victim.extrascore1 = 1; //way to tell client we're downed
+
+	level notify( "sr_player_killed", victim );
+	
+	victim.tagAvailable = true;
+
+	level.dogtags[victim.guid].visuals[0] ScriptModelPlayAnim( "mp_dogtag_spin" );
+	level.dogtags[victim.guid].visuals[1] ScriptModelPlayAnim( "mp_dogtag_spin" );
+}
+
 change_gravity(value)
 {
     setdvar("g_gravity", value);
@@ -906,14 +1041,14 @@ change_timescale(value)
     setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
 }
 
-change_elevators(value)
+change_elevators()
 {
-    setdvar("g_enableelevators", value);
+    setdvar("g_enableelevators", getdvarint("g_enableelevators") == 0 ? 1 : 0);
 }
 
-change_bouncing(value)
+change_bouncing()
 {
-    setdvar("pm_bouncing", value);
+    setdvar("pm_bouncing", getdvarint("pm_bouncing") == 0 ? 1 : 0);
 }
 
 change_health()

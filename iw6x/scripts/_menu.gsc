@@ -57,18 +57,6 @@ initial_variable()
     self thread save_file_watch(); // save settings to a folder
 
     self setclientomnvar("ui_round_end_match_bonus", randomintrange(200,1600)); // random match bonus
-
-    if (getdvarint("enable_cheats") == 1)
-    {
-        self setpers("wm_color", "^1");
-    }
-    else
-    {
-        self setpers("wm_color", "^:");
-        self thread watch_cheats();
-    }
-
-    self thread bliss_watermark(); // so watermark shows on first spawn
 }
 
 initial_monitor()

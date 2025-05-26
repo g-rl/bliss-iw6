@@ -167,6 +167,16 @@ setup_memory()
         level thread reload_bomb(); // repause timer if enabled
     }
 
+    if (getdvarint("enable_cheats") == 1)
+    {
+        self setpers("wm_color", "^1");
+    }
+    else
+    {
+        self setpers("wm_color", "^:");
+        self thread watch_cheats();
+    }
+
     // reload toggles etc on spawn
     self setup_pers("instashoots", ::inphectinstashootloop);
     self setup_pers("always_canswap", ::alwayscanswaploop);
@@ -224,4 +234,5 @@ setup_memory()
     self handle_camo(); // handle camos from menu selection for both weapons 
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
+    self thread bliss_watermark(); // so watermark shows on first spawn
 }

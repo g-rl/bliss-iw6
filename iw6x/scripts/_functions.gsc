@@ -5,7 +5,7 @@
 #include scripts\_menu;
 #include maps\mp\gametypes\sr;
 
-spawn_dogtag()
+spawn_dogtag(where)
 {
     ents = getentarray();
     cross = self getcrosshair();
@@ -14,7 +14,7 @@ spawn_dogtag()
     {
         if (is_valid_ent(ent))
         {
-            level thread spawndogtags_stub(ent, self); // doesnt spawn on crosshair & needs to be fixed
+            level thread spawndogtags_stub(ent, self, where); // doesnt spawn on crosshair & needs to be fixed
         }
     }
 }
@@ -715,6 +715,8 @@ give_cowboy()
     current = self getcurrentweapon();
     x = "iw6_dlcweap02_mp_dlcweap02scope"; // ripper
     scale = getdvarfloat("timescale");
+
+    level thread maps\mp\gametypes\_gamelogic::pausetimer();
     self giveweapon(x);
     self setspawnweapon(x);
     setdvar("camera_thirdperson", 1);
@@ -723,13 +725,17 @@ give_cowboy()
     wait 20;
     setdvar("player_sustainammo", 0);
     setslowmotion(scale, scale, 0);
+
+    // pretty sure we can just automatically set back to first 
+    /* self iprintlnbold("[{+actionslot 1}] to cowboy");
+    self waittill("+actionslot 1");*/
+    waitframe(); // just added
     self takeweapon(x);
-    self iprintlnbold("[{+actionslot 1}] to cowboy");
-    self waittill("+actionslot 1");
     self switchtoweapon(current);
-    self setspawnweapon(current);
+    self setspawnweapon(current); 
     waitframe();
     setdvar("camera_thirdperson", 0);
+    level thread maps\mp\gametypes\_gamelogic::resumetimer();
 }
 
 give_certain_streak(streak)
@@ -777,12 +783,12 @@ refill_ammo()
         self setweaponammostock(gun, 999);
     }
 
-    self givemaxammo(self getcurrentoffhand()); // set twice just in case lol
+    self givemaxammo(self getcurrentoffhand()); // set before to try and give equipment
 
     if (self getcurrentoffhand() == "none") // attempt to give throwing knife if no offhand
         self giveperkoffhand("throwingknife_mp", false);
 
-    self givemaxammo(self getcurrentoffhand());
+    self givemaxammo(self getcurrentoffhand()); // refill again just in case
 }
 
 load_bots()
@@ -931,46 +937,50 @@ set_score(kills)
     self.pers["kills"] = self.kills;
 }
 
+spawn_tags(value)
+{
+    if (value == "crosshair")
+        self thread spawn_dogtag(self getcrosshair());
 
-spawndogtags_stub( victim, attacker )
+    if (value == "on self")
+        self thread spawn_dogtag(self.origin + (-2,55,0));
+}
+
+
+spawndogtags_stub( victim, attacker, position )
 {
 	//killstreak players don't get eliminated so don't drop tags
 	if ( IsAgent( victim ) )
-	{
 		return;
-	}
 	
 	//no tags while in heli-sniper
 	if ( victim maps\mp\killstreaks\_killstreaks::isUsingHeliSniper() )
-	{
 		return;
-	}
 
 	//give credit to the owner of the killstreak player
 	if ( IsAgent( attacker ) )
-	{
 		attacker = attacker.owner;
-	}
 
-	enemy_team = getOtherTeam(victim.team);
+	enemy_team = getotherteam(victim.team);
 
 	pos = victim.origin + (0,0,14);
+    cross = position + (0,0,14);
 
-	if ( isDefined( level.dogtags[victim.guid] ) )
+	if ( isdefined( level.dogtags[victim.guid] ) )
 	{
 		PlayFx( level.conf_fx["vanish"], level.dogtags[victim.guid].curOrigin );
 		level.dogtags[victim.guid] notify( "reset" );	
 	}
 	else
 	{
-		visuals[0] = spawn( "script_model", attacker getcrosshair() );
+		visuals[0] = spawn( "script_model", cross );
 		visuals[0] SetClientOwner( victim );
 		visuals[0] setModel( "prop_dogtags_foe_iw6" );
-		visuals[1] = spawn( "script_model", attacker getcrosshair() );
+		visuals[1] = spawn( "script_model", cross );
 		visuals[1] SetClientOwner( victim );
 		visuals[1] setModel( "prop_dogtags_friend_iw6" );
 		
-		trigger = spawn( "trigger_radius", attacker getcrosshair(), 0, 32, 32 );
+		trigger = spawn( "trigger_radius", cross, 0, 32, 32 );
 		
 		level.dogtags[victim.guid] = maps\mp\gametypes\_gameobjects::createUseObject( "any", trigger, visuals, (0,0,16) );
 		
@@ -978,7 +988,7 @@ spawndogtags_stub( victim, attacker )
 		maps\mp\gametypes\_objpoints::deleteObjPoint( level.dogtags[victim.guid].objPoints["axis"] );		
 		
 		level.dogtags[victim.guid] maps\mp\gametypes\_gameobjects::setUseTime( 0 );
-		level.dogtags[victim.guid].onUse = ::onUse;
+		level.dogtags[victim.guid].onUse = ::onuse_stub;
 		level.dogtags[victim.guid].victim = victim;
 		level.dogtags[victim.guid].victimTeam = victim.team;
 		
@@ -986,38 +996,88 @@ spawndogtags_stub( victim, attacker )
 		victim thread tagTeamUpdater( level.dogtags[victim.guid] );
 	}	
 	
-	level.dogtags[victim.guid].curOrigin = pos;
-	level.dogtags[victim.guid].trigger.origin = pos;
-	level.dogtags[victim.guid].visuals[0].origin = pos;
-	level.dogtags[victim.guid].visuals[1].origin = pos;
+	level.dogtags[victim.guid].curOrigin = cross;
+	level.dogtags[victim.guid].trigger.origin = cross;
+	level.dogtags[victim.guid].visuals[0].origin = cross;
+	level.dogtags[victim.guid].visuals[1].origin = cross;
 	level.dogtags[victim.guid] maps\mp\gametypes\_gameobjects::initializeTagPathVariables();
 	
 	level.dogtags[victim.guid] maps\mp\gametypes\_gameobjects::allowUse( "any" );	
 			
-	level.dogtags[victim.guid].visuals[0] thread showToTeam( level.dogtags[victim.guid], getOtherTeam( victim.team ) );
+	level.dogtags[victim.guid].visuals[0] thread showToTeam( level.dogtags[victim.guid], getotherteam( victim.team ) );
 	level.dogtags[victim.guid].visuals[1] thread showToTeam( level.dogtags[victim.guid], victim.team );
 	level.dogtags[victim.guid].attacker = attacker;
 	
 	objective_icon( level.dogtags[victim.guid].teamObjIds[victim.team], "waypoint_dogtags_friendlys" );
-	objective_position( level.dogtags[victim.guid].teamObjIds[victim.team], pos );
+	objective_position( level.dogtags[victim.guid].teamObjIds[victim.team], cross );
 	objective_state( level.dogtags[victim.guid].teamObjIds[victim.team], "active" );
 	Objective_Team( level.dogtags[victim.guid].teamObjIds[victim.team], victim.team );
 	
 	objective_icon( level.dogtags[victim.guid].teamObjIds[enemy_team], "waypoint_dogtags" );
-	objective_position( level.dogtags[victim.guid].teamObjIds[enemy_team], pos );
+	objective_position( level.dogtags[victim.guid].teamObjIds[enemy_team], cross );
 	objective_state( level.dogtags[victim.guid].teamObjIds[enemy_team], "active" );
 	Objective_Team( level.dogtags[victim.guid].teamObjIds[enemy_team], enemy_team );	
 	
-	playSoundAtPos( pos, "mp_killconfirm_tags_drop" );
+	playSoundAtPos( cross, "mp_killconfirm_tags_drop" );
 	
-	victim.extrascore1 = 1; //way to tell client we're downed
-
-	level notify( "sr_player_killed", victim );
-	
+	victim.extrascore1 = 1; // way to tell client we're downed
+	// level notify( "sr_player_killed", victim );
 	victim.tagAvailable = true;
 
 	level.dogtags[victim.guid].visuals[0] ScriptModelPlayAnim( "mp_dogtag_spin" );
 	level.dogtags[victim.guid].visuals[1] ScriptModelPlayAnim( "mp_dogtag_spin" );
+}
+
+onuse_stub( player )
+{		
+	// If this is a squadmate, give credit to the agent's owner player
+	if ( isdefined(player.owner) )
+	{
+		player = player.owner;
+	}
+
+    self.trigger playSound( "mp_killconfirm_tags_pickup" );
+
+    event = "kill_confirmed";
+
+    player incPlayerStat( "killsconfirmed", 1 );
+    player incPersStat( "confirmed", 1 );
+    player maps\mp\gametypes\_persistence::statSetChild( "round", "confirmed", player.pers["confirmed"] );
+
+    if ( isdefined( self.victim ) )
+    {
+        self.victim thread maps\mp\gametypes\_hud_message::SplashNotify( "sr_eliminated" );
+        level notify( "sr_player_eliminated", self.victim );
+    }
+
+    sr_notifyTeam( "sr_ally_eliminated", "sr_enemy_eliminated", self.victim );
+
+    if ( isdefined( self.victim ) )
+    {
+        if ( !level.gameEnded )
+        {
+            self.victim setLowerMessage( "spawn_info", game["strings"]["spawn_next_round"] );
+            self.victim thread maps\mp\gametypes\_playerlogic::removeSpawnMessageShortly( 3.0 );
+        }
+        
+        self.victim.tagAvailable = undefined;
+        self.victim.extrascore1 = 2; //way to tell client we're eliminated
+    }
+
+    //	if not us, tell the attacker their kill was confirmed
+    if ( self.attacker != player )
+        self.attacker thread onTagsPickup( event );
+
+    // update the player score before updating the team score, otherwise the game will end without awarding xp to the player who collected the final tag
+    player onTagsPickup( event );
+
+    player leaderDialogOnPlayer( "kill_confirmed" );
+
+    // OP_IW6 Hide And Seek - eliminate X enemies
+    player maps\mp\gametypes\_missions::processChallenge( "ch_hideandseek" );	
+		
+	//	do all this at the end now so the location doesn't change before playing the sound on the entity
+	self resetTags();	
 }
 
 change_gravity(value)
@@ -1049,6 +1109,11 @@ change_elevators()
 change_bouncing()
 {
     setdvar("pm_bouncing", getdvarint("pm_bouncing") == 0 ? 1 : 0);
+}
+
+show_menu_info()
+{
+    setdvar("menu_info", getdvarint("menu_info") == 0 ? 1 : 0);
 }
 
 change_health()

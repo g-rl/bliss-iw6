@@ -16,6 +16,7 @@ structure()
     menu_info = list("auto load camos on both guns,options save through rounds,auto round resetting,always auto plant,perks save through classes,dvars & camo save on game quit,teleports on some maps,auto set ranks");
     my_weapons = self getcurrentweaponname() + " & " + self getnextweaponname();
     bind_list = list("sprint loop,lunge,smooth,mala,illusion,glide,care package stall,tilt screen");
+    map = getdvar("mapname");
 
     switch(menu)
     {
@@ -26,7 +27,7 @@ structure()
         self add_option("lobby", credits, ::new_menu, "lobby");
         self add_option("weapons", credits, ::new_menu, "weapons");
         self add_option("clients", credits, ::new_menu, "all clients");
-        self add_option("menu info", credits, ::new_menu, "menu info");
+        if (getdvarint("menu_info") == 1) self add_option("menu info", credits, ::new_menu, "menu info");
         break;
     case "toggles":
         self.is_bind_menu = false;
@@ -43,7 +44,7 @@ structure()
         self add_toggle("equipment swaps", undefined, ::toggle_eq_swap, self.pers["eq_swap"]);
         self add_toggle("instant pumps", undefined, ::toggle_instant_pump, self.pers["instant_pumps"]);
         self add_toggle("instant equipment", undefined, ::toggle_instant_eq, self.pers["instant_eq"]);
-        self add_toggle("instant streaks", undefined, ::toggle_instant_streaks, self.pers["instant_streaks"]);
+        // self add_toggle("instant streaks", undefined, ::toggle_instant_streaks, self.pers["instant_streaks"]);
         if (!is_true(self getpers("game_end_prone"))) self add_toggle("auto prone", undefined, ::toggle_auto_prone, self.pers["auto_prone"]);
         if (!is_true(self getpers("auto_prone"))) self add_toggle("auto prone (game end)", "only prones at end of round", ::toggle_game_end_prone, self.pers["game_end_prone"]);
         self add_toggle("auto reload", undefined, ::toggle_auto_reload, self.pers["auto_reload"]);
@@ -53,16 +54,16 @@ structure()
         if (!is_true(self getpers("is_saved")) && getdvarint("enable_cheats") == 1) self add_toggle("save & load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
         break;
     case "lobby":
-        map = getdvar("mapname");
         self.is_bind_menu = false;
         self add_menu("lobby");
         if (is_true(self.bliss["teleports"][map][4]) && getdvarint("enable_cheats") == 1) // add teleports from utils if any
             self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
         self add_option("dvars", undefined, ::new_menu, "dvars");
-        self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_option("spawn bot", undefined, ::spawnbot);
+        self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
         self add_toggle("enable cheats", undefined, ::enable_cheats, getdvarint("enable_cheats"));
-        self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"), undefined, "dvar");
+        self add_toggle("show menu info", undefined, ::show_menu_info, getdvarint("menu_info"));
+        self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"));
         if (level.gametype == "sr")
         {
             self add_option("pickup bomb", undefined, ::pickup_bomb);
@@ -70,7 +71,7 @@ structure()
             self add_option("end round", undefined, ::end_round);
         }
         self add_array("manage bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
-        // self add_option("spawn dogtag", undefined, ::spawn_dogtag);
+        self add_array("spawn dogtag", slider_controls, ::spawn_tags, list("crosshair,on self"));
         self add_option("cowboy", undefined, ::give_cowboy);
         self add_option("vish", undefined, ::give_vish);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
@@ -98,7 +99,6 @@ structure()
         break;
     case "teleports":
         self.is_bind_menu = false;
-        map = getdvar("mapname");
         self add_menu("teleports - " + self.bliss["teleports"][map][3]);
         for(i = 0; i < self.bliss["teleports"][map][0].size; i++) 
             self add_option(self.bliss["teleports"][map][0][i], undefined, ::set_position, self.bliss["teleports"][map][1][i], self.bliss["teleports"][map][2][i]);

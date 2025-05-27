@@ -9,7 +9,7 @@
 /*
     bliss iw6x @nyli2b
     started: 4/26/25
-    last update: 5/21/25
+    last update: 5/26/25
 
     exe and some functions from mirele @girlmachinery - thank you!!
 */
@@ -150,21 +150,25 @@ setup_memory()
     // only load dvar settings from host data
     if (self ishost())
     {
+        // custom dvars
         setdvarifuni("timescale", 1);
-        setdvarifuni("scr_killcam_time", 5);
         setdvarifuni("timer_paused", 0);
-        setdvarifuni("g_gravity", 800);
-        setdvarifuni("g_speed", 190);
         setdvarifuni("pickup_bomb", 1);
         setdvarifuni("enable_cheats", 0);
+        setdvarifuni("menu_info", 1);
+
+        // game dvars
+        setdvarifuni("scr_killcam_time", 5);
+        setdvarifuni("g_gravity", 800);
+        setdvarifuni("g_speed", 190);
         setdvarifuni("pm_bouncing", 1);
         setdvarifuni("g_enableelevators", 1); // wont get stuck w/ fake eles as much - can toggle in menu
-        setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
 
         if (getdvarint("pickup_bomb") == 1) // auto pickup bomb
             self thread pickup_bomb();
 
         level thread reload_bomb(); // repause timer if enabled
+        setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0); // reset timescale        
     }
 
     if (getdvarint("enable_cheats") == 1)
@@ -205,7 +209,6 @@ setup_memory()
     self setup_bind("glide", false, ::glidebind);
     self setup_bind("care_package", false, ::care_package_stall);
     self setup_bind("tilt", false, ::stz_tilt_bind);
-    // self setup_bind("gunlock", false, ::gunlockbind);
 
     // setup bounce
     self setpersifuniold("bouncecount", "0");

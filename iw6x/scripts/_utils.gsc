@@ -6,6 +6,37 @@
 
 void() {}
 
+is_map(name)
+{
+    if (getdvar("mapname") == map_to_name(name))
+        return true;
+
+    return false;
+}
+
+map_to_name(name)
+{
+    switch(name)
+    {
+        case "flooded":
+            return "mp_flooded";
+        case "prison break":
+            return "mp_prisonbreak";
+        case "freight":
+            return "mp_frag";
+        case "stormfront":
+            return "mp_fahrenheit";
+        case "sovereign":
+            return "mp_sovereign";
+        case "bayview":
+            return "mp_ca_rumble";
+        case "warhawk":
+            return "mp_warhawk";
+        default:
+            return;        
+    }
+}
+
 setup_teleports() // map, origin, angles
 {
     // prison break

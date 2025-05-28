@@ -61,7 +61,7 @@ structure()
         self add_option("dvars", undefined, ::new_menu, "dvars");
         self add_option("spawn bot", undefined, ::spawnbot);
         self add_toggle("freeze & teleport bots", undefined, ::toggle_freeze_bots, self.pers["freeze_bots"]);
-        self add_toggle("enable cheats", undefined, ::enable_cheats, getdvarint("enable_cheats"));
+        self add_toggle("enable cheats", "enable experimental options", ::enable_cheats, getdvarint("enable_cheats"));
         self add_toggle("show menu info", undefined, ::show_menu_info, getdvarint("menu_info"));
         self add_toggle("pause timer", undefined, ::pause_timer, getdvarint("timer_paused"));
         if (level.gametype == "sr")

@@ -7,9 +7,9 @@
 #include scripts\_binds;
 
 /*
-    bliss iw6x @nyli2b
+    bliss iw6 @nyli2b
     started: 4/26/25
-    last update: 5/26/25
+    last update: 5/27/25
 
     exe and some functions from mirele @girlmachinery - thank you!!
 */

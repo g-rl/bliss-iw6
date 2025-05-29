@@ -4,7 +4,7 @@
 #include scripts\_utils;
 #include scripts\_binds;
 #include scripts\_menu;
-#include scripts\_stubs
+#include scripts\_stubs;
 
 bot_positions(map)
 {
@@ -545,30 +545,26 @@ end_game_prone()
 
 toggle_freeze_bots()
 {
-
     self.pers["freeze_bots"] = !toggle(self.pers["freeze_bots"]);
 
     if (self getpers("freeze_bots"))
-    {
-        self thread freeze_loop();
-        
-        // teleport bots to crosshair
+    {    
+        // teleport bots to crosshair & save positions
         ents = getentarray();
         foreach (ent in ents)
-        // if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
         if (is_valid_ent(ent))
         {
             ent setorigin(self getcrosshair());
             self.pers["bot_position"] = ent.origin;
+            self thread freeze_loop();
         }
     }
     else
     {
         self notify("stop_freeze");
-
         ents = getentarray();
         foreach (ent in ents)
-        if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
+        if (is_valid_ent(ent))
             ent freezecontrols(false);
     }
 }
@@ -584,7 +580,7 @@ freeze_loop()
         ents = getentarray();
         foreach (ent in ents)
         {
-            if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
+            if (is_valid_ent(ent))
             {
                 ent freezecontrols(true);
                 ent setstance("stand");

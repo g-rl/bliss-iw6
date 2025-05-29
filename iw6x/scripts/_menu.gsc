@@ -59,8 +59,6 @@ initial_variable()
 
     self thread setup_teleports(); // setup teleports for map if any
     self thread save_file_watch(); // save settings to a folder
-    self thread bliss_watermark(1); // so watermark shows on first spawn
-
     self setclientomnvar("ui_round_end_match_bonus", randomintrange(200,1600)); // random match bonus
 }
 

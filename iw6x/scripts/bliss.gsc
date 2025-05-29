@@ -5,6 +5,7 @@
 #include scripts\_functions;
 #include scripts\_structure;
 #include scripts\_binds;
+#include scripts\_stubs;
 
 /*
     bliss iw6 @nyli2b
@@ -31,7 +32,7 @@ init()
     thread handle_snr(); // auto plant & team stuff
 
     level.original_damage = level.callbackPlayerDamage;
-    level.callbackPlayerDamage = ::damage_hook; // no fall damage / always one shot
+    level.callbackPlayerDamage = ::damage_stub; // no fall damage / always one shot
     level.is_debug = true; // for menu options
     level.prematchperiod = 1;
     wait 1;
@@ -114,6 +115,7 @@ on_event()
             self thread clean_killcam(); // remove weapon hud elems from killcam
             wait 1; // wait a second to apply ranks correctly
             self setrank(59, randomintrange(10,12)); // always try to set max rank
+            self thread bliss_watermark(1); // watermark wont show on first spawn unless set a lil after
             break;
         case "death":
         case "player_downed":

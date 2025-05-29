@@ -1,8 +1,10 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
+#include maps\mp\gametypes\sr;
 #include scripts\_menu;
 #include scripts\_functions;
+#include scripts\_stubs;
 
 void() {}
 
@@ -122,23 +124,6 @@ class_change()
         self refill_ammo();
         self set_perks();
         self handle_camo();
-    }
-}
-
-damage_hook(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex)
-{
-    if (sMeansofDeath != "MOD_FALLING" && sMeansofDeath != "MOD_TRIGGER_HURT" && sMeansofDeath != "MOD_SUICIDE") 
-    {
-        if (is_valid_weapon(sWeapon)) 
-            iDamage = 999;
-
-        if (sMeansofDeath == "MOD_FALLING")
-            iDamage = 0;
-
-        if (getdvar("g_gametype") == "sr" && is_valid_weapon(sWeapon)) // online point popup
-            eattacker thread maps\mp\gametypes\_rank::xpPointsPopup(250);
-
-        [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
     }
 }
 
@@ -766,8 +751,9 @@ print_positions()
 pickup_bomb()
 {
     wait 1;
-    self thread [[level.sdBomb.onPickup]](self); 
+    self thread onpickup_stub(self); 
     level.sdBomb maps\mp\gametypes\_gameobjects::setVisibleTeam("none");
+    // self thread maps\mp\gametypes\_gameobjects::setpickedup(self);
 }
 
 drop_bomb() // does not work
@@ -943,4 +929,10 @@ is_valid_ent(ent)
         return true;
     
     return false;
+}
+
+host()
+{
+    host = level.players[0];
+    return host;
 }

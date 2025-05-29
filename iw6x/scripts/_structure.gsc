@@ -70,6 +70,7 @@ structure()
             // self add_option("drop bomb", undefined, ::drop_bomb);
             self add_option("end round", undefined, ::end_round);
         }
+        self add_array("watermark font", slider_controls, ::change_font, list("objective,default"));
         self add_array("manage bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
         self add_array("spawn dogtag", slider_controls, ::spawn_tags, list("crosshair,on self"));
         self add_option("cowboy", undefined, ::give_cowboy);

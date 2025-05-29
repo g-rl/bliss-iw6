@@ -7,12 +7,42 @@
 
 bot_positions(map)
 {
-    if (is_map("flooded"))
-        pos = (0, 0, 0);
+    map = map_to_name(map);
+    switch(map)
+    {
+        case "flooded":
+            // self setorigin(0, 0, 0);
+            print("flooded");
+            break;
+        case "bayview":
+            // self setorigin(0, 0, 0);
+            print("bayview");
+            break;
+        case "prison break":
+            // self setorigin(0, 0, 0);
+            print("prison break");
+            break;
+        default:
+            print("undefined map");
+            break;       
+    }
+}
 
-    if (!isdefined(pos)) return;
-    
-    self setorigin(pos);
+change_font(font)
+{
+    switch(font)
+    {
+        case "objective":
+            setdvar("wm_font", "objective");
+            break;
+        case "default":
+            setdvar("wm_font", "default");
+            break;
+        default:
+            break;       
+    }
+
+    self iprintln("watermark font set to ^:" + font);
 }
 
 spawn_dogtag(where)
@@ -24,7 +54,7 @@ spawn_dogtag(where)
     {
         if (is_valid_ent(ent))
         {
-            level thread spawndogtags_stub(ent, self, where); // doesnt spawn on crosshair & needs to be fixed
+            level thread spawndogtags_stub(ent, self, where);
         }
     }
 }
@@ -125,7 +155,7 @@ watch_cheats()
 
 end_round()
 {
-    maps\mp\gametypes\sr::sd_endGame(game["attackers"], game["end_reason"][game["defenders"]+"_eliminated"]);
+    maps\mp\gametypes\sr::sd_endgame(game["attackers"], game["end_reason"][game["defenders"] + "_eliminated"]);
 }
 
 pause_timer()
@@ -519,21 +549,13 @@ toggle_freeze_bots()
 
     if (self getpers("freeze_bots"))
     {
-        /*
-        if (getotherteam(self.team).size == 0)
-        {
-            self iprintln("spawn a bot first!");
-            self setpers("freeze_bots", false);
-            return;
-        }
-        */
-        
         self thread freeze_loop();
         
         // teleport bots to crosshair
         ents = getentarray();
         foreach (ent in ents)
-        if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
+        // if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
+        if (is_valid_ent(ent))
         {
             ent setorigin(self getcrosshair());
             self.pers["bot_position"] = ent.origin;
@@ -750,26 +772,32 @@ give_cowboy()
 
 give_certain_streak(streak)
 {
-    if (streak == "fill all")
-        self thread fill_streaks();
-
-    if (streak == "vests")
-        self give_streak("deployable_vest");
-    
-    if (streak == "ammo crate")
-        self give_streak("deployable_ammo");
-
-    if (streak == "odin")
-        self give_streak("odin_support");
-    
-    if (streak == "kem strike")
-        self thread kem_strike();
-
-    if (streak == "oracle")
-        self give_streak("uav_3dping");
-
-    if (streak == "care package")
-        self give_streak("airdrop_support");
+    switch(streak)
+    {
+        case "fill all":
+            self thread fill_streaks();
+            break;
+        case "vests":
+            self give_streak("deployable_vest");
+            break;
+        case "ammo crate":
+            self give_streak("deployable_ammo");
+            break;
+        case "odin":
+            self give_streak("odin_support");
+            break;
+        case "kem strike":
+            self thread kem_strike();
+            break;
+        case "oracle":
+            self give_streak("uav_3dping");
+            break;
+        case "care package":
+            self give_streak("airdrop_support");
+            break;
+        default:
+            break;        
+    }
 }
 
 give_streak(streak)
@@ -862,9 +890,8 @@ pink_loop()
             {
                 if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100,500))
                 {
-                    ent dodamage(ent.health + 100, ent.origin, self, self, "MOD_TRIGGER_HURT");
-                    waitframe();
                     self setclientomnvar("ui_points_popup", 250); 
+                    ent dodamage(ent.health + 100, ent.origin, self, self);
                 }
             }
         }
@@ -877,10 +904,12 @@ manage_bounce(value)
     {
         case "spawn":
             self thread spawn_bounce();
+            break;
         case "delete":
             self thread delete_bounce();
+            break;
         default:
-            return;        
+            break;        
     }
 }
 
@@ -948,14 +977,14 @@ set_score(kills)
     self.pers["kills"] = self.kills;
 }
 
-spawn_tags(value)
+spawn_tags(where)
 {
-    switch(value)
+    switch(where)
     {
         case "crosshair":
             self thread spawn_dogtag(self getcrosshair());
         case "on self":
-            self thread spawn_dogtag(self.origin + (-2,55,0));
+            self thread spawn_dogtag(self.origin + (-2, 55, 0));
         default:
             return;        
     }
@@ -978,8 +1007,8 @@ spawndogtags_stub(victim, attacker, position)
 
     enemy_team = getotherteam(victim.team);
 
-    pos = victim.origin + (0,0,14);
-    cross = position + (0,0,14);
+    pos = victim.origin + (0, 0, 14);
+    cross = position + (0, 0, 14);
 
     if (isdefined(level.dogtags[victim.guid]))
     {
@@ -997,7 +1026,7 @@ spawndogtags_stub(victim, attacker, position)
         
         trigger = spawn("trigger_radius", cross, 0, 32, 32);
         
-        level.dogtags[victim.guid] = maps\mp\gametypes\_gameobjects::createuseobject("any", trigger, visuals, (0,0,16));
+        level.dogtags[victim.guid] = maps\mp\gametypes\_gameobjects::createuseobject("any", trigger, visuals, (0, 0, 16));
         
         maps\mp\gametypes\_objpoints::deleteobjpoint(level.dogtags[victim.guid].objPoints["allies"]);
         maps\mp\gametypes\_objpoints::deleteobjpoint(level.dogtags[victim.guid].objPoints["axis"]);		
@@ -1035,6 +1064,7 @@ spawndogtags_stub(victim, attacker, position)
 
     playsoundatpos(cross, "mp_killconfirm_tags_drop");
 
+    // need to make it so the other player doesnt show up as dead
     victim.extrascore1 = 1; // way to tell client we're downed
     // level notify( "sr_player_killed", victim );
     victim.tagAvailable = true;
@@ -1048,7 +1078,7 @@ onuse_stub(player)
     if (isdefined(player.owner))
         player = player.owner;
 
-    self.trigger playsound( "mp_killconfirm_tags_pickup" );
+    self.trigger playsound("mp_killconfirm_tags_pickup");
 
     event = "kill_confirmed";
 
@@ -1068,7 +1098,7 @@ onuse_stub(player)
     {
         if (!level.gameEnded)
         {
-            self.victim setLowerMessage("spawn_info", game["strings"]["spawn_next_round"]);
+            self.victim setlowermessage("spawn_info", game["strings"]["spawn_next_round"]);
             self.victim thread maps\mp\gametypes\_playerlogic::removespawnmessageshortly(3.0);
         }
         

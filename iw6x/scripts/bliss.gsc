@@ -133,6 +133,7 @@ on_bot_spawned()
     {
         self waittill("spawned_player");
         self thread bot_classes(); // outfit, rank, classes
+        self thread bot_positions(getdvar("mapname"));
     }
 }
 
@@ -156,6 +157,7 @@ setup_memory()
         setdvarifuni("pickup_bomb", 1);
         setdvarifuni("enable_cheats", 0);
         setdvarifuni("menu_info", 1);
+        setdvarifuni("wm_font", "objective");
 
         // game dvars
         setdvarifuni("scr_killcam_time", 5);
@@ -237,5 +239,4 @@ setup_memory()
     self handle_camo(); // handle camos from menu selection for both weapons 
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
-    self thread bliss_watermark(); // so watermark shows on first spawn
 }

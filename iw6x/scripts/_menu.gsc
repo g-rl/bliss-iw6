@@ -6,13 +6,17 @@
 #include scripts\_structure;
 #include scripts\bliss;
 
-bliss_watermark()
+bliss_watermark(type)
 {
-    self.watermark = createfontstring("objective", 1);
+    if (is_true(self.watermark)) self.watermark destroy();
+
+    self.watermark = createfontstring(getdvar("wm_font"), 1);
     self.watermark setpoint("LEFT", "CENTER", -424, 234);
-    self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open " + self getpers("wm_color") + "bliss");
-    self.watermark.showinKillcam = false;
-    self.watermark.hidewheninmenu = true;
+
+    if (is_true(type))
+        self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open " + self getpers("wm_color") + "bliss");
+    else
+        self.watermark set_text("[{+actionslot 1}] + [{+actionslot 2}] to scroll | [{+gostand}] to select | [{+usereload}] to go back | [{+melee_zoom}] to force close");
 }
 
 initial_precache()
@@ -55,6 +59,7 @@ initial_variable()
 
     self thread setup_teleports(); // setup teleports for map if any
     self thread save_file_watch(); // save settings to a folder
+    self thread bliss_watermark(1); // so watermark shows on first spawn
 
     self setclientomnvar("ui_round_end_match_bonus", randomintrange(200,1600)); // random match bonus
 }
@@ -671,7 +676,7 @@ open_menu(menu)
     self set_procedure();
     self create_option();
     setslowmotion(1, 1, 0);
-    self.watermark destroy();
+    self thread bliss_watermark();
     self thread flicker_shaders();
     self notify("opened_menu");
 }
@@ -768,7 +773,7 @@ close_menu()
     self set_procedure();
     self clear_option();
     self clear_all(self.menu["hud"]);
-    self thread bliss_watermark();
+    self thread bliss_watermark(1);
     setslowmotion(getdvarfloat("timescale"), getdvarfloat("timescale"), 0);
     self notify("exit_menu");
 }
@@ -1010,8 +1015,7 @@ update_menu(menu, cursor, force)
     }
 }
 
-// overflow fix that doesnt work
-
+// overflow fix that doesnt work (i think - kinda, maybe)
 overflow_fix_init()
 {
     self.stringTable = [];

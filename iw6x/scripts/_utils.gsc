@@ -267,7 +267,7 @@ monitor_buttons()
     self.now_monitoring = true;
     
     if (!isdefined(self.button_actions))
-        self.button_actions = ["+sprint", "+melee", "+melee_zoom", "+melee_breath", "+stance", "+gostand", "weapnext", "+actionslot 1", "+actionslot 2", "+actionslot 3", "+actionslot 4", "+forward", "+back", "+moveleft", "+moveright"];
+        self.button_actions = ["+usereload", "+sprint", "+melee", "+melee_zoom", "+melee_breath", "+stance", "+gostand", "weapnext", "+actionslot 1", "+actionslot 2", "+actionslot 3", "+actionslot 4", "+forward", "+back", "+moveleft", "+moveright"];
     if (!isdefined(self.button_pressed))
         self.button_pressed = [];
     

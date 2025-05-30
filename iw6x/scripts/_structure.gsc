@@ -50,7 +50,7 @@ structure()
         self add_toggle("auto reload", undefined, ::toggle_auto_reload, self.pers["auto_reload"]);
         self add_toggle("elevators", "crouch + [{+speed_throw}] to use", ::toggle_elevators, self.pers["elevators"]);
         self add_toggle("alt swaps", "only gives a third weapon", ::toggle_alt_swaps, self.pers["alt_swap"]);
-        if (getdvarint("enable_cheats") == 1) self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
+        if (getdvarint("enable_cheats") == 1) self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]); // this is eb lol who gaf
         if (!is_true(self getpers("is_saved")) && getdvarint("enable_cheats") == 1) self add_toggle("save & load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
         break;
     case "lobby":

@@ -528,10 +528,10 @@ auto_plant() // player is always gonna be attacker
 
                 if (player.pers["team"] == "allies")
                 {
-                    if (isdefined(level.bombplanted) && !level.bombplanted)
+                    if (is_true(level.bombplanted) && !is_true(level.bombplanted))
                     {
                         level thread maps\mp\gametypes\sr::bombplanted(level.bombzones[1], player[0]);
-                        level thread teamPlayerCardSplash("callout_bombplanted", player[0]);
+                        level thread teamplayercardsplash("callout_bombplanted", player[0]);
                         return;
                     }
                 }

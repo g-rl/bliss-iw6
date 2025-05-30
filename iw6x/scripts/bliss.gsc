@@ -8,10 +8,11 @@
 #include scripts\_stubs;
 
 /*
-    bliss iw6 @nyli2b
+    bliss iw6 by @nyli2b
     started: 4/26/25
-    last update: 5/27/25
+    last update: 5/30/25
 
+    menu base by xeirh (ported from h1) - edited by me and @mjkzys
     exe and some functions from mirele @girlmachinery - thank you!!
 */
 
@@ -149,16 +150,18 @@ setup_memory()
     self setpersifuniold("unstuck", self.origin);
     self setpersifuni("camo", int(camo_list));
     self setpersifuni("smooth_can_time", "0.2");
-
+    
+    self handle_camo(); // handle camos from menu selection for both weapons 
+    
     // only load dvar settings from host data
     if (self ishost())
     {
         // custom dvars
         setdvarifuni("timescale", 1);
         setdvarifuni("timer_paused", 0);
-        setdvarifuni("pickup_bomb", 1);
+        setdvarifuni("pickup_bomb", 0);
         setdvarifuni("enable_cheats", 0);
-        setdvarifuni("menu_info", 1);
+        setdvarifuni("menu_info", 0);
         setdvarifuni("wm_font", "objective");
 
         // game dvars
@@ -238,7 +241,6 @@ setup_memory()
     }
 
     // apply class stuff after everything
-    self handle_camo(); // handle camos from menu selection for both weapons 
     self set_perks(); // set default & custom set perks on spawn
     self refill_ammo(); // refill ammo cuz why not
 }

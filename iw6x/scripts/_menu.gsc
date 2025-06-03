@@ -658,7 +658,7 @@ open_menu(menu)
     self.current_menu_color = (0.929, 0.518, 0.753);
     // self.current_menu_color = randomfloatrange(0.0, 1);
 
-    self.menu["hud"]["title"]        = self create_text(self get_title(), self.font, self.font_scale, "TOP_LEFT", "TOPCENTER", (self.x_offset + 4), (self.y_offset + 1.75), self.color[4], 1, 10);
+    self.menu["hud"]["title"] = self create_text(self get_title(), self.font, self.font_scale, "TOP_LEFT", "TOPCENTER", (self.x_offset + 4), (self.y_offset + 1.75), self.color[4], 1, 10);
     // outline
     self.menu["hud"]["background"][0] = self create_shader("white", "TOP_LEFT", "TOPCENTER", self.x_offset, (self.y_offset - 1), 222, 34, self.current_menu_color, 0.6, 1);
     // top bar
@@ -667,15 +667,18 @@ open_menu(menu)
     self.menu["hud"]["foreground"][0] = self create_shader("white", "TOP_LEFT", "TOPCENTER", (self.x_offset + 1), (self.y_offset + 16), 220, 16, self.color[1], 0.05, 3);
     // cursor - use these for flickershaders?
     self.menu["hud"]["foreground"][1] = self create_shader("white", "TOP_LEFT", "TOPCENTER", (self.x_offset + 1), (self.y_offset + 16), 214, 16, self.current_menu_color, 0.6, 4);
-    // scrolling bar on the side
     //self.menu["hud"]["foreground"][2] = self create_shader("white", "TOP_RIGHT", "TOPCENTER", (self.x_offset + 221), (self.y_offset + 16), 4, 16, self.current_menu_color, 0.4, 4);
 
     self set_menu(menu);
     self set_procedure();
     self create_option();
     setslowmotion(1, 1, 0);
+
     self thread bliss_watermark();
-    self thread flicker_shaders();
+
+    if(getdvarint("rainbow") == 1)
+        self thread flicker_shaders();
+
     self notify("opened_menu");
 }
 
@@ -691,7 +694,7 @@ flicker_shaders()
     for(;;)
     {
         color = self.current_menu_color;
-        waittime = randomintrange(1,2);
+        waittime = randomintrange(1, 2);
 
         if (!first)
         {

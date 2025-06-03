@@ -16,8 +16,11 @@ damage_stub(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPo
         if (sMeansofDeath == "MOD_FALLING")
             iDamage = 0;
 
+        xp = int(eattacker.plant_xp);
+
         if (getdvar("g_gametype") == "sr" && is_valid_weapon(sWeapon)) // online point popup
-            eattacker thread maps\mp\gametypes\_rank::xpPointsPopup(250);
+            // eattacker thread maps\mp\gametypes\_rank::xpPointsPopup(eattacker.plant_xp);
+            eattacker setclientomnvar("ui_points_popup", xp); // try this instead
 
         [[level.original_damage]](eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex);
     }
@@ -39,7 +42,7 @@ spawndogtags_stub(victim, attacker, position) // allows custom positions
     pos = victim.origin + (0, 0, 14);
     cross = position + (0, 0, 14);
 
-    if (isdefined(level.dogtags[victim.guid]))
+    if (is_true(level.dogtags[victim.guid]))
     {
         playfx(level.conf_fx["vanish"], level.dogtags[victim.guid].curOrigin);
         level.dogtags[victim.guid] notify("reset");	
@@ -104,7 +107,7 @@ spawndogtags_stub(victim, attacker, position) // allows custom positions
 
 onuse_stub(player)
 {		
-    if (isdefined(player.owner))
+    if (is_true(player.owner))
         player = player.owner;
 
     self.trigger playsound("mp_killconfirm_tags_pickup");
@@ -115,7 +118,7 @@ onuse_stub(player)
     player incpersstat("confirmed", 1);
     player maps\mp\gametypes\_persistence::statsetchild("round", "confirmed", player.pers["confirmed"]);
 
-    if (isdefined(self.victim))
+    if (is_true(self.victim))
     {
         self.victim thread maps\mp\gametypes\_hud_message::splashnotify("sr_eliminated");
         level notify("sr_player_eliminated", self.victim);
@@ -123,7 +126,7 @@ onuse_stub(player)
 
     sr_notifyteam("sr_ally_eliminated", "sr_enemy_eliminated", self.victim);
 
-    if (isdefined(self.victim))
+    if (is_true(self.victim))
     {
         if (!level.gameEnded)
         {
@@ -148,10 +151,10 @@ onuse_stub(player)
 onpickup_stub(player) // no longer sets 2d / 3d icons due to console errors
 {
 	player.isBombCarrier = true;
-	player incplayerstat( "bombscarried", 1 );
-	player thread maps\mp\_matchdata::loggameevent( "pickup", player.origin );
+	player incplayerstat("bombscarried", 1);
+	player thread maps\mp\_matchdata::loggameevent("pickup", player.origin);
 	
-	player setclientomnvar( "ui_carrying_bomb", true );
+	player setclientomnvar("ui_carrying_bomb", true);
 	setomnvar("ui_bomb_carrier", player getentitynumber());
 	
 	if (is_true(level.sd_loadout) && is_true(level.sd_loadout[player.team]))

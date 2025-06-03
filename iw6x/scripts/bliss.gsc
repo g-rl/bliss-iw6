@@ -21,7 +21,7 @@ main()
     setdvar("sv_cheats", 1);
     setdvar("g_playercollision", 0);
     setdvar("g_playerejection", 0);
-    setdvar("bg_surfacePenetration", 999999);
+    setdvar("bg_surfacepenetration", 999999);
     setdvar("jump_slowdownenable", 0);
     setdvar("sv_hostname", "bliss [setup & unsetup]");
     setdvar("panelafile", "hello"); // need this for fileread to work
@@ -36,8 +36,8 @@ init()
     level.callbackPlayerDamage = ::damage_stub; // no fall damage / always one shot
     level.is_debug = true; // for menu options
     level.prematchperiod = 1;
-    wait 1;
-    maps\mp\_utility::gameflagset("graceperiod_done");
+    /* wait 1;
+    maps\mp\_utility::gameflagset("graceperiod_done"); */
 }
 
 on_player_connect()
@@ -96,7 +96,7 @@ on_event()
                 if (!isdefined(self.menu))
                     self.menu = [];
 
-                self overflow_fix_init(); // does not work.
+                self overflow_fix_init(); // kinda works lol
                 self thread initial_variable(); // some other player threads are in here - _menu.gsc
                 self thread initial_monitor();
                 self thread monitor_buttons();
@@ -132,11 +132,26 @@ on_bot_spawned()
     self endon("disconnect");
     level endon("game_ended");
 
+    map = getdvar("mapname");
+
     for(;;)
     {
         self waittill("spawned_player");
         self thread bot_classes(); // outfit, rank, classes
-        self thread bot_positions(getdvar("mapname"));
+
+        preset_spawn = true;
+
+        // don't set preset positions if bot is frozen & saved
+        foreach(human in level.players)
+        {
+            if (is_true(human getpers("freeze_bots")))
+            {
+                preset_spawn = false;
+                // human iprintln("isn't setting preset bot positions");
+            }
+        }
+        if (is_true(preset_spawn))
+            self thread bot_positions(map);
     }
 }
 
@@ -145,7 +160,8 @@ setup_memory()
 {
     camo_list = randomize("15,39,33,27,13,36"); // fav camos lol
     perk_list = list("specialty_bulletaccuracy,specialty_quickswap,specialty_fastoffhand,specialty_marathon,specialty_bulletpenetration"); // default perks
-
+    self.plant_xp = 250;
+    
     // using setpersifuniold as well until i fix saving
     self setpersifuniold("unstuck", self.origin);
     self setpersifuni("camo", int(camo_list));
@@ -162,6 +178,7 @@ setup_memory()
         setdvarifuni("pickup_bomb", 0);
         setdvarifuni("enable_cheats", 0);
         setdvarifuni("menu_info", 0);
+        setdvarifuni("rainbow", 1);
         setdvarifuni("wm_font", "objective");
 
         // game dvars

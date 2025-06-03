@@ -6,26 +6,17 @@
 #include scripts\_menu;
 #include scripts\_stubs;
 
-bot_positions(map)
+rainbow_menu()
 {
-    map = map_to_name(map);
-    switch(map)
+    if (getdvarint("rainbow") == 1)
     {
-        case "flooded":
-            // self setorigin(0, 0, 0);
-            print("flooded");
-            break;
-        case "bayview":
-            // self setorigin(0, 0, 0);
-            print("bayview");
-            break;
-        case "prison break":
-            // self setorigin(0, 0, 0);
-            print("prison break");
-            break;
-        default:
-            print("undefined map");
-            break;       
+        setdvar("rainbow", 0);
+        self notify("end_flicker");
+    }
+    else
+    {
+        setdvar("rainbow", 1);
+        self thread flicker_shaders();
     }
 }
 
@@ -40,7 +31,8 @@ change_font(font)
             setdvar("wm_font", "default");
             break;
         default:
-            break;       
+            setdvar("wm_font", "objective");
+            break;
     }
 
     self iprintln("watermark font set to ^:" + font);
@@ -54,9 +46,7 @@ spawn_dogtag(where)
     foreach (ent in ents) // there should only be one bot on the other team so this will work
     {
         if (is_valid_ent(ent))
-        {
             level thread spawndogtags_stub(ent, self, where);
-        }
     }
 }
 bot_classes()
@@ -182,13 +172,9 @@ toggle_knife_lunge()
     self.pers["knife_lunge"] = !toggle(self.pers["knife_lunge"]);
 
     if (self getpers("knife_lunge"))
-    {
         self thread knife_lunge();
-    }
     else
-    {
         self notify("stop_knife_lunge");
-    }
 }
 
 knife_lunge()
@@ -536,7 +522,7 @@ end_game_prone()
     self endon("stop_auto_prone");
     self endon("disconnect");
 
-    for(i=0; i<10; i++)
+    for(i = 0; i < 10; i++)
     {
         self setstance("prone");
         wait 0.1;
@@ -881,13 +867,15 @@ pink_loop()
         self waittill("weapon_fired");
         ents = getentarray();
         center = self getcrosshair();
+        xp = int(self.plant_xp);
+
         foreach (ent in ents)
         {
-            if (ent != self && isdefined(ent.team) && self.team != ent.team && isalive(ent))
+            if (is_valid_ent(ent))
             {
-                if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100,500))
+                if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100, 300))
                 {
-                    self setclientomnvar("ui_points_popup", 250); 
+                    self setclientomnvar("ui_points_popup", xp); 
                     ent dodamage(ent.health + 100, ent.origin, self, self);
                 }
             }

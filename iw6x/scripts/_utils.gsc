@@ -16,26 +16,48 @@ is_map(name)
     return false;
 }
 
+bot_positions(map)
+{
+    map = map_to_name(map);
+    switch(map)
+    {
+        case "flooded":
+            self set_position((83.7021, 789.76, 260.818), (0.229492, -0.589356, 0));
+            // print("flooded");
+            break;
+        case "bayview":
+            // self setorigin(0, 0, 0);
+            print("bayview");
+            break;
+        case "prison break":
+            self set_position((-328.133, 1017.6, 1024.42), (2.20825, -157.5, 0));
+            break;
+        default:
+            break;       
+    }
+    print("trying to set bot position for " + map);
+}
+
 map_to_name(name)
 {
     switch(name)
     {
-        case "flooded":
-            return "mp_flooded";
-        case "prison break":
-            return "mp_prisonbreak";
-        case "freight":
-            return "mp_frag";
-        case "stormfront":
-            return "mp_fahrenheit";
-        case "sovereign":
-            return "mp_sovereign";
-        case "bayview":
-            return "mp_ca_rumble";
-        case "warhawk":
-            return "mp_warhawk";
+        case "mp_flooded":
+            return "flooded";
+        case "mp_prisonbreak":
+            return "prison break";
+        case "mp_frag":
+            return "freight";
+        case "mp_fahrenheit":
+            return "stormfront";
+        case "mp_sovereign":
+            return "sovereign";
+        case "mp_ca_rumble":
+            return "bayview";
+        case "mp_warhawk":
+            return "warhawk";
         default:
-            return;        
+            return "undefined map";        
     }
 }
 
@@ -530,6 +552,7 @@ auto_plant() // player is always gonna be attacker
                 {
                     if (is_true(level.bombplanted) && !is_true(level.bombplanted))
                     {
+                        player.is_planted = 550;
                         level thread maps\mp\gametypes\sr::bombplanted(level.bombzones[1], player[0]);
                         level thread teamplayercardsplash("callout_bombplanted", player[0]);
                         return;

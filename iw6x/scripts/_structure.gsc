@@ -26,9 +26,14 @@ structure()
         self add_option("toggles", credits, ::new_menu, "toggles");
         self add_option("lobby & more", credits, ::new_menu, "lobby & more");
         self add_option("customization", credits, ::new_menu, "customization");
+        self add_option("debugging", credits, ::new_menu, "debugging");
         self add_option("weapons & streaks", credits, ::new_menu, "weapons & streaks");
         self add_option("clients", credits, ::new_menu, "all clients");
         if (getdvarint("menu_info") == 1) self add_option("menu info", credits, ::new_menu, "menu info");
+        break;
+    case "debugging":
+        self.is_bind_menu = false;
+        self add_menu("debugging");
         break;
     case "toggles":
         self.is_bind_menu = false;
@@ -60,6 +65,8 @@ structure()
         self add_toggle("show menu info", undefined, ::show_menu_info, getdvarint("menu_info"));
         self add_toggle("rainbow menu", undefined, ::rainbow_menu, getdvarint("rainbow"));
         self add_array("watermark font", slider_controls, ::change_font, list("objective,default"));
+        self add_increment("watermark x", increment_controls, ::change_x, getdvarint("wm_x"), 0, 900, 2);
+        self add_increment("watermark y", increment_controls, ::change_y, getdvarint("wm_y"), 0, 900, 2);
         break;
     case "lobby & more":
         self.is_bind_menu = false;
@@ -81,7 +88,7 @@ structure()
         self add_option("cowboy", undefined, ::give_cowboy);
         self add_option("vish", undefined, ::give_vish);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);
-        if (is_true(level.is_debug) && self get_name() == "catchet") self add_option("print position", undefined, ::print_positions);
+        if (is_true(level.is_debug) && (self get_name() == "catchet" || self get_name() == "ethan")) self add_option("print position", undefined, ::print_positions);
         if (level.gametype == "dm") self add_option("fast last", undefined, ::fast_last); // add ffa support later
         break;
     case "dvars":

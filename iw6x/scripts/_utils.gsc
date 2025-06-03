@@ -16,7 +16,7 @@ is_map(name)
     return false;
 }
 
-bot_positions(map)
+bot_positions(map) // preset bot positions (only if bot isnt setup)
 {
     map = map_to_name(map);
     switch(map)

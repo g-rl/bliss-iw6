@@ -10,8 +10,11 @@ bliss_watermark(type)
 {
     if (is_true(self.watermark)) self.watermark destroy();
 
+    x = getdvarint("wm_x");
+    y = getdvarint("wm_y");
+
     self.watermark = createfontstring(getdvar("wm_font"), 1);
-    self.watermark setpoint("LEFT", "CENTER", -424, 234);
+    self.watermark setpoint("LEFT", "CENTER", x, y);
 
     if (is_true(type))
         self.watermark set_text("[{+speed_throw}] & [{+actionslot 1}] to open " + self getpers("wm_color") + "bliss");
@@ -72,7 +75,7 @@ initial_monitor()
         {
             if (!self in_menu())
             {
-                if (self adsButtonPressed() && self isbuttonpressed("+actionslot 1"))
+                if (self adsbuttonpressed() && self isbuttonpressed("+actionslot 1"))
                 {
                     if (is_true(self.option_interact))
                     {  
@@ -96,7 +99,7 @@ initial_monitor()
                     self playlocalsound("mp_intel_fail");
                     self playlocalsound("mp_hit_alert");
                 }
-                else if (self UseButtonPressed()) // back
+                else if (self usebuttonpressed()) // back
                 {
                     if (isdefined(self.previous[(self.previous.size - 1)]))
                     {
@@ -374,12 +377,11 @@ create_text(text, font, font_scale, alignment, relative, x_offset, y_offset, col
 
     element maps\mp\gametypes\_hud_util::setpoint(alignment, relative, x_offset, y_offset);
 
-    /*
+    // come back to this
     if (int(text))
         element setvalue(text);
     else
-    */
-    element set_safe_text(self, text);;
+        element set_safe_text(self, text);;
 
     self.element_count++;
 
@@ -532,24 +534,6 @@ add_array(text, summary, function, array, argument_1, argument_2, argument_3)
     self.structure[self.structure.size] = option;
 }
 
-/*
-add_bind(text, summary, function, argument_1, argument_2, argument_3)
-{
-    option               = [];
-    option["text"]       = text;
-    option["summary"]    = summary;
-    option["function"]   = function;
-    option["slider"]     = true;
-    option["is_array"]   = true;
-    option["array"]      = "[{" + list("+actionslot 1,+actionslot 2,+actionslot 3,+actionslot 4") + "}]";
-    option["argument_1"] = argument_1;
-    option["argument_2"] = argument_2;
-    option["argument_3"] = argument_3;
-
-    self.structure[self.structure.size] = option;
-}
-*/
-
 add_bind(name, func, pers, end_on) // lol im so lazy bro idc
 {
     self add_menu(name);
@@ -676,7 +660,7 @@ open_menu(menu)
 
     self thread bliss_watermark();
 
-    if(getdvarint("rainbow") == 1)
+    if (getdvarint("rainbow") == 1)
         self thread flicker_shaders();
 
     self notify("opened_menu");

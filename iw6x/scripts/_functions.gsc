@@ -6,6 +6,16 @@
 #include scripts\_menu;
 #include scripts\_stubs;
 
+change_x(value)
+{
+    setdvar("wm_x", value);
+}
+
+change_y(value)
+{
+    setdvar("wm_y", value);
+}
+
 rainbow_menu()
 {
     if (getdvarint("rainbow") == 1)

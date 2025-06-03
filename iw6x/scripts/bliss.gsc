@@ -7,14 +7,15 @@
 #include scripts\_binds;
 #include scripts\_stubs;
 
-/*
-    bliss iw6 by @nyli2b
+                                                                    /*
+    bliss iw6 by nyli (@nyli2b)
     started: 4/26/25
-    last update: 5/30/25
+    last update: 6/2/25
 
     menu base by xeirh (ported from h1) - edited by me and @mjkzys
     exe and some functions from mirele @girlmachinery - thank you!!
-*/
+    issues? dm @nyli2b on twitter
+                                                                    */
 
 main()
 {
@@ -158,29 +159,31 @@ on_bot_spawned()
 // memory
 setup_memory()
 {
+    self.plant_xp = 250;
     camo_list = randomize("15,39,33,27,13,36"); // fav camos lol
     perk_list = list("specialty_bulletaccuracy,specialty_quickswap,specialty_fastoffhand,specialty_marathon,specialty_bulletpenetration"); // default perks
-    self.plant_xp = 250;
     
     // using setpersifuniold as well until i fix saving
     self setpersifuniold("unstuck", self.origin);
     self setpersifuni("camo", int(camo_list));
     self setpersifuni("smooth_can_time", "0.2");
     
-    self handle_camo(); // handle camos from menu selection for both weapons 
+    self handle_camo(); // handle camos for both weapons 
     
     // only load dvar settings from host data
     if (self ishost())
     {
         // custom dvars
         setdvarifuni("timescale", 1);
+        setdvarifuni("rainbow", 1);
         setdvarifuni("timer_paused", 0);
         setdvarifuni("pickup_bomb", 0);
         setdvarifuni("enable_cheats", 0);
         setdvarifuni("menu_info", 0);
-        setdvarifuni("rainbow", 1);
+        setdvarifuni("wm_x", -424);
+        setdvarifuni("wm_y", 234);
         setdvarifuni("wm_font", "objective");
-
+        
         // game dvars
         setdvarifuni("scr_killcam_time", 5);
         setdvarifuni("g_gravity", 800);
@@ -251,10 +254,11 @@ setup_memory()
     if (!is_true(self.pers["my_perks"][perk]))
         self.pers["my_perks"][perk] = perk;
 
+    // reload bounces
     if (self getpers("bouncecount") >= 1)
     {
         self notify("stop_bounce_loop");
-        self thread bounce_loop(); // watch for placed bounces
+        self thread bounce_loop();
     }
 
     // apply class stuff after everything

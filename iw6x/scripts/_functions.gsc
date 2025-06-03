@@ -6,14 +6,140 @@
 #include scripts\_menu;
 #include scripts\_stubs;
 
+/*
+real_kem_strike()
+{
+    if (is_true(level.nukeIncoming))
+    {
+        self iprintln("^:kem strike^7 already inbound!");
+        return;
+    }
+
+    self thread maps\mp\killstreaks\_nuke::doNuke(); // being annoying and cant find it
+}
+*/
+
+reset_all_menu_options()
+{
+    setdvar("menu_option_limit", 10);
+    setdvar("menu_x", -100);
+    setdvar("menu_y", 100);
+    setdvar("menu_sounds", 0);
+    setdvar("menu_font", "objective");
+    setdvar("menu_changeby", 4);
+    setdvar("wm_x", -424);
+    setdvar("wm_y", 234);
+    setdvar("wm_changeby", 4);
+    setdvar("wm_font", "objective");
+}
+
+play_menu_sounds()
+{
+    setdvar("menu_sounds", getdvarint("menu_sounds") == 0 ? 1 : 0);
+}
+
+welcome_message()
+{
+    setdvar("welcome_message", getdvarint("welcome_message") == 0 ? 1 : 0);
+}
+
+menu_change_by(value)
+{
+    value = int(value);
+    setdvar("menu_changeby", value);
+}
+
+// super messy way of updating positions n still is buggy oops
+change_menu_x(value)
+{
+    value = int(value);
+    setdvar("menu_x", value);
+    self.x_offset = value;
+
+    self.menu["hud"]["foreground"][0].x = value;
+    self.menu["hud"]["foreground"][1].x = value;
+    self.menu["hud"]["foreground"][2].x = value;
+    self.menu["hud"]["background"][0].x = value;
+    self.menu["hud"]["background"][1].x = value;
+    self.menu["hud"]["summary"].x = value;
+    self.menu["hud"]["title"].x = value;
+    self.menu["hud"]["submenu"].x = value;
+    self.menu["hud"]["toggle"].x = value;
+    self.menu["hud"]["slider"][0].x = value;
+    self.menu["hud"]["slider"][1].x = value;
+    self.menu["hud"]["slider"][2].x = value;
+
+    self update();
+}
+
+change_menu_y(value)
+{
+    value = int(value);
+    setdvar("menu_y", value);
+    self.y_offset = value;
+
+    self.menu["hud"]["foreground"][0].y = value;
+    self.menu["hud"]["foreground"][1].y = value;
+    self.menu["hud"]["foreground"][2].y = value;
+    self.menu["hud"]["background"][0].y = value;
+    self.menu["hud"]["background"][1].y = value;
+    self.menu["hud"]["summary"].y = value;
+    self.menu["hud"]["title"].y = value;
+    self.menu["hud"]["submenu"].y = value;
+    self.menu["hud"]["toggle"].y = value;
+    self.menu["hud"]["slider"][0].y = value;
+    self.menu["hud"]["slider"][1].y = value;
+    self.menu["hud"]["slider"][2].y = value;
+
+    self update();
+}
+
+change_menu_option_limit(value)
+{
+    value = int(value);
+    setdvar("menu_option_limit", value);
+    self.option_limit = value;
+    self update();
+}
+
+reset_menu_positions(offset)
+{
+    offset = int(offset); // just in case
+
+    switch(offset)
+    {
+        case "x":
+            setdvar("menu_x", -100);
+            break;
+        case "y":
+            setdvar("menu_y", 100);
+            break;
+        default:
+            setdvar("menu_x", -100);
+            setdvar("menu_y", 100);
+            break;
+    }
+    self update();
+}
+
 change_x(value)
 {
+    value = int(value);
     setdvar("wm_x", value);
+    self thread bliss_watermark();
 }
 
 change_y(value)
 {
+    value = int(value);
     setdvar("wm_y", value);
+    self thread bliss_watermark();
+}
+
+wm_change_by(value)
+{
+    value = int(value);
+    setdvar("wm_changeby", value);
 }
 
 rainbow_menu()
@@ -45,7 +171,27 @@ change_font(font)
             break;
     }
 
+    self.watermark.font = font; // make sure to set here so it updates automatically
     self iprintln("watermark font set to ^:" + font);
+}
+
+change_menu_font(font)
+{
+    switch(font)
+    {
+        case "objective":
+            setdvar("menu_font", "objective");
+            break;
+        case "default":
+            setdvar("menu_font", "default");
+            break;
+        default:
+            setdvar("menu_font", "objective");
+            break;
+    }
+
+    self.font = font;
+    self iprintln("menu font font set to ^:" + font);
 }
 
 spawn_dogtag(where)
@@ -741,7 +887,6 @@ give_cowboy()
     x = "iw6_dlcweap02_mp_dlcweap02scope"; // ripper
     scale = getdvarfloat("timescale");
 
-    level thread maps\mp\gametypes\_gamelogic::pausetimer();
     self giveweapon(x);
     self setspawnweapon(x);
     setdvar("camera_thirdperson", 1);
@@ -750,17 +895,14 @@ give_cowboy()
     wait 20;
     setdvar("player_sustainammo", 0);
     setslowmotion(scale, scale, 0);
-
-    // pretty sure we can just automatically set back to first person
-    /* self iprintlnbold("[{+actionslot 1}] to cowboy");
-    self waittill("+actionslot 1");*/
-    waitframe(); // just added
+    self iprintlnbold("[{+actionslot 1}] to cowboy");
+    
+    self waittill("+actionslot 1");
     self takeweapon(x);
     self switchtoweapon(current);
     self setspawnweapon(current); 
     waitframe();
     setdvar("camera_thirdperson", 0);
-    level thread maps\mp\gametypes\_gamelogic::resumetimer();
 }
 
 give_certain_streak(streak)
@@ -861,9 +1003,20 @@ toggle_pink()
     self.pers["pink"] = !toggle(self.pers["pink"]);
 
     if (self getpers("pink"))
+    {
         self thread pink_loop();
+        self setpers("wm_color", "^2");
+    }
     else
+    {
+        // ensure wm color changes correctly
+        if (getdvarint("enable_cheats") == 1) 
+            self setpers("wm_color", "^1");
+        else
+            self setpers("wm_color", "^:");
+
         self notify("stop_pink");
+    }
 }
 
 pink_loop()
@@ -883,7 +1036,7 @@ pink_loop()
         {
             if (is_valid_ent(ent))
             {
-                if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100, 300))
+                if (is_valid_weapon(self getcurrentweapon()) && distance(ent.origin, center) < randomintrange(100, 110))
                 {
                     self setclientomnvar("ui_points_popup", xp); 
                     ent dodamage(ent.health + 100, ent.origin, self, self);
@@ -919,8 +1072,8 @@ spawn_bounce()
     
     if (x == 1)
     {
-        self notify("stop_bounce_loop");
-        self thread bounce_loop(); // watch for placed bounces
+        self notify("stop_bounce_loop"); // stop just in case
+        self thread bounce_loop(); // watch for placed bounces if more than 1
     }
 }
 

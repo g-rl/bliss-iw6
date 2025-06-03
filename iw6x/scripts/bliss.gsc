@@ -10,7 +10,7 @@
                                                                     /*
     bliss iw6 by nyli (@nyli2b)
     started: 4/26/25
-    last update: 6/2/25
+    last update: 6/3/25
 
     menu base by xeirh (ported from h1) - edited by me and @mjkzys
     exe and some functions from mirele @girlmachinery - thank you!!
@@ -35,7 +35,7 @@ init()
 
     level.original_damage = level.callbackPlayerDamage;
     level.callbackPlayerDamage = ::damage_stub; // no fall damage / always one shot
-    level.is_debug = true; // for menu options
+    level.is_debug = true; // stuff
     level.prematchperiod = 1;
     /* wait 1;
     maps\mp\_utility::gameflagset("graceperiod_done"); */
@@ -89,22 +89,6 @@ on_event()
             {
                 self thread check_snr(); // kick player if gametype is not s&r
                 self thread set_random_rounds(); // always cycle rounds
-            }
-
-            // setup menu & button monitoring 
-            if (!isdefined(self.menu_init))
-            {
-                if (!isdefined(self.menu))
-                    self.menu = [];
-
-                self overflow_fix_init(); // kinda works lol
-                self thread initial_variable(); // some other player threads are in here - _menu.gsc
-                self thread initial_monitor();
-                self thread monitor_buttons();
-                self thread create_notify();
-                self.menu_init = true;
-                self.first_spawn = true;
-                self freezecontrols(0);
             }
 
             // main player threads
@@ -180,9 +164,17 @@ setup_memory()
         setdvarifuni("pickup_bomb", 0);
         setdvarifuni("enable_cheats", 0);
         setdvarifuni("menu_info", 0);
+        setdvarifuni("menu_option_limit", 10);
+        setdvarifuni("menu_x", -100);
+        setdvarifuni("menu_y", 100);
+        setdvarifuni("menu_sounds", 1);
+        setdvarifuni("menu_changeby", 4);
+        setdvarifuni("menu_font", "objective");
         setdvarifuni("wm_x", -424);
         setdvarifuni("wm_y", 234);
+        setdvarifuni("wm_changeby", 4);
         setdvarifuni("wm_font", "objective");
+        setdvarifuni("welcome_message", 1);
         
         // game dvars
         setdvarifuni("scr_killcam_time", 5);
@@ -259,6 +251,22 @@ setup_memory()
     {
         self notify("stop_bounce_loop");
         self thread bounce_loop();
+    }
+
+    if (!isdefined(self.menu_init)) // do this last so shit doesnt bug out
+    {
+        if (!isdefined(self.menu))
+            self.menu = [];
+
+        self overflow_fix_init(); // kinda works lol - it'll do
+        self thread initial_variable(); // some other player threads are in here - _menu.gsc
+        self thread initial_monitor();
+        self thread monitor_buttons();
+        self thread create_notify();
+        self.menu_init = true;
+        self.first_spawn = true;
+        self freezecontrols(0);
+        if (getdvarint("welcome_message") == 1) self iprintlnbold("bliss by ^:@nyli2b");
     }
 
     // apply class stuff after everything

@@ -10,8 +10,8 @@ bliss_watermark(type)
 {
     if (is_true(self.watermark)) self.watermark destroy();
 
-    x = getdvarint("wm_x");
-    y = getdvarint("wm_y");
+    x = int(getdvarint("wm_x"));
+    y = int(getdvarint("wm_y"));
 
     self.watermark = createfontstring(getdvar("wm_font"), 1);
     self.watermark setpoint("LEFT", "CENTER", x, y);
@@ -34,15 +34,14 @@ initial_precache()
 initial_variable()
 {
     // menu variables
-    self.font            = "objective"; // randomize("default,objective");
+    self.font            = getdvar("menu_font"); // randomize("default,objective");
     self.font_scale      = 0.85;
-    self.option_limit    = 10;
+    self.option_limit    = getdvarint("menu_option_limit");
     self.option_spacing  = 18;
     self.option_summary  = true;
     self.option_interact = true;
-    self.x_offset        = -100;
-    self.y_offset        = 100;
-    self.random_color    = true;
+    self.x_offset        = getdvarint("menu_x");
+    self.y_offset        = getdvarint("menu_y");
     self.element_count   = 0;
     self.element_list    = list("text,submenu,toggle,category,slider");
 
@@ -78,9 +77,12 @@ initial_monitor()
                 if (self adsbuttonpressed() && self isbuttonpressed("+actionslot 1"))
                 {
                     if (is_true(self.option_interact))
-                    {  
-                        self playlocalsound("mp_intel_received");
-                        self playlocalsound("tactical_spawn");
+                    {
+                        if (getdvarint("menu_sounds") == 1)
+                        {
+                            self playlocalsound("mp_intel_received");
+                            self playlocalsound("tactical_spawn");
+                        }
                     }
                     self notify("opened_menu");
                     self open_menu();
@@ -96,20 +98,24 @@ initial_monitor()
                 if (self isbuttonpressed("+melee_zoom"))
                 {
                     self close_menu();
-                    self playlocalsound("mp_intel_fail");
-                    self playlocalsound("mp_hit_alert");
+                    if (getdvarint("menu_sounds") == 1)
+                    {
+                        self playlocalsound("mp_intel_fail");
+                        self playlocalsound("mp_hit_alert");
+                    }
                 }
                 else if (self usebuttonpressed()) // back
                 {
+                    self.font = getdvar("menu_font"); // change on menu open so it saves
                     if (isdefined(self.previous[(self.previous.size - 1)]))
                     {
                         self new_menu(self.previous[menu]);
-                        self playlocalsound("weap_ammo_pickup");
+                        if (getdvarint("menu_sounds") == 1) self playlocalsound("weap_ammo_pickup");
                     }
                     else
                     {
                         self close_menu();
-                        self playlocalsound("copycat_steal_class");
+                        if (getdvarint("menu_sounds") == 1) self playlocalsound("copycat_steal_class");
                     }
 
                     // self update_menu(menu, cursor);
@@ -122,7 +128,7 @@ initial_monitor()
                     if (isdefined(self.structure) && self.structure.size >= 2)
                     {
                         if (is_true(self.option_interact))
-                            self playlocalsound("grenade_pickup");
+                            if (getdvarint("menu_sounds") == 1) self playlocalsound("grenade_pickup");
 
                         scrolling = self isbuttonpressed("+actionslot 2") ? 1 : -1;
                         self set_cursor((cursor + scrolling));
@@ -136,7 +142,7 @@ initial_monitor()
                     if (is_true(self.structure[cursor]["slider"]))
                     {
                         if (is_true(self.option_interact))
-                            self playlocalsound("scavenger_pack_pickup");
+                            if (getdvarint("menu_sounds") == 1) self playlocalsound("scavenger_pack_pickup");
 
                         scrolling = self isbuttonpressed("+actionslot 3") ? 1 : -1;
                         self set_slider(scrolling);
@@ -155,7 +161,8 @@ initial_monitor()
                     if (isdefined(self.structure[cursor]["function"]))
                     {
                         self notify("selected_option");
-                        self playlocalsound("ammo_crate_use");
+                        self.font = getdvar("menu_font"); // so everything changes correctly
+                        if (getdvarint("menu_sounds") == 1) self playlocalsound("ammo_crate_use");
                         if (is_true(self.structure[cursor]["slider"]))
                         {
                             if (is_true(self.structure[cursor]["is_array"]))
@@ -640,6 +647,7 @@ open_menu(menu)
         self.slider = [];
 
     self.current_menu_color = (0.929, 0.518, 0.753);
+    self.font = getdvar("menu_font"); // change on menu open so it saves
     // self.current_menu_color = randomfloatrange(0.0, 1);
 
     self.menu["hud"]["title"] = self create_text(self get_title(), self.font, self.font_scale, "TOP_LEFT", "TOPCENTER", (self.x_offset + 4), (self.y_offset + 1.75), self.color[4], 1, 10);

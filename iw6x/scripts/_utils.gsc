@@ -26,7 +26,7 @@ bot_positions(map) // preset bot positions (only if bot isnt setup)
             // print("flooded");
             break;
         case "bayview":
-            // self setorigin(0, 0, 0);
+            self set_position((159.214, 10.5442, 13.7296), (2.67105, -109.435, 0));
             print("bayview");
             break;
         case "prison break":
@@ -35,7 +35,7 @@ bot_positions(map) // preset bot positions (only if bot isnt setup)
         default:
             break;       
     }
-    print("trying to set bot position for " + map);
+    if (is_true(level.is_debug)) print("trying to set bot position for " + map);
 }
 
 map_to_name(name)
@@ -839,7 +839,7 @@ setdvarifuni(dvar, value)
     setdvar(dvar, fileread("bliss/" + dvar));
 
     level.savedvar[dvar] = value;
-    waitframe();
+    // waitframe();
 }
 
 toggle_pers(pers)

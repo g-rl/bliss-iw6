@@ -26,7 +26,7 @@ structure()
         self add_option("toggles", credits, ::new_menu, "toggles");
         self add_option("lobby & more", credits, ::new_menu, "lobby & more");
         self add_option("customization", credits, ::new_menu, "customization");
-        self add_option("debugging", credits, ::new_menu, "debugging");
+        // if (is_true(level.is_debug)) self add_option("debugging", credits, ::new_menu, "debugging");
         self add_option("weapons & streaks", credits, ::new_menu, "weapons & streaks");
         self add_option("clients", credits, ::new_menu, "all clients");
         if (getdvarint("menu_info") == 1) self add_option("menu info", credits, ::new_menu, "menu info");
@@ -56,21 +56,41 @@ structure()
         self add_toggle("auto reload", undefined, ::toggle_auto_reload, self.pers["auto_reload"]);
         self add_toggle("elevators", "crouch + [{+speed_throw}] to use", ::toggle_elevators, self.pers["elevators"]);
         self add_toggle("alt swaps", "only gives a third weapon", ::toggle_alt_swaps, self.pers["alt_swap"]);
-        if (getdvarint("enable_cheats") == 1) self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]); // this is eb lol who gaf
+        if (getdvarint("enable_cheats") == 1) self add_toggle("better weapon spread", undefined, ::toggle_pink, self.pers["pink"]);
         if (!is_true(self getpers("is_saved")) && getdvarint("enable_cheats") == 1) self add_toggle("save & load", undefined, ::toggle_save_and_load, self.pers["save_and_load"]);
         break;
     case "customization":
         self.is_bind_menu = false;
         self add_menu("customization");
+        self add_option("edit watermark", "edit watermark settings", ::new_menu, "watermark");
+        self add_option("edit menu", "edit menu options (kinda buggy)", ::new_menu, "menu settings");
+        self add_toggle("welcome message", undefined, ::welcome_message, getdvarint("welcome_message"));
+        break;
+    case "menu settings":
+        self.is_bind_menu = false;
+        self add_menu("menu settings");
         self add_toggle("show menu info", undefined, ::show_menu_info, getdvarint("menu_info"));
-        self add_toggle("rainbow menu", undefined, ::rainbow_menu, getdvarint("rainbow"));
+        self add_toggle("play menu sounds", undefined, ::play_menu_sounds, getdvarint("menu_sounds"));
+        self add_toggle("toggle rainbow", undefined, ::rainbow_menu, getdvarint("rainbow"));
+        self add_array("font", slider_controls, ::change_menu_font, list("objective,default"));
+        self add_increment("option limit", increment_controls, ::change_menu_option_limit, getdvarint("menu_option_limit"), 5, 11, 1);
+        self add_increment("x offset", "close menu to fix issues", ::change_menu_x, getdvarint("menu_x"), -600, 900, getdvarint("menu_changeby"));
+        self add_increment("y offset", "close menu to fix issues", ::change_menu_y, getdvarint("menu_y"), 0, 900, getdvarint("menu_changeby"));
+        self add_increment("change by", increment_controls, ::menu_change_by, getdvarint("menu_changeby"), 2, 20, 2);
+        // self add_array("reset offset", slider_controls, ::reset_menu_positions, list("x,y"));
+        // self add_option("reset all menu settings", undefined, ::reset_all_menu_options);
+        break;
+    case "watermark":
+        self.is_bind_menu = false;
+        self add_menu("watermark settings");
         self add_array("watermark font", slider_controls, ::change_font, list("objective,default"));
-        self add_increment("watermark x", increment_controls, ::change_x, getdvarint("wm_x"), 0, 900, 2);
-        self add_increment("watermark y", increment_controls, ::change_y, getdvarint("wm_y"), 0, 900, 2);
+        self add_increment("x offset", increment_controls, ::change_x, getdvarint("wm_x"), -600, 900, getdvarint("wm_changeby"));
+        self add_increment("y offset", increment_controls, ::change_y, getdvarint("wm_y"), 0, 900, getdvarint("wm_changeby"));
+        self add_increment("change by", increment_controls, ::wm_change_by, getdvarint("wm_changeby"), 2, 20, 2);
         break;
     case "lobby & more":
         self.is_bind_menu = false;
-        self add_menu("lobby");
+        self add_menu("lobby settings");
         if (is_true(self.bliss["teleports"][map][4]) && getdvarint("enable_cheats") == 1) // add teleports from utils if any
             self add_option("map teleports (" + self.bliss["teleports"][map][0].size + ")", undefined, ::new_menu, "teleports");
         self add_option("dvars", undefined, ::new_menu, "dvars");
@@ -85,6 +105,7 @@ structure()
             self add_array("spawn dogtag", slider_controls, ::spawn_tags, list("crosshair,on self"));
         }
         self add_array("manage bounces", slider_controls, ::manage_bounce, list("spawn,delete"));
+        // self add_option("start kem strike", undefined, ::real_kem_strike);
         self add_option("cowboy", undefined, ::give_cowboy);
         self add_option("vish", undefined, ::give_vish);
         self add_option("unstuck", "go back to your first spawn", ::unstuck);

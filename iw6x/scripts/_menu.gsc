@@ -10,8 +10,8 @@ bliss_watermark(type)
 {
     if (is_true(self.watermark)) self.watermark destroy();
 
-    x = int(getdvarint("wm_x"));
-    y = int(getdvarint("wm_y"));
+    x = getdvarint("wm_x");
+    y = getdvarint("wm_y");
 
     self.watermark = createfontstring(getdvar("wm_font"), 1);
     self.watermark setpoint("LEFT", "CENTER", x, y);

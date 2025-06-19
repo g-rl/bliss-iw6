@@ -175,7 +175,8 @@ setup_memory()
         setdvarifuni("wm_changeby", 4);
         setdvarifuni("wm_font", "objective");
         setdvarifuni("welcome_message", 1);
-        
+        setdvarifuni("g_watermark", 1);
+
         // game dvars
         setdvarifuni("scr_killcam_time", 5);
         setdvarifuni("g_gravity", 800);

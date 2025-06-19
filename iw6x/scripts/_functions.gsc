@@ -191,7 +191,7 @@ change_menu_font(font)
     }
 
     self.font = font;
-    self iprintln("menu font font set to ^:" + font);
+    self iprintln("menu font set to ^:" + font);
 }
 
 spawn_dogtag(where)
@@ -407,7 +407,7 @@ drop_canswap()
     self setdropcamo(weapons, self getpers("camo")); // apply camo to weapon before dropping
 }
 
-weapon_settings(setting)
+weapon_settings(setting) // add switch to this 
 {
     if (setting == "drop canswap")
         self thread drop_canswap();

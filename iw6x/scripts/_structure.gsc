@@ -83,6 +83,7 @@ structure()
     case "watermark":
         self.is_bind_menu = false;
         self add_menu("watermark settings");
+        self add_toggle("toggle watermark", undefined, ::toggle_watermark, getdvarint("g_watermark"));
         self add_array("watermark font", slider_controls, ::change_font, list("objective,default"));
         self add_increment("x offset", increment_controls, ::change_x, getdvarint("wm_x"), -600, 900, getdvarint("wm_changeby"));
         self add_increment("y offset", increment_controls, ::change_y, getdvarint("wm_y"), 0, 900, getdvarint("wm_changeby"));

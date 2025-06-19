@@ -6,12 +6,28 @@
 #include scripts\_structure;
 #include scripts\bliss;
 
+toggle_watermark()
+{
+    if (getdvarint("g_watermark") == 1)
+    {
+        setdvar("g_watermark", 0);
+        self.watermark destroy();
+    }
+    else
+    {
+        setdvar("g_watermark", 1);
+        self thread bliss_watermark();
+    }
+}
+
 bliss_watermark(type)
 {
     if (is_true(self.watermark)) self.watermark destroy();
 
     x = getdvarint("wm_x");
     y = getdvarint("wm_y");
+
+    if (getdvarint("g_watermark") == 0) return;
 
     self.watermark = createfontstring(getdvar("wm_font"), 1);
     self.watermark setpoint("LEFT", "CENTER", x, y);

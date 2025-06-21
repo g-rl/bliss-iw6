@@ -1,4 +1,4 @@
 # bliss
 
 - drag into iw6x root directory
-- exe required - thank u panela
+- exe required or it won't work - thank u mirele
